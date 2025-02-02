@@ -92,8 +92,9 @@ function Validate-MACAddressString {
     process {
         # Ensure input is not null or empty
         if ([string]::IsNullOrWhiteSpace($MacAddress)) {
-            Write-Error "Invalid input: MAC address cannot be empty or null."
-            return
+            $err = "Invalid input: MAC address cannot be empty or null."
+            Write-Error $err
+            return $false, $err
         }
 
         # Remove common separators and whitespace
@@ -101,14 +102,16 @@ function Validate-MACAddressString {
 
         # Validate length
         if ($cleanedMac.Length -ne 12) {
-            Write-Error "Invalid MAC address length: $MacAddress"
-            return
+            $err = "Invalid MAC address length: $MacAddress"
+            Write-Error $err
+            return $false, $err
         }
 
         # Validate that all characters are hexadecimal (0-9, A-F)
         if ($cleanedMac -notmatch '^[0-9A-Fa-f]{12}$') {
-            Write-Error "Invalid MAC address format: contains non-hexadecimal characters - $MacAddress"
-            return
+            $err = "Invalid MAC address format: contains non-hexadecimal characters - $MacAddress"
+            Write-Error $err
+            return $false, $err
         }
 
         # Convert to uppercase for consistency
@@ -116,8 +119,9 @@ function Validate-MACAddressString {
 
         # Check if it's a broadcast address (FF:FF:FF:FF:FF:FF)
         if ($cleanedMac -eq 'FFFFFFFFFFFF') {
-            Write-Error "Invalid MAC address: Cannot be a broadcast address - $MacAddress"
-            return
+            $err = "Invalid MAC address: Cannot be a broadcast address - $MacAddress"
+            Write-Error $err
+            return $false, $err
         }
 
         # Extract first byte and convert it to an integer
@@ -125,16 +129,18 @@ function Validate-MACAddressString {
 
         # Check if it's a multicast address (first byte's least significant bit is 1)
         if ($firstByte -band 1) {
-            Write-Error "Invalid MAC address: Cannot be a multicast address - $MacAddress"
-            return
+            $err = "Invalid MAC address: Cannot be a multicast address - $MacAddress"
+            Write-Error $err
+            return $false, $err
         }
 
         # Check if it is a valid OUI
         if (-not $SkipOUI) {
             $OUIList = Get-IEEEOUIList -CacheDays 1
             if (-not (Validate-OUI -MacAddress $cleanedMac -OUIHashTable $OUIList)) {
-                Write-Error "Unregistered OUI: $OUI is not found in the official IEEE list."
-                return
+                $err = "Unregistered OUI: $OUI is not found in the official IEEE list."
+                Write-Error $err
+                return $false, $err
             }
         }
 
@@ -143,6 +149,7 @@ function Validate-MACAddressString {
         # Format as colon-separated uppercase
         $formattedMac = ($cleanedMac -split '(?<=\G.{2})(?=.)') -join ':'
         Write-Output $formattedMac
+        return $true, $formattedMac
     }
 }
 
