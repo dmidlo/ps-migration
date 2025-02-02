@@ -65,7 +65,7 @@ function Start-psMigration {
     # Start the migration server (this happens in both Dev and non-Dev modes)
     try {
         if(-not $Test) {
-            Start-psMigrationServer -HttpPort $HttpPort -HttpsPort $HttpsPort
+            Start-psMigrationServer -HttpPort $HttpPort -HttpsPort $HttpsPort -Dev:$Dev.IsPresent
             Write-Verbose "psMigration server started on HTTP port $HttpPort and HTTPS port $HttpsPort."
         }
     }
