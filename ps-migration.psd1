@@ -21,7 +21,7 @@
     Description       = 'A Pode.Web-based module for migrating users, building custom routes/pages/widgets, etc.'
 
     # Minimum version of the PowerShell host required by this module
-    PowerShellVersion = '7.5.0'
+    PowerShellVersion = '7.4.6'
 
     # Modules that must be installed from the gallery
     RequiredModules   = @(
