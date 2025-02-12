@@ -1,28 +1,79 @@
 function Get-DataHash {
+    <#
+    .SYNOPSIS
+        Computes a SHA-256 hash of a PowerShell object after normalizing its structure.
+
+    .DESCRIPTION
+        - Recursively normalizes a given PowerShell object by:
+          - Removing specified fields (e.g., `_id`, `Guid`, `Hash`, etc.).
+          - Sorting dictionary keys deterministically.
+          - Sorting lists if they contain comparable scalar values.
+          - Supports heterogeneous and deeply nested types.
+
+        - Converts the normalized object to a JSON string.
+        - Computes and returns the SHA-256 hash of the JSON string.
+
+    .PARAMETER DataObject
+        The input object to be normalized and hashed.
+
+    .PARAMETER FieldsToIgnore
+        An array of field names to be excluded from the normalization and hashing process.
+
+    .PARAMETER Debug
+        If specified, outputs intermediate debugging information.
+
+    .OUTPUTS
+        A hashtable containing:
+        - `NormalizedData`: The processed object after normalization.
+        - `Json`: The serialized JSON representation of the normalized object.
+        - `Hash`: The computed SHA-256 hash.
+    #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [PSCustomObject] $DataObject,
+        [PSObject]$DataObject,
 
-        [string[]] $FieldsToIgnore = @('_id', 'Guid', 'Id', 'Hash', 'META_UTCCreated', 'META_UTCUpdated', 'Count', 'Length')
+        [string[]]$FieldsToIgnore = @('_id', 'Guid', 'Hash', 'META_UTCCreated', 'META_UTCUpdated', 'Count', 'Length')
+
     )
 
-    # Convert object to JSON and back to remove ignored fields and sort properties
-    $processed = $DataObject | ConvertTo-Json -Depth 15 | ConvertFrom-Json
+    # Convert FieldsToIgnore array into a HashSet for O(1) lookups
+    $ignoreFields = [System.Collections.Generic.HashSet[string]]::new($FieldsToIgnore, [System.StringComparer]::OrdinalIgnoreCase)
 
-    # Remove ignored fields dynamically
-    foreach ($field in $FieldsToIgnore) {
-        $processed.PSObject.Properties.Remove($field)
+    if ($null -eq $DataObject) {
+        $json = 'null'
+        return @{
+            NormalizedData = $null
+            Json           = $json
+            Hash           = Compute-HashSHA256 $json
+        }
     }
 
-    # Convert the cleaned object back to a stable JSON format
-    $json = $processed | ConvertTo-Json -Depth 15 -Compress
+    try {
+        $normalizedData = Normalize-Data -InputObject $DataObject -IgnoreFields $ignoreFields
+    }
+    catch {
+        throw "Normalization Error: $_"
+    }
 
-    # Compute SHA256 hash
-    $sha256  = [System.Security.Cryptography.SHA256]::Create()
-    $bytes   = [System.Text.Encoding]::UTF8.GetBytes($json)
-    $hash    = $sha256.ComputeHash($bytes)
-    $hashHex = [BitConverter]::ToString($hash) -replace '-',''
+    try {
+        $json = ConvertTo-Json -InputObject $normalizedData -Compress -Depth 50
+    }
+    catch {
+        throw "JSON Serialization Error: $_"
+    }
 
-    return $hashHex
+    # Compute the hash once and store
+    $hash = Compute-HashSHA256 $json
+
+    # Write-Host "`n=== Normalized Data ===`n$(ConvertTo-Json -InputObject $normalizedData -Depth 50 | Out-String)"
+    # Write-Host "`n=== Serialized JSON ===`n$json"
+    # Write-Host "`n=== Computed Hash ===`n$hash"
+
+    return @{
+        NormalizedData = $normalizedData
+        Json           = $json
+        Hash           = $hash
+    }
 }
+
