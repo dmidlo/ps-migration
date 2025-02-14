@@ -55,7 +55,7 @@ function Normalize-Data {
         return $null
     }
 
-    # Remainder of the original logic:
+    # Triadic Recusive function suite start. 
     if ($InputObject -is [System.Collections.IDictionary] -or $InputObject -is [PSCustomObject]) {
         return Normalize-Dictionary -Dictionary $InputObject -IgnoreFields $IgnoreFields
     }
