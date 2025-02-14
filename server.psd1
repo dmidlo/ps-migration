@@ -5,7 +5,7 @@
     PlymouthSearchScopeDN = "OU=MP Users,OU=CMI Users,OU=CMI,DC=northstar,DC=local"
     northstarSearchScopeDN = "DC=northstar,DC=local"
     databasePath = ".\StoredObjects\ps-migration.db"
-    dhcptestPath = "C:\Users\AVT.ASA\Desktop\CMIENTRAIDSYNC-Archive\bin\dhcptest-0.9-win64.exe"
+    dhcptestPath = ".\private\bin\dhcptest-0.9-win64.exe"
     Server = @{
         Ssl = @{
             Protocols = @("TLS","TLS11","TLS12")
