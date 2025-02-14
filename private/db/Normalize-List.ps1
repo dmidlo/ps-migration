@@ -27,9 +27,7 @@ function Normalize-List {
     }) -notcontains $false
 
     if (-not $canSort) {
-        # ---------------------------------------------------------------------
-        # CUSTOM BLOCK for sorting dictionaries by their canonical string form:
-        # ---------------------------------------------------------------------
+        #  sorting dictionaries by their canonical string form:
         # 1. Check if *all* non-null items are dictionaries:
         $allDicts = $true
         foreach ($item in $nonNullValues) {
