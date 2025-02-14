@@ -55,7 +55,7 @@ function Normalize-Data {
         return $null
     }
 
-    # Triadic Recusive function suite start. 
+    # Indirect Triadic Recusive function suite start. careful, this one might just be an Ouroboros
     if ($InputObject -is [System.Collections.IDictionary] -or $InputObject -is [PSCustomObject]) {
         return Normalize-Dictionary -Dictionary $InputObject -IgnoreFields $IgnoreFields
     }
