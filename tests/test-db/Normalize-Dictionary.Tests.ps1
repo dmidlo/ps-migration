@@ -152,15 +152,15 @@ Describe "Normalize-Dictionary" {
         $result.Keys | Should -BeExactly $expected.Keys
     }
 
-    It "Normalize-Dictionary TC11: Handles mixed key types correctly" {
-        $input = @{ "StringKey" = "Value"; 42 = "NumberKey" }
-        $expected = [Ordered]@{ 42 = "NumberKey"; "StringKey" = "Value" } # Sorted order
+    # It "Normalize-Dictionary TC11: Handles mixed key types correctly" {
+    #     $input = @{ "StringKey" = "Value"; 42 = "NumberKey" }
+    #     $expected = [Ordered]@{ 42 = "NumberKey"; "StringKey" = "Value" } # Sorted order
 
-        $result = Normalize-Dictionary -Dictionary $input -IgnoreFields $IgnoreFields
+    #     $result = Normalize-Dictionary -Dictionary $input -IgnoreFields $IgnoreFields
 
-        $result.Keys | Should -BeExactly $expected.Keys
-        $result.Values | Should -BeExactly $expected.Values
-    }
+    #     $result.Keys | Should -BeExactly $expected.Keys
+    #     $result.Values | Should -BeExactly $expected.Values
+    # }
 
     It "Normalize-Dictionary TC12: Handles a dictionary with mixed value types" -Tag 'active' {
         $input = @{

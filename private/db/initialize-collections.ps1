@@ -10,15 +10,72 @@ function Initialize-Collections {
     Write-PodeHost "Initializing collections and indexes using dbConnection:"
     Out-PodeHost -InputObject $Connection
 
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Temp' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'RecycleBin' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+
+    ###############################################################################
+    # Organizations
+    ###############################################################################
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Organizations' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Regions' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Campuses' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Sites' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Floors' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Areas' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Rooms' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Racks' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Panels' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Channels' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Circuits' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Providers' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+
+
     ###############################################################################
     # HOSTS
     ###############################################################################
     Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Hosts' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
     )
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Interfaces' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'IPv4Addresses' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'NetworkNames' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
 
     # if ($SampleData) {
-    #     $dcHost = New-dbHost -FriendlyId "DC-001" `
+    #     $dcHost = Set-dbHost -FriendlyId "DC-001" `
     #             -Hostname "DC01.example.local" `
     #             -IPAddress "10.0.0.10" `
     #             -OSVersion "Windows Server 2022" `
@@ -52,54 +109,54 @@ function Initialize-Collections {
     ###############################################################################
     # DOMAINS - FSMORoles
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'FSMORoles' -Indexes @( 
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'FSMORoles' -Indexes @( 
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
 
-    # Define FSMO Roles
-    $FSMORolesData = @(
-        @{
-            RoleName = 'PDCEmulator'
-        },
-        @{
-            RoleName = 'RIDMaster'
-        },
-        @{
-            RoleName = 'InfrastructureMaster'
-        },
-        @{
-            RoleName = 'SchemaMaster'
-        },
-        @{
-            RoleName = 'DomainNamingMaster'
-        }
-    )
+    # # Define FSMO Roles
+    # $FSMORolesData = @(
+    #     @{
+    #         RoleName = 'PDCEmulator'
+    #     },
+    #     @{
+    #         RoleName = 'RIDMaster'
+    #     },
+    #     @{
+    #         RoleName = 'InfrastructureMaster'
+    #     },
+    #     @{
+    #         RoleName = 'SchemaMaster'
+    #     },
+    #     @{
+    #         RoleName = 'DomainNamingMaster'
+    #     }
+    # )
     
-    $FSMORoles = @()
-    foreach ($fsmoRole in $FSMORolesData) {
-        $META_UTCCreated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-        $META_UTCUpdated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    # $FSMORoles = @()
+    # foreach ($fsmoRole in $FSMORolesData) {
+    #     $META_UTCCreated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    #     $META_UTCUpdated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
 
-        if ($fsmoRole -in @('SchemaMaster', 'DomainNamingMaster')) {
-            $Scope = "Forest"
-        }
-        else {
-            $Scope = "Domain"
-        }
+    #     if ($fsmoRole -in @('SchemaMaster', 'DomainNamingMaster')) {
+    #         $Scope = "Forest"
+    #     }
+    #     else {
+    #         $Scope = "Domain"
+    #     }
 
-        $fsmoRole['META_UTCCreated']  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-        $fsmoRole['META_UTCUpdated']  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-        $fsmoRole['Scope'] = $Scope
+    #     $fsmoRole['META_UTCCreated']  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    #     $fsmoRole['META_UTCUpdated']  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    #     $fsmoRole['Scope'] = $Scope
 
-       $FSMORoles += $fsmoRole
-    }
+    #    $FSMORoles += $fsmoRole
+    # }
 
-    foreach ($role in $FSMORoles) {
-        $newFSMORole = Add-DbDocument -Connection $Connection -CollectionName 'FSMORoles' -Data $role
-    }
+    # foreach ($role in $FSMORoles) {
+    #     $newFSMORole = Add-DbDocument -Connection $Connection -CollectionName 'FSMORoles' -Data $role
+    # }
 
-    $fsmoRoles = Find-LiteDBDocument -Collection 'FSMORoles' -Connection $Connection
-    Out-PodeHost $fsmoRoles
+    # $fsmoRoles = Find-LiteDBDocument -Collection 'FSMORoles' -Connection $Connection
+    # Out-PodeHost $fsmoRoles
 
 
     # $FSMORoles = @()
@@ -326,9 +383,9 @@ function Initialize-Collections {
     # DOMAINS - Trusts
     ###############################################################################
 
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DomainTrusts' -Indexes @( 
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DomainTrusts' -Indexes @( 
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
 
     # $trustData = @(
     #     @{
@@ -358,9 +415,9 @@ function Initialize-Collections {
     ###############################################################################
     # TENANTS
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Tenants' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Tenants' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $tenantData = @{
     #     FriendlyId = 'TEN-001'
@@ -376,9 +433,9 @@ function Initialize-Collections {
     ###############################################################################
     # USERS
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Users' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Users' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $userData = @{
     #     FriendlyId         = 'USR-001'
@@ -395,9 +452,9 @@ function Initialize-Collections {
     ###############################################################################
     # GROUPS
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Groups' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Groups' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $groupData = @{
     #     FriendlyId = 'GRP-001'
@@ -412,9 +469,9 @@ function Initialize-Collections {
     ###############################################################################
     # MIGRATION BATCHES
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'MigrationBatches' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'MigrationBatches' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $batchData = @{
     #     FriendlyId      = 'BATCH-001'
@@ -432,9 +489,9 @@ function Initialize-Collections {
     ###############################################################################
     # DHCP SCOPES, LEASES, RESERVATIONS
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DHCP_Scopes' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DHCP_Scopes' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $scopeData = @{
     #     FriendlyId  = 'SCP-001'
@@ -448,9 +505,9 @@ function Initialize-Collections {
     # $newScope = Add-DbDocument -Connection $Connection -CollectionName 'DHCP_Scopes' -Data $scopeData
     # Write-PodeHost "Inserted DHCP Scope:" $newScope.FriendlyId
 
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DHCP_Leases' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DHCP_Leases' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $leaseData = @{
     #     IPAddress      = '10.0.0.100'
@@ -464,9 +521,9 @@ function Initialize-Collections {
     # $newLease = Add-DbDocument -Connection $Connection -CollectionName 'DHCP_Leases' -Data $leaseData
     # Write-PodeHost "Inserted DHCP Lease for IP:" $newLease.IPAddress
 
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DHCP_Reservations' -Indexes @(
-        [PSCustomObject]@{ Field='Hash';  Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DHCP_Reservations' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash';  Unique=$true }
+    # )
     # Usage example:
     # $reservationData = @{
     #     IPAddress  = '10.0.0.150'
@@ -481,9 +538,9 @@ function Initialize-Collections {
     ###############################################################################
     # FILE SERVERS & SHARES
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'FileServers' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'FileServers' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $fileServerData = @{
     #     FriendlyId  = 'FS-001'
@@ -495,9 +552,9 @@ function Initialize-Collections {
     # $newFileServer = Add-DbDocument -Connection $Connection -CollectionName 'FileServers' -Data $fileServerData
     # Write-PodeHost "Inserted FileServer:" $newFileServer.FriendlyId
 
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'FileShares' -Indexes @(
-        [PSCustomObject]@{ Field='Hash';   Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'FileShares' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash';   Unique=$true }
+    # )
     # Usage example:
     # $shareData = @{
     #     FriendlyId   = 'SHR-001'
@@ -515,9 +572,9 @@ function Initialize-Collections {
     ###############################################################################
     # GROUP POLICY
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'GroupPolicy' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'GroupPolicy' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $gpoData = @{
     #     GPOGuid       = '11111111-2222-3333-4444-555555555555'
@@ -535,9 +592,9 @@ function Initialize-Collections {
     ###############################################################################
     # DRIVE MAPPINGS
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DriveMappings' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DriveMappings' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $driveMapData = @{
     #     FriendlyId   = 'DM-001'
@@ -553,9 +610,9 @@ function Initialize-Collections {
     ###############################################################################
     # PROFILE MIGRATIONS
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'ProfileMigrations' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'ProfileMigrations' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $profileMigData = @{
     #     FriendlyId       = 'PMIG-001'
@@ -574,9 +631,9 @@ function Initialize-Collections {
     ###############################################################################
     # FULL-MESH MIGRATIONS
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'FullMeshMigrations' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'FullMeshMigrations' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $fullMeshData = @{
     #     FriendlyId      = 'FMIG-001'
@@ -594,9 +651,9 @@ function Initialize-Collections {
     ###############################################################################
     # MAILFLOW / MAIL SECURITY APPLIANCES / SMART CONNECTORS
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Mailflow' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Mailflow' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $mailflowData = @{
     #     FriendlyId  = 'MAILFLO-001'
@@ -609,9 +666,9 @@ function Initialize-Collections {
     # $newMailflow = Add-DbDocument -Connection $Connection -CollectionName 'Mailflow' -Data $mailflowData
     # Write-PodeHost "Inserted Mailflow:" $newMailflow.FriendlyId
 
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'MailSecurityAppliances' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'MailSecurityAppliances' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $applianceData = @{
     #     FriendlyId   = 'MSA-001'
@@ -624,9 +681,9 @@ function Initialize-Collections {
     # $newAppliance = Add-DbDocument -Connection $Connection -CollectionName 'MailSecurityAppliances' -Data $applianceData
     # Write-PodeHost "Inserted Mail Security Appliance:" $newAppliance.FriendlyId
 
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'SmartConnectors' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'SmartConnectors' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $connectorData = @{
     #     FriendlyId    = 'CONN-001'
@@ -642,9 +699,9 @@ function Initialize-Collections {
     ###############################################################################
     # MIGRATION WORKFLOWS
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'MigrationWorkflows' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    )
+    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'MigrationWorkflows' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    # )
     # Usage example:
     # $workflowData = @{
     #     FriendlyId   = 'WFLOW-001'
@@ -659,5 +716,5 @@ function Initialize-Collections {
     # Write-PodeHost "Inserted Migration Workflow:" $newWorkflow.FriendlyId
 
     ###############################################################################
-    Write-PodeHost "All collections initialized successfully."
+    # Write-PodeHost "All collections initialized successfully."
 }

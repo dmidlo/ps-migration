@@ -53,7 +53,7 @@ function Ensure-LiteDBCollection {
     foreach ($idx in $Indexes) {
         if (-not $idx.Field) {
             Write-Error "Index definition must contain a 'Field' property."
-            continue
+           throw 
         }
 
         $unique = $false
