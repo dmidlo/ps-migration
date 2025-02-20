@@ -18,30 +18,23 @@ Describe "Integration Tests for Initialize-DB" {
     }
 
     Context "Database creation and connection" {
-        It "Initialize-DB TC01: should create a new database file and return a valid connection with expected properties" -Tag 'active' {
-            # Act: Initialize the database.
-
-            $dbPath = Join-Path $env:TEMP "test.db"
-            $connection = Initialize-DB -DBPath $dbPath
-
+        It "Initialize-DB TC01: should create a new database file and return a valid connection string with expected properties" -Tag 'active' {
+            # Arragne: Run the initialization
+            $connectionString = Initialize-DB -DBPath $dbPath
             # Assert: The database file now exists.
             (Test-Path $dbPath) | Should -BeTrue
 
             # Assert: A non-null connection object is returned.
-            $connection | Should -Not -BeNull
-
+            $connectionString | Should -Not -BeNull
+            
             # Validate connection object properties based on expected shape.
-            $connection.Database       | Should -Be $dbPath
-            $connection.Collation      | Should -Be "en-US/IgnoreCase"
-            $connection.Timeout.ToString() | Should -Be "00:01:00"
-            $connection.UserVersion    | Should -Be 0
-            $connection.LimitSize      | Should -Be 9223372036854775807
-            $connection.CheckpointSize | Should -Be 1000
-
-            # Optionally, verify presence of additional properties.
-            $connection.ConnectionInfo | Should -Not -BeNull
-            $connection.Mapper         | Should -Not -BeNull
-            $connection.FileStorage    | Should -Not -BeNull
+            $connectionString.Connection    | Should -Be "Shared"
+            $connectionString.Filename      | Should -Be $dbPath
+            $connectionString.InitialSize   | Should -Be 0
+            $connectionString.ReadOnly      | Should -Be $false
+            $connectionString.Upgrade       | Should -Be $true
+            $connectionString.AutoRebuild   | Should -Be $true
+            $connectionString.Collation     | Should -Be "en-US/IgnoreCase, IgnoreNonSpace, IgnoreSymbols"
         }
     }
 

@@ -14,7 +14,7 @@ function Initialize-DB {
             $database.Dispose()
         }
 
-        return $database
+        return $connectionString
     }
     catch { 
         Write-PodeHost "Caught an error!"
