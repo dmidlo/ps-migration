@@ -26,7 +26,8 @@
     # Modules that must be installed from the gallery
     RequiredModules   = @(
         @{ ModuleName = 'Pode'; ModuleVersion = '2.9.0' },  # example versions
-        @{ ModuleName = 'Pode.Web'; ModuleVersion = '0.8.3' }
+        @{ ModuleName = 'Pode.Web'; ModuleVersion = '0.8.3' },
+        @{ ModuleName = 'Ldbc'; ModuleVersion = '0.8.11'}
     )
 
     # Functions to export from this module
