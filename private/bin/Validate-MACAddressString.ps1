@@ -2,7 +2,7 @@ function Get-IEEEOUIList {
     [CmdletBinding()]
     param (
         [string]$OUIUrl = "https://standards-oui.ieee.org/oui/oui.txt",
-        [string]$CacheFile = "$env:TEMP\OUIList.clixml",
+        [string]$CacheFile = ".\StoredObjects\OUIList.clixml",
         [int]$CacheDays = 1
     )
 
@@ -10,7 +10,9 @@ function Get-IEEEOUIList {
         try {
             if ((Test-Path $CacheFile) -and ($CacheDays -gt 0)) {
                 $FileAge = (Get-Item $CacheFile).CreationTime
-                if ((Get-Date) - $FileAge -lt (New-TimeSpan -Days $CacheDays)) {
+                $ExpirationTime = $FileAge.AddDays($CacheDays)
+            
+                if ((Get-Date) -lt $ExpirationTime) {
                     return Import-Clixml -Path $CacheFile
                 }
             }
@@ -90,11 +92,20 @@ function Validate-MACAddressString {
     )
 
     process {
+        # Output Object Template
+        $output = [PSCustomObject]@{
+            IsValid        = $false
+            MacAddress  = $null
+            Message = ""
+        }
+
         # Ensure input is not null or empty
         if ([string]::IsNullOrWhiteSpace($MacAddress)) {
             $err = "Invalid input: MAC address cannot be empty or null."
             Write-Error $err
-            return $false, $err
+            $output.MacAddress = $MacAddress
+            $output.Message = $err
+            return $output
         }
 
         # Remove common separators and whitespace
@@ -104,14 +115,18 @@ function Validate-MACAddressString {
         if ($cleanedMac.Length -ne 12) {
             $err = "Invalid MAC address length: $MacAddress"
             Write-Error $err
-            return $false, $err
+            $output.MacAddress = $MacAddress
+            $output.Message = $err
+            return $output
         }
 
         # Validate that all characters are hexadecimal (0-9, A-F)
         if ($cleanedMac -notmatch '^[0-9A-Fa-f]{12}$') {
             $err = "Invalid MAC address format: contains non-hexadecimal characters - $MacAddress"
             Write-Error $err
-            return $false, $err
+            $output.MacAddress = $MacAddress
+            $output.Message = $err
+            return $output
         }
 
         # Convert to uppercase for consistency
@@ -121,7 +136,9 @@ function Validate-MACAddressString {
         if ($cleanedMac -eq 'FFFFFFFFFFFF') {
             $err = "Invalid MAC address: Cannot be a broadcast address - $MacAddress"
             Write-Error $err
-            return $false, $err
+            $output.MacAddress = $MacAddress
+            $output.Message = $err
+            return $output
         }
 
         # Extract first byte and convert it to an integer
@@ -131,7 +148,9 @@ function Validate-MACAddressString {
         if ($firstByte -band 1) {
             $err = "Invalid MAC address: Cannot be a multicast address - $MacAddress"
             Write-Error $err
-            return $false, $err
+            $output.MacAddress = $MacAddress
+            $output.Message = $err
+            return $output
         }
 
         # Check if it is a valid OUI
@@ -140,7 +159,9 @@ function Validate-MACAddressString {
             if (-not (Validate-OUI -MacAddress $cleanedMac -OUIHashTable $OUIList)) {
                 $err = "Unregistered OUI: $OUI is not found in the official IEEE list."
                 Write-Error $err
-                return $false, $err
+                $output.MacAddress = $MacAddress
+                $output.Message = $err
+                return $output
             }
         }
 
@@ -149,7 +170,9 @@ function Validate-MACAddressString {
         # Format as colon-separated uppercase
         $formattedMac = ($cleanedMac -split '(?<=\G.{2})(?=.)') -join ':'
         Write-Output $formattedMac
-        return $true, $formattedMac
+        $output.MacAddress = $formattedMac
+        $output.IsValid = $true
+        return $output
     }
 }
 
