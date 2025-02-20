@@ -4,10 +4,10 @@ function Start-psMigration {
         [switch]$Dev,
         [switch]$Test,
         [switch]$ResetDatabase,
-        [string]$DatabasePath = ".\StoredObjects\ps-migration.db",
+        [string]$DatabasePath = "$PSScriptRoot\StoredObjects\ps-migration.db",
         [switch]$Clear,
-        [int]$HttpPort = 8080,
-        [int]$HttpsPort = 8443
+        [int]$HttpPort = 80,
+        [int]$HttpsPort = 443
     )
 
     # Clear the host if requested

@@ -2,7 +2,7 @@ function Get-IEEEOUIList {
     [CmdletBinding()]
     param (
         [string]$OUIUrl = "https://standards-oui.ieee.org/oui/oui.txt",
-        [string]$CacheFile = ".\StoredObjects\OUIList.clixml",
+        [string]$CacheFile = "$PSScriptRoot\StoredObjects\OUIList.clixml",
         [int]$CacheDays = 1
     )
 

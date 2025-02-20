@@ -8,7 +8,7 @@ enum dbComponentType {
 # Module Utilities
 $utilitiesFolders = @("private")
 foreach ($utilitiesFolder in $utilitiesFolders) {
-    Get-ChildItem -Recurse ".\$utilitiesFolder\*.ps1" -File | ForEach-Object {
+    Get-ChildItem -Recurse "$PSScriptRoot\$utilitiesFolder\*.ps1" -File | ForEach-Object {
         . $_.FullName
     }
 }
@@ -16,7 +16,7 @@ foreach ($utilitiesFolder in $utilitiesFolders) {
 # Exported Functions
 $exportFolders = @("public")
 foreach ($exportFolder in $exportFolders) {
-    Get-ChildItem -Recurse ".\$exportFolder\*.ps1" -File | ForEach-Object {
+    Get-ChildItem -Recurse "$PSScriptRoot\$exportFolder\*.ps1" -File | ForEach-Object {
         . $_.FullName
     }
 }
