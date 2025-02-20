@@ -1,569 +1,597 @@
 #region Global Validation Data
 # A global hashtable mapping abbreviated Windows OS versions to supported features/roles.
 # This design can be replaced with enums or custom objects for stricter type checking.
-$Global:SupportedWindowsFeatures = @{
-    "Windows Server 2008 R2 - Foundation" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File Services",
-        "Print Services",
-        "Web Server (IIS)"
-    )
-    "Windows Server 2008 R2 - Standard - Desktop" = @(
-        "Active Directory Domain Services",
-        "Active Directory Certificate Services",
-        "DHCP Server",
-        "DNS Server",
-        "File Services",
-        "Print Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Remote Desktop Services",
-        "Failover Clustering"
-    )
-    "Windows Server 2008 R2 - Standard - Core" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File Services",
-        "Print Services",
-        "Web Server (IIS)",
-        "Hyper-V"
-    )
-    "Windows Server 2008 R2 - Enterprise - Desktop" = @(
-        "Active Directory Domain Services",
-        "Active Directory Certificate Services",
-        "Active Directory Federation Services",
-        "DHCP Server",
-        "DNS Server",
-        "File Services",
-        "Print Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Remote Desktop Services",
-        "Failover Clustering"
-    )
-    "Windows Server 2008 R2 - Enterprise - Core" = @(
-        "Active Directory Domain Services",
-        "Active Directory Certificate Services",
-        "DHCP Server",
-        "DNS Server",
-        "File Services",
-        "Print Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Failover Clustering"
-    )
-    "Windows Server 2008 R2 - Datacenter - Desktop" = @(
-        "Active Directory Domain Services",
-        "Active Directory Certificate Services",
-        "Active Directory Federation Services",
-        "DHCP Server",
-        "DNS Server",
-        "File Services",
-        "Print Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Remote Desktop Services",
-        "Failover Clustering"
-    )
-    "Windows Server 2008 R2 - Datacenter - Core" = @(
-        "Active Directory Domain Services",
-        "Active Directory Certificate Services",
-        "DHCP Server",
-        "DNS Server",
-        "File Services",
-        "Print Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Failover Clustering"
-    )
-    "Windows Server 2008 R2 - Web" = @(
-        "Web Server (IIS)",
-        "FTP Server"
-    )
-    "Windows Server 2008 R2 - HPC Server" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File Services",
-        "Print Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Failover Clustering"
-    )
-    "Windows Server 2008 R2 - Itanium" = @(
-        "Active Directory Domain Services",
-        "Active Directory Certificate Services",
-        "DHCP Server",
-        "DNS Server",
-        "File Services",
-        "Print Services",
-        "Web Server (IIS)",
-        "Failover Clustering"
-    )
-    "Windows Server 2012 - Foundation" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File and Storage Services",
-        "Print and Document Services",
-        "Web Server (IIS)"
-    )
-    "Windows Server 2012 - Essentials" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File and Storage Services",
-        "Print and Document Services",
-        "Web Server (IIS)"
-    )
-    "Windows Server 2012 - Standard - Desktop" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File and Storage Services",
-        "Print and Document Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Windows Server Update Services (WSUS)",
-        "IP Address Management (IPAM)",
-        "Failover Clustering",
-        "Active Directory Certificate Services",
-        "Server Core Mode"
-    )
-    "Windows Server 2012 - Standard - Core" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File and Storage Services",
-        "Print and Document Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Windows Server Update Services (WSUS)",
-        "IP Address Management (IPAM)",
-        "Failover Clustering",
-        "Active Directory Certificate Services"
-    )
-    "Windows Server 2012 - Datacenter - Desktop" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File and Storage Services",
-        "Print and Document Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Windows Server Update Services (WSUS)",
-        "IP Address Management (IPAM)",
-        "Failover Clustering",
-        "Active Directory Certificate Services",
-        "Server Core Mode"
-    )
-    "Windows Server 2012 - Datacenter - Core" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File and Storage Services",
-        "Print and Document Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Windows Server Update Services (WSUS)",
-        "IP Address Management (IPAM)",
-        "Failover Clustering",
-        "Active Directory Certificate Services"
-    )
-    "Windows Server 2012 R2 - Foundation" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File and Storage Services",
-        "Print and Document Services",
-        "Web Server (IIS)"
-    )
-    "Windows Server 2012 R2 - Essentials" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File and Storage Services",
-        "Print and Document Services",
-        "Web Server (IIS)"
-    )
-    "Windows Server 2012 R2 - Standard - Desktop" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File and Storage Services",
-        "Print and Document Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Windows Server Update Services (WSUS)",
-        "IP Address Management (IPAM)",
-        "Failover Clustering",
-        "Active Directory Certificate Services",
-        "Server Core Mode"
-    )
-    "Windows Server 2012 R2 - Standard - Core" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File and Storage Services",
-        "Print and Document Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Windows Server Update Services (WSUS)",
-        "IP Address Management (IPAM)",
-        "Failover Clustering",
-        "Active Directory Certificate Services"
-    )
-    "Windows Server 2012 R2 - Datacenter - Desktop" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File and Storage Services",
-        "Print and Document Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Windows Server Update Services (WSUS)",
-        "IP Address Management (IPAM)",
-        "Failover Clustering",
-        "Active Directory Certificate Services",
-        "Server Core Mode"
-    )
-    "Windows Server 2012 R2 - Datacenter - Core" = @(
-        "Active Directory Domain Services",
-        "DHCP Server",
-        "DNS Server",
-        "File and Storage Services",
-        "Print and Document Services",
-        "Web Server (IIS)",
-        "Hyper-V",
-        "Windows Server Update Services (WSUS)",
-        "IP Address Management (IPAM)",
-        "Failover Clustering",
-        "Active Directory Certificate Services"
-    )
-    "Windows Server 2016 - Essentials" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Remote Desktop Services",
-        "Enhanced Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Shielded Virtual Machines",
-        "Containers"
-    )
-    "Windows Server 2016 - Standard - Desktop" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Remote Desktop Services",
-        "Enhanced Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2016 - Standard - Core" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2016 - Datacenter - Desktop" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Remote Desktop Services",
-        "Enhanced Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2016 - Datacenter - Core" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2016 - Nano" = @(
-        "DHCP Server",
-        "DNS Server",
-        "Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2019 - Essentials" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Remote Desktop Services",
-        "Enhanced Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Shielded Virtual Machines",
-        "Containers"
-    )
-    "Windows Server 2019 - Standard - Desktop" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Remote Desktop Services",
-        "Enhanced Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2019 - Standard - Core" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2019 - Datacenter - Desktop" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Remote Desktop Services",
-        "Enhanced Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2019 - Datacenter - Core" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2019 - Nano" = @(
-        "DHCP Server",
-        "DNS Server",
-        "Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2022 - Essentials" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Remote Desktop Services",
-        "Enhanced Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Shielded Virtual Machines",
-        "Containers"
-    )
-    "Windows Server 2022 - Standard - Desktop" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Remote Desktop Services",
-        "Enhanced Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2022 - Standard - Core" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2022 - Datacenter - Desktop" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Remote Desktop Services",
-        "Enhanced Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2022 - Datacenter - Core" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2022 - Nano" = @(
-        "DHCP Server",
-        "DNS Server",
-        "Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2025 - Essentials" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Remote Desktop Services",
-        "Enhanced Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Shielded Virtual Machines",
-        "Containers"
-    )
-    "Windows Server 2025 - Standard - Desktop" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Remote Desktop Services",
-        "Enhanced Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2025 - Standard - Core" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2025 - Datacenter - Desktop" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Remote Desktop Services",
-        "Enhanced Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2025 - Datacenter - Core" = @(
-        "Active Directory Services",
-        "DHCP Server",
-        "DNS Server",
-        "Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-    "Windows Server 2025 - Nano" = @(
-        "DHCP Server",
-        "DNS Server",
-        "Hyper-V",
-        "IIS",
-        "WSUS",
-        "Storage Services",
-        "IPAM",
-        "Hyper-V Replica"
-    )
-}
+# $Global:SupportedWindowsFeatures = @{
+#     "Windows Server 2008 R2 - Foundation" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File Services",
+#         "Print Services",
+#         "Web Server (IIS)"
+#     )
+#     "Windows Server 2008 R2 - Standard - Desktop" = @(
+#         "Active Directory Domain Services",
+#         "Active Directory Certificate Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File Services",
+#         "Print Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Remote Desktop Services",
+#         "Failover Clustering"
+#     )
+#     "Windows Server 2008 R2 - Standard - Core" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File Services",
+#         "Print Services",
+#         "Web Server (IIS)",
+#         "Hyper-V"
+#     )
+#     "Windows Server 2008 R2 - Enterprise - Desktop" = @(
+#         "Active Directory Domain Services",
+#         "Active Directory Certificate Services",
+#         "Active Directory Federation Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File Services",
+#         "Print Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Remote Desktop Services",
+#         "Failover Clustering"
+#     )
+#     "Windows Server 2008 R2 - Enterprise - Core" = @(
+#         "Active Directory Domain Services",
+#         "Active Directory Certificate Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File Services",
+#         "Print Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Failover Clustering"
+#     )
+#     "Windows Server 2008 R2 - Datacenter - Desktop" = @(
+#         "Active Directory Domain Services",
+#         "Active Directory Certificate Services",
+#         "Active Directory Federation Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File Services",
+#         "Print Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Remote Desktop Services",
+#         "Failover Clustering"
+#     )
+#     "Windows Server 2008 R2 - Datacenter - Core" = @(
+#         "Active Directory Domain Services",
+#         "Active Directory Certificate Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File Services",
+#         "Print Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Failover Clustering"
+#     )
+#     "Windows Server 2008 R2 - Web" = @(
+#         "Web Server (IIS)",
+#         "FTP Server"
+#     )
+#     "Windows Server 2008 R2 - HPC Server" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File Services",
+#         "Print Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Failover Clustering"
+#     )
+#     "Windows Server 2008 R2 - Itanium" = @(
+#         "Active Directory Domain Services",
+#         "Active Directory Certificate Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File Services",
+#         "Print Services",
+#         "Web Server (IIS)",
+#         "Failover Clustering"
+#     )
+#     "Windows Server 2012 - Foundation" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File and Storage Services",
+#         "Print and Document Services",
+#         "Web Server (IIS)"
+#     )
+#     "Windows Server 2012 - Essentials" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File and Storage Services",
+#         "Print and Document Services",
+#         "Web Server (IIS)"
+#     )
+#     "Windows Server 2012 - Standard - Desktop" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File and Storage Services",
+#         "Print and Document Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Windows Server Update Services (WSUS)",
+#         "IP Address Management (IPAM)",
+#         "Failover Clustering",
+#         "Active Directory Certificate Services",
+#         "Server Core Mode"
+#     )
+#     "Windows Server 2012 - Standard - Core" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File and Storage Services",
+#         "Print and Document Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Windows Server Update Services (WSUS)",
+#         "IP Address Management (IPAM)",
+#         "Failover Clustering",
+#         "Active Directory Certificate Services"
+#     )
+#     "Windows Server 2012 - Datacenter - Desktop" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File and Storage Services",
+#         "Print and Document Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Windows Server Update Services (WSUS)",
+#         "IP Address Management (IPAM)",
+#         "Failover Clustering",
+#         "Active Directory Certificate Services",
+#         "Server Core Mode"
+#     )
+#     "Windows Server 2012 - Datacenter - Core" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File and Storage Services",
+#         "Print and Document Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Windows Server Update Services (WSUS)",
+#         "IP Address Management (IPAM)",
+#         "Failover Clustering",
+#         "Active Directory Certificate Services"
+#     )
+#     "Windows Server 2012 R2 - Foundation" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File and Storage Services",
+#         "Print and Document Services",
+#         "Web Server (IIS)"
+#     )
+#     "Windows Server 2012 R2 - Essentials" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File and Storage Services",
+#         "Print and Document Services",
+#         "Web Server (IIS)"
+#     )
+#     "Windows Server 2012 R2 - Standard - Desktop" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File and Storage Services",
+#         "Print and Document Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Windows Server Update Services (WSUS)",
+#         "IP Address Management (IPAM)",
+#         "Failover Clustering",
+#         "Active Directory Certificate Services",
+#         "Server Core Mode"
+#     )
+#     "Windows Server 2012 R2 - Standard - Core" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File and Storage Services",
+#         "Print and Document Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Windows Server Update Services (WSUS)",
+#         "IP Address Management (IPAM)",
+#         "Failover Clustering",
+#         "Active Directory Certificate Services"
+#     )
+#     "Windows Server 2012 R2 - Datacenter - Desktop" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File and Storage Services",
+#         "Print and Document Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Windows Server Update Services (WSUS)",
+#         "IP Address Management (IPAM)",
+#         "Failover Clustering",
+#         "Active Directory Certificate Services",
+#         "Server Core Mode"
+#     )
+#     "Windows Server 2012 R2 - Datacenter - Core" = @(
+#         "Active Directory Domain Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "File and Storage Services",
+#         "Print and Document Services",
+#         "Web Server (IIS)",
+#         "Hyper-V",
+#         "Windows Server Update Services (WSUS)",
+#         "IP Address Management (IPAM)",
+#         "Failover Clustering",
+#         "Active Directory Certificate Services"
+#     )
+#     "Windows Server 2016 - Essentials" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Remote Desktop Services",
+#         "Enhanced Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Shielded Virtual Machines",
+#         "Containers"
+#     )
+#     "Windows Server 2016 - Standard - Desktop" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Remote Desktop Services",
+#         "Enhanced Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2016 - Standard - Core" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2016 - Datacenter - Desktop" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Remote Desktop Services",
+#         "Enhanced Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2016 - Datacenter - Core" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2016 - Nano" = @(
+#         "DHCP Server",
+#         "DNS Server",
+#         "Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2019 - Essentials" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Remote Desktop Services",
+#         "Enhanced Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Shielded Virtual Machines",
+#         "Containers"
+#     )
+#     "Windows Server 2019 - Standard - Desktop" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Remote Desktop Services",
+#         "Enhanced Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2019 - Standard - Core" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2019 - Datacenter - Desktop" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Remote Desktop Services",
+#         "Enhanced Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2019 - Datacenter - Core" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2019 - Nano" = @(
+#         "DHCP Server",
+#         "DNS Server",
+#         "Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2022 - Essentials" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Remote Desktop Services",
+#         "Enhanced Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Shielded Virtual Machines",
+#         "Containers"
+#     )
+#     "Windows Server 2022 - Standard - Desktop" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Remote Desktop Services",
+#         "Enhanced Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2022 - Standard - Core" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2022 - Datacenter - Desktop" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Remote Desktop Services",
+#         "Enhanced Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2022 - Datacenter - Core" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2022 - Nano" = @(
+#         "DHCP Server",
+#         "DNS Server",
+#         "Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2025 - Essentials" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Remote Desktop Services",
+#         "Enhanced Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Shielded Virtual Machines",
+#         "Containers"
+#     )
+#     "Windows Server 2025 - Standard - Desktop" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Remote Desktop Services",
+#         "Enhanced Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2025 - Standard - Core" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2025 - Datacenter - Desktop" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Remote Desktop Services",
+#         "Enhanced Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2025 - Datacenter - Core" = @(
+#         "Active Directory Services",
+#         "DHCP Server",
+#         "DNS Server",
+#         "Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+#     "Windows Server 2025 - Nano" = @(
+#         "DHCP Server",
+#         "DNS Server",
+#         "Hyper-V",
+#         "IIS",
+#         "WSUS",
+#         "Storage Services",
+#         "IPAM",
+#         "Hyper-V Replica"
+#     )
+# }
 
-#region Helper Function: Update-PropertyIfNeeded
-function Update-PropertyIfNeeded {
-    <#
-    .SYNOPSIS
-        Non–destructively update a property on the target object unless –Force is specified.
-    .PARAMETER Target
-        The target object (an ordered hashtable) to update.
-    .PARAMETER Key
-        The property key.
-    .PARAMETER Value
-        The new value for that property.
-    .PARAMETER Force
-        If specified, always update the value.
-    .OUTPUTS
-        The updated target object.
-    #>
+#region New-HostIPv4Address
+function New-HostIPv4Address {
+    [CmdletBinding()]
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory)]
-        [hashtable]$Target,
+        [Parameter(ValueFromPipeline)]
+        [hashtable]$DbHost,
 
-        [Parameter(Mandatory)]
-        [string]$Key,
+        [Parameter()]
+        [string]$HostGuid,
 
-        [Parameter(Mandatory)]
-        $Value,
+        [Parameter()]
+        [string]$InterfaceGuid,
 
-        [Switch]$Force
+        [Parameter()]
+        [hashtable]$Properties
     )
 
-    if ($Force -or (-not $Target.ContainsKey($Key)) -or ([string]::IsNullOrEmpty("$($Target[$Key])"))) {
-        $Target[$Key] = $Value
+    process {
+        $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+        # Create a new IPv4 address object with ordered properties.
+        $HostIPv4Address = [ordered]@{
+            InterfaceGuid    = $InterfaceGuid
+            HostGuid         = $HostGuid
+            IPAddress        = $null
+            CIDR             = $null
+            NetworkNames     = @()  # <-- Allow multiple names per IP
+            SubnetMask       = $null
+            WildcardMask     = $null
+            NetworkAddress   = $null
+            BroadcastAddress = $null
+            FirstUsableHost  = $null
+            LastUsableHost   = $null
+            TotalIPs         = $null
+            UsableHosts      = $null
+            IPClass          = $null
+            IsPrivate        = $null
+            META_UTCCreated  = $now
+            META_UTCUpdated  = $now
+        }
+        
+
+        if ($Properties) {
+            foreach ($key in $Properties.Keys) {
+                $HostIPv4Address[$key] = $Properties[$key]
+            }
+        }
+
+        # Merge new interface with existing ones
+        $HostIPv4Address.NetworkNames = Merge-Arrays -Arrays @($DbHost.Interfaces, @($HostInterface))
+
+        # Update dbHost metadata timestamp
+        $DbHost.META_UTCUpdated = $now
+
+        Write-Output $HostIPv4Address
     }
 }
-#endregion Helper Function
+#endregion New-HostIPv4Address
 
-#region New-dbHost
-function New-dbHost {
+#region New-HostNetworkName
+function New-HostNetworkName {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory, Position = 0)]
-        [ValidateNotNullOrEmpty()]
-        [string]$MACAddress,
+        [Parameter(Mandatory)]
+        [string]$Name,  # Network name (hostname, FQDN, NetBIOS)
+
+        [Parameter()]
+        [string]$HostGuid,  # Optional: Associate with a Host
+
+        [Parameter()]
+        [string]$IPv4Guid,  # Optional: Associate with an IP Address
 
         [Parameter()]
         [hashtable]$Properties,
@@ -575,47 +603,49 @@ function New-dbHost {
 
     process {
         $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-        # Create a new host object with initial (ordered) properties.
-        $dbHost = [ordered]@{
-            MACAddress         = $MACAddress
-            IPAddress          = $null
-            HostType           = $null
-            Hostname           = $null
-            FQDN               = $null
-            DomainOrWorkgroup  = $null
-            LastUsers          = @()
-            OS                 = $null
-            VirtualMachine     = $null
-            ClusterNodeMember  = $null
-            Role               = $null
-            Services           = [ordered]@{
-                WindowsRoles = @()
-                LinuxRoles   = @()
-                DHCP         = $false
-                DNS          = $false
-            }
-            AD_Roles           = @()
-            FSMORoles          = @()
-            META_UTCCreated    = $now
-            META_UTCUpdated    = $now
+
+        # Validate the hostname format before proceeding
+        $validation = Validate-HostnameFormat -Hostname $Name
+        if (-not $validation.IsValid) {
+            Write-Error "Invalid hostname format: $($validation.Message)"
+            return
         }
 
+        # Ensure at least one reference (Host or IP) is specified
+        if (-not $HostGuid -and -not $IPv4Guid) {
+            Write-Error "A Network Name must be associated with either a Host or an IPv4 Address."
+            return
+        }
+
+        # Create a new network name object
+        $HostNetworkName = [ordered]@{
+            Name             = $validation.Hostname
+            NetworkNameType  = $validation.HostnameType
+            HostGuid         = $HostGuid
+            IPv4Guid         = $IPv4Guid
+            META_UTCCreated  = $now
+            META_UTCUpdated  = $now
+        }
+
+        # Apply additional properties if provided
         if ($Properties) {
             foreach ($key in $Properties.Keys) {
-                if ($NewProp -and (-not $dbHost.Contains($key))) {
+                if ($NewProp -and (-not $HostNetworkName.Contains($key))) {
                     # Add new properties only if -NewProp is specified
-                    $dbHost[$key] = $Properties[$key]
+                    $HostNetworkName[$key] = $Properties[$key]
                 } else {
                     # Use Update-PropertyIfNeeded for existing properties
-                    Update-PropertyIfNeeded -Target $dbHost -Key $key -Value $Properties[$key] -Force:($Force.IsPresent)
+                    Update-PropertyIfNeeded -Target $HostNetworkName -Key $key -Value $Properties[$key] -Force:($Force.IsPresent)
                 }
             }
         }
 
-        Write-Output $dbHost
+        Write-Output $HostNetworkName
     }
 }
-#endregion New-dbHost
+#endregion New-HostNetworkName
+
+
 
 #region Set-HostBasic
 function Set-HostBasic {
@@ -626,7 +656,7 @@ function Set-HostBasic {
         Updates the host object with basic properties. Accepts input via the pipeline or
         directly via parameters and a supplemental hashtable for additional key/value updates.
     .EXAMPLE
-        New-dbHost -MACAddress "00:11:22:33:44:55" |
+        Set-dbHost -MACAddress "00:11:22:33:44:55" |
             Set-HostBasic -IPAddress "192.168.1.100"
     #>
     [CmdletBinding()]

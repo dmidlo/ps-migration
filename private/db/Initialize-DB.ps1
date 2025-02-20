@@ -2,15 +2,21 @@ function Initialize-DB {
     param($DBPath)
 
     try {
-        if (-not (Test-Path $DBPath)) {
-            New-LiteDBDatabase -Path $DBPath -Verbose
+        $connectionString = New-DbConnectionString -Culture "en-US" -IgnoreCase -IgnoreNonSpace -IgnoreSymbols -ConnectionType Shared -AutoRebuild -FilePath $DBPath -AutoUpgrade
+
+        $database = New-LiteDatabase -ConnectionString $connectionString
+
+        try {
+            Invoke-LiteCommand 'pragma UTC_DATE = true;' -Database $database
+            Invoke-LiteCommand 'select pragmas from $database;' -Database $database
+        }
+        finally {
+            $database.Dispose()
         }
 
-        $dbConnection = Open-LiteDBConnection -Database $DBPath -Mode Shared -Verbose -collation "en-US/IgnoreCase"
-        Check-DBLocale -Connection $dbConnection
-        return $dbConnection
+        return $database
     }
-    catch {
+    catch { 
         Write-PodeHost "Caught an error!"
     
         # Basic error message

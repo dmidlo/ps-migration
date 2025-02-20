@@ -11,7 +11,8 @@ function Initialize-Collections {
     Out-PodeHost -InputObject $Connection
 
     Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Temp' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field='Hash'; Unique=$true },
+        [PSCustomObject]@{ Field="_id"; Unique=$true}
     )
     Ensure-LiteDBCollection -Connection $Connection -CollectionName 'RecycleBin' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
@@ -57,11 +58,17 @@ function Initialize-Collections {
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
     )
 
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Components' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
 
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Chassis' -Indexes @(
+        [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    )
     ###############################################################################
     # HOSTS
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Hosts' -Indexes @(
+    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Module' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
     )
     Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Interfaces' -Indexes @(
