@@ -54,7 +54,55 @@ function Start-psMigration {
                     Import-Module -Name Pester -PassThru -ErrorAction Stop | Out-Null
                     Write-Verbose "Imported Pester module."
                 }
-                Invoke-Pester -Output Detailed -Verbose -Debug
+
+                # Create a new Pester configuration object using New-PesterConfiguration
+                $PesterDebugConfiguration = New-PesterConfiguration
+
+                # Enable Debugging Messages
+                # $PesterDebugConfiguration.Debug.WriteDebugMessages = $true
+                # $PesterDebugConfiguration.Debug.WriteDebugMessagesFrom = @('*')  # Capture all debug sources
+                # $PesterDebugConfiguration.Debug.ShowFullErrors = $true           # Show full error stack traces
+
+                # Enable Navigation Markers in VS Code
+                $PesterDebugConfiguration.Debug.ShowNavigationMarkers = $true
+
+                # Set Error Handling for Tests
+                $PesterDebugConfiguration.Should.ErrorAction = 'Stop'  # Stop execution on the first encountered error
+
+                # Configure Test Run Behavior
+                $PesterDebugConfiguration.Run.PassThru = $true         # Return results to pipeline for further analysis
+                $PesterDebugConfiguration.Run.SkipRun = $false         # Ensure tests actually run
+                $PesterDebugConfiguration.Run.SkipRemainingOnFailure = 'Block' # Stop execution within a block if a test fails
+
+                # Filter Configuration for Debugging Specific Tests
+                $PesterDebugConfiguration.Filter.Tag = @('active')  # Run only tests with these tags
+                # $PesterDebugConfiguration.Filter.ExcludeTag = @('Slow')        # Exclude slow tests from debug runs
+
+                # Code Coverage Settings
+                # $PesterDebugConfiguration.CodeCoverage.Enabled = $true         # Enable code coverage
+                # $PesterDebugConfiguration.CodeCoverage.OutputFormat = 'CoverageGutters' # More detailed output format
+                # $PesterDebugConfiguration.CodeCoverage.OutputPath = 'cov.xml'
+                # $PesterDebugConfiguration.CodeCoverage.UseBreakpoints = $false # Use Profiler-based tracing instead of breakpoints
+                # $PesterDebugConfiguration.CodeCoverage.SingleHitBreakpoints = $true
+
+                # Test Result Logging
+                # $PesterDebugConfiguration.TestResult.Enabled = $true
+                # $PesterDebugConfiguration.TestResult.OutputFormat = 'NUnit3' # Standard NUnit XML format
+                # $PesterDebugConfiguration.TestResult.OutputPath = 'testResults.xml'
+
+                # Output Configuration
+                $PesterDebugConfiguration.Output.Verbosity = 'Detailed' # Provide maximum output details
+                # $PesterDebugConfiguration.Output.StackTraceVerbosity = 'Full' # Show full stack traces for errors
+                # $PesterDebugConfiguration.Output.RenderMode = 'Ansi'  # Use ANSI for better terminal output formatting
+
+                # Enabling TestDrive and TestRegistry for Isolated Testing
+                $PesterDebugConfiguration.TestDrive.Enabled = $true
+                $PesterDebugConfiguration.TestRegistry.Enabled = $true
+
+                # Store the Configuration Globally in $PesterPreference
+                $PesterPreference = $PesterDebugConfiguration
+
+                Invoke-Pester -Configuration $PesterDebugConfiguration
             }
             catch {
                 Write-Warning "Failed to run Pester tests: $_"
