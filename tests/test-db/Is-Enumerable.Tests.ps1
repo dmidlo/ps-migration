@@ -1,66 +1,66 @@
 Describe 'Is-Enumerable' {
     Context 'When Value is null' {
-        It 'Is-Enumerable TC01: Returns $false for $null' -Tag 'active' {
+        It 'Is-Enumerable TC01: Returns $false for $null'  {
             Is-Enumerable -Value $null | Should -Be $false
         }
     }
 
     Context 'When Value is a primitive type' {
-        It 'Is-Enumerable TC02: Returns $false for an integer' -Tag 'active' {
+        It 'Is-Enumerable TC02: Returns $false for an integer'  {
             Is-Enumerable -Value 42 | Should -Be $false
         }
 
-        It 'Is-Enumerable TC03: Returns $false for a boolean' -Tag 'active' {
+        It 'Is-Enumerable TC03: Returns $false for a boolean'  {
             Is-Enumerable -Value $true | Should -Be $false
         }
     }
 
     Context 'When Value is a string' {
-        It 'Is-Enumerable TC04: Returns $false for a non-empty string' -Tag 'active' {
+        It 'Is-Enumerable TC04: Returns $false for a non-empty string'  {
             Is-Enumerable -Value "hello" | Should -Be $false
         }
 
-        It 'Is-Enumerable TC05: Returns $false for an empty string' -Tag 'active' {
+        It 'Is-Enumerable TC05: Returns $false for an empty string'  {
             Is-Enumerable -Value "" | Should -Be $false
         }
     }
 
     Context 'When Value is an array' {
-        It 'Is-Enumerable TC06: Returns $true for an empty array' -Tag 'active' {
+        It 'Is-Enumerable TC06: Returns $true for an empty array'  {
             Is-Enumerable -Value @() | Should -Be $true
         }
 
-        It 'Is-Enumerable TC07: Returns $true for a non-empty array' -Tag 'active' {
+        It 'Is-Enumerable TC07: Returns $true for a non-empty array'  {
             Is-Enumerable -Value @(1,2,3) | Should -Be $true
         }
     }
 
     Context 'When Value is a hashtable' {
-        It 'Is-Enumerable TC08: Returns $true for an empty hashtable' -Tag 'active' {
+        It 'Is-Enumerable TC08: Returns $true for an empty hashtable'  {
             Is-Enumerable -Value @{} | Should -Be $true
         }
 
-        It 'Is-Enumerable TC09: Returns $true for a non-empty hashtable' -Tag 'active' {
+        It 'Is-Enumerable TC09: Returns $true for a non-empty hashtable'  {
             Is-Enumerable -Value @{ Key = 'Value' } | Should -Be $true
         }
     }
 
     Context 'When Value is a collection object' {
-        It 'Is-Enumerable TC10: Returns $true for an ArrayList' -Tag 'active' {
+        It 'Is-Enumerable TC10: Returns $true for an ArrayList'  {
             $list = [System.Collections.ArrayList]::new()
             Is-Enumerable -Value $list | Should -Be $true
         }
 
-        It 'Is-Enumerable TC11: Returns $true for a Generic List' -Tag 'active' {
+        It 'Is-Enumerable TC11: Returns $true for a Generic List'  {
             $genericList = [System.Collections.Generic.List[int]]::new()
             Is-Enumerable -Value $genericList | Should -Be $true
         }
 
-        It 'Is-Enumerable TC12: Returns $true for a Queue' -Tag 'active' {
+        It 'Is-Enumerable TC12: Returns $true for a Queue'  {
             $queue = [System.Collections.Queue]::new()
             Is-Enumerable -Value $queue | Should -Be $true
         }
-        It 'Is-Enumerable TC13: Returns $true for an OrderedDictionary' -Tag 'active' {
+        It 'Is-Enumerable TC13: Returns $true for an OrderedDictionary'  {
             $orderedDict = [System.Collections.Specialized.OrderedDictionary]::new()
             Is-Enumerable -Value $orderedDict | Should -Be $true
         }
@@ -68,23 +68,23 @@ Describe 'Is-Enumerable' {
     }
 
     Context 'When Value is a non-enumerable object' {
-        It 'Is-Enumerable TC14: Returns $false for a PSCustomObject' -Tag 'active' {
+        It 'Is-Enumerable TC14: Returns $false for a PSCustomObject'  {
             $obj = [PSCustomObject]@{}
             Is-Enumerable -Value $obj | Should -Be $false
         }
 
 
-        It 'Is-Enumerable TC15: Returns $false for a script block' -Tag 'active' {
+        It 'Is-Enumerable TC15: Returns $false for a script block'  {
             $scriptBlock = { param($x) $x }
             Is-Enumerable -Value $scriptBlock | Should -Be $false
         }
 
-        It 'Is-Enumerable TC16: Returns $false for a COM object' -Tag 'active' {
+        It 'Is-Enumerable TC16: Returns $false for a COM object'  {
             $comObject = New-Object -ComObject Scripting.Dictionary
             Is-Enumerable -Value $comObject | Should -Be $false
         }
 
-        It 'Is-Enumerable TC17: Returns $false for a StringEnumerator' -Tag 'active' {
+        It 'Is-Enumerable TC17: Returns $false for a StringEnumerator'  {
             $stringCollection = New-Object System.Collections.Specialized.StringCollection
             $stringCollection.AddRange(@('a','b','c'))
             $stringEnum = $stringCollection.GetEnumerator()
@@ -92,7 +92,7 @@ Describe 'Is-Enumerable' {
             Is-Enumerable -Value $stringEnum | Should -Be $false
         }
 
-        It 'Is-Enumerable TC18: Returns $false for [DBNull]::Value' -Tag 'active' {
+        It 'Is-Enumerable TC18: Returns $false for [DBNull]::Value'  {
             Is-Enumerable -Value ([DBNull]::Value) | Should -Be $false
         }
     }

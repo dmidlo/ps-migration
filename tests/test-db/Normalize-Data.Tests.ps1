@@ -17,11 +17,11 @@ Describe "Normalize-Data" {
     }
 
     Context "Basic Functionality" {
-        It "Normalize-Data TC01: Returns 'null' when given 'null'" -Tag 'active' {
+        It "Normalize-Data TC01: Returns 'null' when given 'null'"  {
             Normalize-Data -InputObject $null -IgnoreFields $IgnoreFields | Should -BeExactly $null
         }
 
-        It "Normalize-Data TC02: Returns primitive values as-is" -Tag 'active' {
+        It "Normalize-Data TC02: Returns primitive values as-is"  {
             Normalize-Data -InputObject 42 -IgnoreFields $IgnoreFields | Should -BeExactly 42
             Normalize-Data -InputObject "Hello" -IgnoreFields $IgnoreFields | Should -BeExactly "Hello"
             Normalize-Data -InputObject $true -IgnoreFields $IgnoreFields | Should -BeExactly $true
@@ -34,7 +34,7 @@ Describe "Normalize-Data" {
         #     Normalize-Data -InputObject $obj -IgnoreFields $IgnoreFields | Should -BeExactly 123
         # }
 
-        It "Normalize-Data TC04: Treats a multi-property PSCustomObject as a dictionary" -Tag 'active' {
+        It "Normalize-Data TC04: Treats a multi-property PSCustomObject as a dictionary"  {
             $obj = New-Object PSCustomObject -Property @{ A = 1; B = 2 }
             $expected = [Ordered]@{ A = 1; B = 2 }
 
@@ -44,7 +44,7 @@ Describe "Normalize-Data" {
     }
 
     Context "Handling Dictionaries" {
-        It "Normalize-Data TC05: Normalizes a hashtable with sorted keys" -Tag 'active' {
+        It "Normalize-Data TC05: Normalizes a hashtable with sorted keys"  {
             $dict = @{ B = "Value2"; A = "Value1" }
             $expected = [Ordered]@{ A = "Value1"; B = "Value2" }
 
@@ -54,7 +54,7 @@ Describe "Normalize-Data" {
     }
 
     Context "Handling Enumerables (Non-String)" {
-        It "Normalize-Data TC06: Normalizes an array by sorting its elements" -Tag 'active' {
+        It "Normalize-Data TC06: Normalizes an array by sorting its elements"  {
             $list = @(3, 1, 2)
             $expected = @(1, 2, 3)
 
@@ -62,7 +62,7 @@ Describe "Normalize-Data" {
             $result | Should -Be $expected
         }
 
-        It "Normalize-Data TC07: Preserves 'null' values in an array at their original index" -Tag 'active' {
+        It "Normalize-Data TC07: Preserves 'null' values in an array at their original index"  {
             $list = @(3, $null, 1, 2)
             $expected = @(1, $null, 2, 3)
 
@@ -72,7 +72,7 @@ Describe "Normalize-Data" {
     }
 
     Context "Handling Deeply Nested Structures" {
-        It "Normalize-Data TC08: Normalizes a complex nested dictionary and lists" -Tag 'active' {
+        It "Normalize-Data TC08: Normalizes a complex nested dictionary and lists"  {
             $input = @{
                 Unsorted = @(3, 1, 2)
                 Dict = @{ Z = "Last"; A = "First" }
@@ -95,13 +95,13 @@ Describe "Normalize-Data" {
     }
 
     Context "Handling Mixed-Type Lists" {
-        It "Normalize-Data TC09: Returns list with stable order when sorting is not possible" -Tag 'active' {
+        It "Normalize-Data TC09: Returns list with stable order when sorting is not possible"  {
             $input = @(1, "string", @{ key = "value" })
             $result = Normalize-Data -InputObject $input -IgnoreFields $IgnoreFields
             ($result | ConvertTo-Json -Depth 10) | Should -Be ($input | ConvertTo-Json -Depth 10)
         }
 
-        It "Normalize-Data TC10: Ensures identical dictionaries inside lists remain identical" -Tag 'active' {
+        It "Normalize-Data TC10: Ensures identical dictionaries inside lists remain identical"  {
             $input = @( @{ "A" = 1; "B" = 2 }, @{ "A" = 1; "B" = 2 } )
             $expected = @( [Ordered]@{ "A" = 1; "B" = 2 }, [Ordered]@{ "A" = 1; "B" = 2 } )
 
@@ -111,7 +111,7 @@ Describe "Normalize-Data" {
     }
 
     Context "Handling Large Inputs (Performance Tests)" {
-        It "Normalize-Data TC11: Efficiently processes a large list of numbers" -Tag 'active' {
+        It "Normalize-Data TC11: Efficiently processes a large list of numbers"  {
             $largeList = 1..10000 | Sort-Object { Get-Random }
             $result = Normalize-Data -InputObject $largeList -IgnoreFields $IgnoreFields
             $expected = 1..10000
@@ -119,7 +119,7 @@ Describe "Normalize-Data" {
             $result | Should -BeExactly $expected
         }
 
-        It "Normalize-Data TC12: Efficiently processes a large dictionary with sorted keys" -Tag 'active' {
+        It "Normalize-Data TC12: Efficiently processes a large dictionary with sorted keys"  {
             $largeDict = @{}
             for ($i = 1; $i -le 1000; $i++) {
                 $largeDict["Key$i"] = "Value$i"
@@ -138,7 +138,7 @@ Describe "Normalize-Data" {
     }
 
     Context "Handling Ignored Fields" {
-        It "Normalize-Data TC13: Removes ignored fields inside dictionaries" -Tag 'active' {
+        It "Normalize-Data TC13: Removes ignored fields inside dictionaries"  {
             $input = @{ "A" = 1; "IgnoreMe" = 999 }
             $ignoreFields = [System.Collections.Generic.HashSet[string]]::new()
             $ignoreFields.Add("IgnoreMe")
@@ -151,7 +151,7 @@ Describe "Normalize-Data" {
     }
 
     Context "Additional Tests" {
-        It "Normalize-Data TC14: Handles dictionaries with non-string keys" -Tag 'active' {
+        It "Normalize-Data TC14: Handles dictionaries with non-string keys"  {
             $input = @{ 1 = "One"; 2 = "Two"; "A" = "Letter" }
             $expected = [Ordered]@{ "1" = "One"; "2" = "Two"; "A" = "Letter" }
             
@@ -159,7 +159,7 @@ Describe "Normalize-Data" {
             ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
         }
 
-        It "Normalize-Data TC15: Does not attempt to sort mixed-type lists" -Tag 'active' {
+        It "Normalize-Data TC15: Does not attempt to sort mixed-type lists"  {
             $input = @(1, "string", @{ key = "value" })
             $expected = $input  # Expecting the same order
             
@@ -167,7 +167,7 @@ Describe "Normalize-Data" {
             ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
         }
 
-        It "Normalize-Data TC16: Returns empty list as empty list" -Tag 'active' {
+        It "Normalize-Data TC16: Returns empty list as empty list"  {
             $input = @()
             $expected = @()
 
@@ -175,7 +175,7 @@ Describe "Normalize-Data" {
             $result | Should -BeExactly $expected
         }
 
-        It "Normalize-Data TC17: Removes ignored fields at all levels" -Tag 'active' {
+        It "Normalize-Data TC17: Removes ignored fields at all levels"  {
             $input = @{
                 "Keep" = 1
                 "RemoveMe" = 2

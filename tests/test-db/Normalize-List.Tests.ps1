@@ -6,12 +6,12 @@ Describe "Normalize-List Tests" {
     }
 
     Context "Basic Functionality" {
-        It "Normalize-List TC01: Returns an empty list when given an empty list" -Tag 'active' {
+        It "Normalize-List TC01: Returns an empty list when given an empty list"  {
             $result = Normalize-List -List @() -IgnoreFields $IgnoreFields
             $result | Should -BeExactly @()
         }
 
-        It "Normalize-List TC02: Returns the same list if elements are already normalized" -Tag 'active' {
+        It "Normalize-List TC02: Returns the same list if elements are already normalized"  {
             $input = @(1, "test", @{ key = "value" })
             $expected = @(1, "test", [Ordered]@{ key = "value" })
             $result = Normalize-List -List $input -IgnoreFields $IgnoreFields
@@ -20,22 +20,22 @@ Describe "Normalize-List Tests" {
     }
 
     Context "Sorting Behavior" {
-        It "Normalize-List TC03: Sorts a list of numbers" -Tag 'active' {
+        It "Normalize-List TC03: Sorts a list of numbers"  {
             $result = Normalize-List -List @(3, 1, 2) -IgnoreFields $IgnoreFields
             $result | Should -BeExactly @(1, 2, 3)
         }
 
-        It "Normalize-List TC04: Sorts a list of duplicate numbers correctly" -Tag 'active' {
+        It "Normalize-List TC04: Sorts a list of duplicate numbers correctly"  {
             $result = Normalize-List -List @(3, 1, 3, 2, 1) -IgnoreFields $IgnoreFields
             $result | Should -BeExactly @(1, 1, 2, 3, 3)
         }
 
-        It "Normalize-List TC05: Sorts a list of strings case-insensitively" -Tag 'active' {
+        It "Normalize-List TC05: Sorts a list of strings case-insensitively"  {
             $result = Normalize-List -List @("B", "a", "C") -IgnoreFields $IgnoreFields
             $result | Should -BeExactly @("a", "B", "C")  
         }
 
-        It "Normalize-List TC06: Does not change order when elements are not all comparable" -Tag 'active' {
+        It "Normalize-List TC06: Does not change order when elements are not all comparable"  {
             $input = @(1, "string", @{ key = "value" })
             $result = Normalize-List -List $input -IgnoreFields $IgnoreFields
             ($result | ConvertTo-Json -Depth 10) | Should -BeExactly ($input | ConvertTo-Json -Depth 10)
@@ -43,17 +43,17 @@ Describe "Normalize-List Tests" {
     }
 
     Context "Null Handling" {
-        It "Normalize-List TC07: Preserves `$null` values in their original positions" -Tag 'active' {
+        It "Normalize-List TC07: Preserves `$null` values in their original positions"  {
             $result = Normalize-List -List @(1, $null, 2) -IgnoreFields $IgnoreFields
             $result | Should -BeExactly @(1, $null, 2)
         }
 
-        It "Normalize-List TC08: Preserves `$null` while sorting sortable elements" -Tag 'active' {
+        It "Normalize-List TC08: Preserves `$null` while sorting sortable elements"  {
             $result = Normalize-List -List @(3, $null, 1, 2, $null) -IgnoreFields $IgnoreFields
             $result | Should -BeExactly @(1, $null, 2, 3, $null)
         }
 
-        It "Normalize-List TC09: Preserves `$null` in a mixed-type list without sorting" -Tag 'active' {
+        It "Normalize-List TC09: Preserves `$null` in a mixed-type list without sorting"  {
             $input = @("A", $null, 2, @{ key = "value" })
             $result = Normalize-List -List $input -IgnoreFields $IgnoreFields
             ($result | ConvertTo-Json -Depth 10) | Should -BeExactly ($input | ConvertTo-Json -Depth 10)
@@ -61,7 +61,7 @@ Describe "Normalize-List Tests" {
     }
 
     Context "Recursion & Nested Structures" {
-        It "Normalize-List TC10: Recursively normalizes nested lists" -Tag 'active' {
+        It "Normalize-List TC10: Recursively normalizes nested lists"  {
             $input = @(@(3, 1, 2), @(9, 7, 8))
             $result = Normalize-List -List $input -IgnoreFields $IgnoreFields
             $expected = @(@(1, 2, 3), @(7, 8, 9))
@@ -69,7 +69,7 @@ Describe "Normalize-List Tests" {
             $result | Should -BeExactly $expected
         }
 
-        It "Normalize-List TC11: Recursively normalizes deeply nested structures" -Tag 'active' {
+        It "Normalize-List TC11: Recursively normalizes deeply nested structures"  {
             $input = @(@(@(5, 3, 1)), @(@(9, 7, 8)))
             $result = Normalize-List -List $input -IgnoreFields $IgnoreFields
             $expected = @(@(@(1, 3, 5)), @(@(7, 8, 9)))
@@ -77,7 +77,7 @@ Describe "Normalize-List Tests" {
             $result | Should -BeExactly $expected
         }
 
-        It "Normalize-List TC12: Recursively normalizes dictionaries inside lists" -Tag 'active' {
+        It "Normalize-List TC12: Recursively normalizes dictionaries inside lists"  {
             $input = @(@{ a = 2; b = 1 }, @{ a = 4; b = 3 })
             $result = Normalize-List -List $input -IgnoreFields $IgnoreFields
 
@@ -89,7 +89,7 @@ Describe "Normalize-List Tests" {
             ($result | ConvertTo-Json -Depth 10) | Should -BeExactly ($expected | ConvertTo-Json -Depth 10)
         }
 
-        It "Normalize-List TC13: Handles ignored fields inside dictionaries in lists" -Tag 'active' {
+        It "Normalize-List TC13: Handles ignored fields inside dictionaries in lists"  {
             $input = @(@{ a = 2; b = 1 }, @{ a = 4; b = 3 })
             $ignoreFields = [System.Collections.Generic.HashSet[string]]::new()
             $ignoreFields.Add("b")
@@ -105,13 +105,13 @@ Describe "Normalize-List Tests" {
     }
 
     Context "Handling Mixed Types" {
-        It "Normalize-List TC14: Handles lists with mixed types without errors" -Tag 'active' {
+        It "Normalize-List TC14: Handles lists with mixed types without errors"  {
             $input = @(1, "text", $null, @{ key = "value" }, @(5, 2))
             $result = Normalize-List -List $input -IgnoreFields $IgnoreFields
             $result.Count | Should -Be 5
         }
 
-        It "Normalize-List TC15: Maintains stable order in mixed-type lists when sorting is impossible" -Tag 'active' {
+        It "Normalize-List TC15: Maintains stable order in mixed-type lists when sorting is impossible"  {
             $input = @(1, "string", @{ key = "value" }, @(2, 5))
             $result = Normalize-List -List $input -IgnoreFields $IgnoreFields
             ($result | ConvertTo-Json -Depth 10) | Should -BeExactly ($input | ConvertTo-Json -Depth 10)
@@ -119,7 +119,7 @@ Describe "Normalize-List Tests" {
     }
 
     Context "Performance & Scalability" {
-        It "Normalize-List TC16: Handles a large list of numbers efficiently" -Tag 'active' {
+        It "Normalize-List TC16: Handles a large list of numbers efficiently"  {
             $largeList = 1..10000 | Sort-Object { Get-Random }
             $result = Normalize-List -List $largeList -IgnoreFields $IgnoreFields
             $expected = 1..10000
@@ -127,7 +127,7 @@ Describe "Normalize-List Tests" {
             $result | Should -BeExactly $expected
         }
 
-        It "Normalize-List TC17: Handles a large list of dictionaries efficiently" -Tag 'active' {
+        It "Normalize-List TC17: Handles a large list of dictionaries efficiently"  {
             $largeList = @(For ($i = 1; $i -le 1000; $i++) { @{ id = $i; value = (1000 - $i) } })
             $ignoreFields = [System.Collections.Generic.HashSet[string]]::new()
             $ignoreFields.Add("value")
@@ -142,7 +142,7 @@ Describe "Normalize-List Tests" {
     }
 
     Context "Additional Tests" {
-        # It "Normalize-List TC18: Normalizes dictionaries with mixed key types inside a list" -Tag 'active' {
+        # It "Normalize-List TC18: Normalizes dictionaries with mixed key types inside a list"  {
         #     $input = @( @{ 1 = "one"; "B" = "bee" } )
         #     $expected = @( [Ordered]@{ 1 = "one"; "B" = "bee" } )
 
@@ -150,7 +150,7 @@ Describe "Normalize-List Tests" {
         #     ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
         # }
 
-        It "Normalize-List TC19: Ensures identical dictionaries inside lists remain identical" -Tag 'active' {
+        It "Normalize-List TC19: Ensures identical dictionaries inside lists remain identical"  {
             $input = @( @{ "A" = 1; "B" = 2 }, @{ "A" = 1; "B" = 2 } )
             $expected = @( [Ordered]@{ "A" = 1; "B" = 2 }, [Ordered]@{ "A" = 1; "B" = 2 } )
 
@@ -158,7 +158,7 @@ Describe "Normalize-List Tests" {
             ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
         }
 
-        It "Normalize-List TC20: Removes ignored fields inside dictionaries within lists" -Tag 'active' {
+        It "Normalize-List TC20: Removes ignored fields inside dictionaries within lists"  {
             $input = @( @{ "A" = 1; "IgnoreMe" = 999 }, @{ "B" = 2; "IgnoreMe" = 888 } )
             $expected = @( [Ordered]@{ "A" = 1 }, [Ordered]@{ "B" = 2 } )
 
@@ -166,7 +166,7 @@ Describe "Normalize-List Tests" {
             ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
         }
 
-        It "Normalize-List TC21: Sorts a list of dictionaries by key order" -Tag 'active' {
+        It "Normalize-List TC21: Sorts a list of dictionaries by key order"  {
             $input = @( @{ "Z" = 3 }, @{ "A" = 1 } )
             $expected = @( [Ordered]@{ "A" = 1 }, [Ordered]@{ "Z" = 3 } )
 
@@ -174,7 +174,7 @@ Describe "Normalize-List Tests" {
             ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
         }
 
-        It "Normalize-List TC22: Leaves an already sorted list of dictionaries unchanged" -Tag 'active' {
+        It "Normalize-List TC22: Leaves an already sorted list of dictionaries unchanged"  {
             $input = @( @{ "A" = 1 }, @{ "B" = 2 } )
             $expected = $input  # It should remain unchanged
 
@@ -182,7 +182,7 @@ Describe "Normalize-List Tests" {
             ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
         }
 
-        It "Normalize-List TC23: Recursively normalizes nested lists inside dictionaries in a list" -Tag 'active' {
+        It "Normalize-List TC23: Recursively normalizes nested lists inside dictionaries in a list"  {
             $input = @( @{ "List" = @(3, 1, 2) }, @{ "List" = @(9, 7, 8) } )
             $expected = @( [Ordered]@{ "List" = @(1, 2, 3) }, [Ordered]@{ "List" = @(7, 8, 9) } )
 

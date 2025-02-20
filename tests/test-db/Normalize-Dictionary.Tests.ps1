@@ -15,7 +15,7 @@ Describe "Normalize-Dictionary" {
         $ignores | ForEach-Object { $IgnoreFields.Add($_)}
     }
 
-    It "Normalize-Dictionary TC01: Sorts keys in a hashtable" -Tag 'active' {
+    It "Normalize-Dictionary TC01: Sorts keys in a hashtable"  {
         $input = @{ "b" = 2; "a" = 1; "c" = 3 }
         $expected = [Ordered]@{ "a" = 1; "b" = 2; "c" = 3 }
 
@@ -25,7 +25,7 @@ Describe "Normalize-Dictionary" {
         $result.Values | Should -BeExactly $expected.Values
     }
 
-    It "Normalize-Dictionary TC02: Removes fields specified in IgnoreFields" -Tag 'active' {
+    It "Normalize-Dictionary TC02: Removes fields specified in IgnoreFields"  {
         $input = @{ "KeepMe" = "Value"; "IgnoreMe" = "Hidden" }
         $expected = [Ordered]@{ "KeepMe" = "Value" }
 
@@ -35,7 +35,7 @@ Describe "Normalize-Dictionary" {
         $result.Values | Should -BeExactly $expected.Values
     }
 
-    It "Normalize-Dictionary TC03: Recursively normalizes nested dictionaries" -Tag 'active' {
+    It "Normalize-Dictionary TC03: Recursively normalizes nested dictionaries"  {
         $input = @{
             "Nested" = @{
                 "Z" = 3
@@ -58,7 +58,7 @@ Describe "Normalize-Dictionary" {
         ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
     }
 
-    It "Normalize-Dictionary TC04: Handles PSCustomObject conversion" -Tag 'active' {
+    It "Normalize-Dictionary TC04: Handles PSCustomObject conversion"  {
         $object = New-Object PSCustomObject -Property @{ "b" = 2; "a" = 1; "c" = 3 }
         $expected = [Ordered]@{ "a" = 1; "b" = 2; "c" = 3 }
 
@@ -68,7 +68,7 @@ Describe "Normalize-Dictionary" {
         $result.Values | Should -BeExactly $expected.Values
     }
 
-    It "Normalize-Dictionary TC05: Handles a dictionary with mixed data types" -Tag 'active' {
+    It "Normalize-Dictionary TC05: Handles a dictionary with mixed data types"  {
         $input = @{ "Number" = 42; "String" = "Hello"; "Array" = @(1, 2, 3) }
         $expected = [Ordered]@{ "Array" = @(1, 2, 3); "Number" = 42; "String" = "Hello" }
 
@@ -78,7 +78,7 @@ Describe "Normalize-Dictionary" {
         $result.Values | Should -BeExactly $expected.Values
     }
 
-    It "Normalize-Dictionary TC06: Throws an error for non-dictionary input" -Tag 'active' {
+    It "Normalize-Dictionary TC06: Throws an error for non-dictionary input"  {
         $exception = $null
         try {
             Normalize-Dictionary -Dictionary "NotAHashTable" -IgnoreFields $IgnoreFields
@@ -90,7 +90,7 @@ Describe "Normalize-Dictionary" {
         $exception.Exception.Message | Should -Match "Expected IDictionary or PSCustomObject"
     }
 
-    It "Normalize-Dictionary TC07: Recursively normalizes nested lists" -Tag 'active' {
+    It "Normalize-Dictionary TC07: Recursively normalizes nested lists"  {
         $input = @{ "List" = @(3, 1, 2) }
         $expected = [Ordered]@{ "List" = @(1, 2, 3) }  # Expect sorted list
 
@@ -103,7 +103,7 @@ Describe "Normalize-Dictionary" {
         $result["List"] | Should -BeExactly $expected["List"]
     }
 
-    It "Normalize-Dictionary TC08: Handles empty lists and null values" -Tag 'active' {
+    It "Normalize-Dictionary TC08: Handles empty lists and null values"  {
         $input = @{ "EmptyList" = @(); "NullValue" = $null }
         $expected = [Ordered]@{ "EmptyList" = @(); "NullValue" = $null }
 
@@ -113,7 +113,7 @@ Describe "Normalize-Dictionary" {
         $result.Values | Should -BeExactly $expected.Values
     }
 
-    It "Normalize-Dictionary TC09: Fully normalizes multi-level nested dictionaries" -Tag 'active' {
+    It "Normalize-Dictionary TC09: Fully normalizes multi-level nested dictionaries"  {
         $input = @{ "Outer" = @{ "Middle" = @{ "Inner" = "Value"; "Another" = "Test" } } }
 
         $expected = [Ordered]@{
@@ -140,7 +140,7 @@ Describe "Normalize-Dictionary" {
         ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
     }
 
-    It "Normalize-Dictionary TC10: Ignores fields case-insensitively" -Tag 'active' {
+    It "Normalize-Dictionary TC10: Ignores fields case-insensitively"  {
         $IgnoreFieldsCaseInsensitive = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
         $IgnoreFieldsCaseInsensitive.Add("ignoreme")
 
@@ -162,7 +162,7 @@ Describe "Normalize-Dictionary" {
     #     $result.Values | Should -BeExactly $expected.Values
     # }
 
-    It "Normalize-Dictionary TC12: Handles a dictionary with mixed value types" -Tag 'active' {
+    It "Normalize-Dictionary TC12: Handles a dictionary with mixed value types"  {
         $input = @{
             "String"  = "Hello"
             "Number"  = 123
@@ -183,7 +183,7 @@ Describe "Normalize-Dictionary" {
         ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
     }
 
-    It "Normalize-Dictionary TC13: Handles a large dictionary efficiently" -Tag 'active' {
+    It "Normalize-Dictionary TC13: Handles a large dictionary efficiently"  {
         $input = @{}
         for ($i = 1; $i -le 1000; $i++) {
             $input["Key$i"] = $i
@@ -196,7 +196,7 @@ Describe "Normalize-Dictionary" {
         $result.Keys | Should -BeExactly $sortedKeys
     }
 
-    It "Normalize-Dictionary TC14: Handles circular references without infinite recursion" -Tag 'active' {
+    It "Normalize-Dictionary TC14: Handles circular references without infinite recursion"  {
         $input = @{ "Self" = $null }
         $input["Self"] = $input  # Circular reference
 
@@ -211,7 +211,7 @@ Describe "Normalize-Dictionary" {
         $exception.Exception.Message | Should -Match "The script failed due to call depth overflow."
     }
 
-    It "Normalize-Dictionary TC15: Produces identical output when run multiple times" -Tag 'active' {
+    It "Normalize-Dictionary TC15: Produces identical output when run multiple times"  {
         $input = @{ "b" = 2; "a" = 1; "c" = 3 }
         $expected = Normalize-Dictionary -Dictionary $input -IgnoreFields $IgnoreFields
 
@@ -220,7 +220,7 @@ Describe "Normalize-Dictionary" {
         ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
     }
 
-    It "Normalize-Dictionary TC16: Preserves `$null` values in nested dictionaries" -Tag 'active' {
+    It "Normalize-Dictionary TC16: Preserves `$null` values in nested dictionaries"  {
         $input = @{ "Outer" = @{ "Inner" = $null } }
         $expected = [Ordered]@{ "Outer" = [Ordered]@{ "Inner" = $null } }
 
@@ -238,7 +238,7 @@ Describe "Normalize-Dictionary" {
     #     ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
     # }
 
-    It "Normalize-Dictionary TC18: Handles deeply nested lists inside dictionaries" -Tag 'active' {
+    It "Normalize-Dictionary TC18: Handles deeply nested lists inside dictionaries"  {
         $input = @{ "NestedList" = @(@(@(5, 3, 1)), @(@(9, 7, 8))) }
         $expected = [Ordered]@{ "NestedList" = @(@(@(1, 3, 5)), @(@(7, 8, 9))) }
 
@@ -247,7 +247,7 @@ Describe "Normalize-Dictionary" {
         ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
     }
 
-    It "Normalize-Dictionary TC19: Preserves `$null` values inside lists within dictionaries" -Tag 'active' {
+    It "Normalize-Dictionary TC19: Preserves `$null` values inside lists within dictionaries"  {
         $input = @{ "list" = @(3, $null, 1, 2, $null) }
         $expected = [Ordered]@{ "list" = @(1, $null, 2, 3, $null) }
 
@@ -256,7 +256,7 @@ Describe "Normalize-Dictionary" {
         ($result | ConvertTo-Json -Depth 10) | Should -Be ($expected | ConvertTo-Json -Depth 10)
     }
 
-    It "Normalize-Dictionary TC20: Normalizes identical nested structures consistently" -Tag 'active' {
+    It "Normalize-Dictionary TC20: Normalizes identical nested structures consistently"  {
         $input = @{
             "A" = @{ "X" = 1; "Y" = 2 }
             "B" = @{ "X" = 1; "Y" = 2 }

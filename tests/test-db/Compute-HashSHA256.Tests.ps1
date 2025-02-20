@@ -1,6 +1,6 @@
 Describe "Compute-HashSHA256" {
 
-    It "Produces correct SHA-256 hash for various inputs" -Tag 'active' -ForEach @(
+    It "Produces correct SHA-256 hash for various inputs"  -ForEach @(
         @{
             InputString = 'Hello'
             Expected    = '185F8DB32271FE25F561A6FC938B2E264306EC304EDA518007D1764826381969'

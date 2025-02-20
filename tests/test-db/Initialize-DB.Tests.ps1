@@ -52,7 +52,7 @@ Describe "Integration Tests for Initialize-DB" {
             Initialize-DB -DBPath $dbPath
         }
 
-        It "Initialize-DB TC02: should use the existing database file and return a valid connection with expected properties" -Tag 'active' {
+        It "Initialize-DB TC02: should use the existing database file and return a valid connection with expected properties"  {
 
             # Assert: The file still exists.
             (Test-Path $dbPath) | Should -BeTrue
@@ -73,17 +73,17 @@ Describe "Integration Tests for Initialize-DB" {
     }
 
     Context "Edge Cases" {
-        It "should throw an error if DBPath is null" -Tag 'active' {
+        It "should throw an error if DBPath is null"  {
             { Initialize-DB -DBPath $null } | Should -Throw
         }
 
-        It "should throw an error if DBPath is an empty string" -Tag 'active' {
+        It "should throw an error if DBPath is an empty string"  {
             { Initialize-DB -DBPath "" } | Should -Throw
         }
     }
 
     Context "Error Handling" {
-        It "should log error details and rethrow if an error occurs" -Tag 'active' {
+        It "should log error details and rethrow if an error occurs"  {
             # Passing a directory path instead of a file should trigger an error.
             { Initialize-DB -DBPath $env:TEMP } | Should -Throw
         }
