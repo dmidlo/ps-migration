@@ -1,14 +1,7 @@
 function New-PodeWebCardAddHost {
     New-PodeWebCard -Name "Add Hosts" -Content @(
         New-PodeWebSteps -Name "Add Host Steps" -Steps @(
-            New-PodeWebStep -Name "Host Addresses" -Icon "identifier" -Content @(
-                New-PodeWebCardAddHostAddresses
-            ) -ScriptBlock {
-                New-PodeWebCardAddHostAddressesValidator
-            }
-            New-PodeWebStep -Name "Host Details" -Icon "identifier" -Content @(
-                New-PodeWebText -Value "Host Details"
-            )
+            New-AddHostSteps
         ) -ScriptBlock {
             Out-PodeHost $WebEvent.Data
         }
@@ -62,8 +55,8 @@ function New-PodeWebCardAddHost {
     #         [PSCustomObject]@{ $_.Key = $_.Value }
     #     }
 
-    #     # Call New-dbHost function
-    #     $dbHost = New-dbHost -MACAddress $formData.MACAddress -Properties $properties -Force:$formData.Force -NewProp:$formData.NewProp
+    #     # Call Set-dbHost function
+    #     $dbHost = Set-dbHost -MACAddress $formData.MACAddress -Properties $properties -Force:$formData.Force -NewProp:$formData.NewProp
 
     #     # Display the created dbHost object
     #     Show-PodeWebToast -Message "Host created successfully!" -Duration 5000

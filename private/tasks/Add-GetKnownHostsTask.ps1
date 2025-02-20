@@ -13,7 +13,6 @@
 # DNSConfig            : {}
 # Guid                 : f58856c3-293f-4d09-a8fc-1e6682370114
 # VerInt               : 0
-# Id                   : 679ddb80fb11150443065dd8-f58856c3-293f-4d09-a8fc-1e6682370114
 # OSVersion            : Windows Server 2022
 # Hostname             : DC01.example.local
 # FSMORoles            : {@{RoleName=InfrastructureMaster; FSMOGuid=GUID-InfrastructureMaster; FSMOHash=HASH-InfrastructureMaster}, @{RoleName=PDCEmulator; FSMOGuid=GUID-PDCEmulator;       
