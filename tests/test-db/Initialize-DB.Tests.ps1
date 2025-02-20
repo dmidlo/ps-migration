@@ -21,6 +21,7 @@ Describe "Integration Tests for Initialize-DB" {
         It "Initialize-DB TC01: should create a new database file and return a valid connection with expected properties" -Tag 'active' {
             # Act: Initialize the database.
 
+            $dbPath = Join-Path $env:TEMP "test.db"
             $connection = Initialize-DB -DBPath $dbPath
 
             # Assert: The database file now exists.
