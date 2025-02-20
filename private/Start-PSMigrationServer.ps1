@@ -55,14 +55,14 @@ function Start-psMigrationServer {
         #Setup Database Connection
         $dbConnection = Initialize-DB -DBPath (Get-PodeConfig).databasePath
         Set-PodeState -Name "dbConnection" -Value $dbConnection
-        Initialize-Collections -Connection (Get-PodeState -Name "dbConnection") -SampleData
+        Initialize-Collections -Connection (Get-PodeState -Name "dbConnection")
         
-        # Register Tasks with Web Server
+        # # Register Tasks with Web Server
         Add-HostServicesStatusTask
         Add-GetKnownHostsTask
         
-        # Main
-        New-PodeServerHostsPage
-        New-PodeServerToolsPage
+        # # Main
+        # New-PodeServerHostsPage
+        # New-PodeServerToolsPage
     }
 }
