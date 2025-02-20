@@ -21,7 +21,7 @@ Describe "Integration Tests for Ensure-LiteDBCollection" {
     }
 
     Context "Ensuring Collection Exists" {
-        It "Ensure-LiteDBCollection TC01: should create a new collection when it does not exist" -Tag 'active' {
+        It "Ensure-LiteDBCollection TC01: should create a new collection when it does not exist" {
             # Act: Ensure the collection exists.
             Ensure-LiteDBCollection -Connection $dbConnection -CollectionName "TestCollection"
 
@@ -30,7 +30,7 @@ Describe "Integration Tests for Ensure-LiteDBCollection" {
             $existingCollections | Should -Contain "TestCollection"
         }
 
-        It "Ensure-LiteDBCollection TC02: should not fail when the collection already exists" -Tag 'active' {
+        It "Ensure-LiteDBCollection TC02: should not fail when the collection already exists" {
             # Arrange: Pre-create the collection.
             $dbConnection.GetCollection("TestCollection") | Out-Null
 
@@ -99,15 +99,15 @@ Describe "Integration Tests for Ensure-LiteDBCollection" {
         #     $indexList | Should -BeEmpty
         # }
 
-        It "Ensure-LiteDBCollection TC07: should throw an error if CollectionName is null" -Tag 'active' {
+        It "Ensure-LiteDBCollection TC07: should throw an error if CollectionName is null" {
             { Ensure-LiteDBCollection -Connection $dbConnection -CollectionName $null } | Should -Throw
         }
 
-        It "Ensure-LiteDBCollection TC08: should throw an error if CollectionName is empty" -Tag 'active' {
+        It "Ensure-LiteDBCollection TC08: should throw an error if CollectionName is empty" {
             { Ensure-LiteDBCollection -Connection $dbConnection -CollectionName "" } | Should -Throw
         }
 
-        It "Ensure-LiteDBCollection TC09: should throw an error when Index definition is missing 'Field' property" -Tag 'active' {
+        It "Ensure-LiteDBCollection TC09: should throw an error when Index definition is missing 'Field' property" {
             # Arrange: Define an invalid index (missing `Field`).
             $indexes = @(
                 [PSCustomObject]@{ Unique = $true }
@@ -136,7 +136,7 @@ Describe "Integration Tests for Ensure-LiteDBCollection" {
     # }
 
     Context "Performance Testing" {
-        It "Ensure-LiteDBCollection TC11: should create 100 indexes within a reasonable time" -Tag 'active' {
+        It "Ensure-LiteDBCollection TC11: should create 100 indexes within a reasonable time" {
             # Arrange: Generate 100 unique indexes.
             $largeIndexes = 1..100 | ForEach-Object { [PSCustomObject]@{ Field = "Field$_" } }
 
