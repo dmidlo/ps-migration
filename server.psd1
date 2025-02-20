@@ -1,20 +1,17 @@
 @{
     HttpPort = 80
     HttpsPort = 443
-    BlaineSeachScopeDN = "OU=LL Users,OU=CMI Users,OU=CMI,DC=northstar,DC=local"
-    PlymouthSearchScopeDN = "OU=MP Users,OU=CMI Users,OU=CMI,DC=northstar,DC=local"
-    northstarSearchScopeDN = "DC=northstar,DC=local"
     databasePath = ".\StoredObjects\ps-migration.db"
     dhcptestPath = ".\private\bin\dhcptest-0.9-win64.exe"
     Server = @{
         Ssl = @{
             Protocols = @("TLS","TLS11","TLS12")
         }
-        # FileMonitor = @{
-        #     Enable = $true
-        #     Include = @("*.psd1", "*.ps1")
-        #     ShowFiles = $true
-        # }
+        FileMonitor = @{
+            Enable = $true
+            Include = @("*.psd1", "*.ps1")
+            ShowFiles = $true
+        }
     }
     Web = @{
         Compression = @{
