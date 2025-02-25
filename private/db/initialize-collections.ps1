@@ -2,77 +2,94 @@ function Initialize-Collections {
     param(
         [Parameter(Mandatory=$true)]
         [LiteDB.LiteDatabase]
-        $Connection,
+        $Database,
         [switch]
         $SampleData
     )
 
     Write-PodeHost "Initializing collections and indexes using dbConnection:"
-    Out-PodeHost -InputObject $Connection
+    Out-PodeHost -InputObject $Database
 
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Temp' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Temp' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true },
-        [PSCustomObject]@{ Field="_id"; Unique=$true}
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'RecycleBin' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'RecycleBin' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
 
     ###############################################################################
     # Organizations
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Organizations' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Organizations' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Regions' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Regions' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Campuses' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Campuses' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Sites' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Sites' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Floors' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Floors' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Areas' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Areas' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Rooms' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Rooms' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Racks' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Racks' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Panels' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Panels' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Channels' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Channels' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Circuits' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Circuits' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Providers' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Providers' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
 
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Components' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Components' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
 
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Chassis' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Chassis' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
     ###############################################################################
     # HOSTS
     ###############################################################################
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Module' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Module' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Interfaces' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Interfaces' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+        [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
     # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'IPv4Addresses' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }

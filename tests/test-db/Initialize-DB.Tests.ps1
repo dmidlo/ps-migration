@@ -1,9 +1,12 @@
+# using assembly "..\Ldbc\0.8.11\LiteDB.dll"
 Describe "Integration Tests for Initialize-DB" {
     # Define the database file path at the top so it’s available to all tests.
 
     BeforeEach {
         # Ensure a clean slate by removing any existing test database file.
         $dbPath = Join-Path $env:TEMP "test.db"
+
+        $connectionString = New-DbConnectionString -Culture "en-US" -IgnoreCase -IgnoreNonSpace -IgnoreSymbols -ConnectionType Shared -AutoRebuild -FilePath $dbPath -Upgrade
         if ($dbPath -and (Test-Path $dbPath)) {
             Remove-Item $dbPath -Force
         }
@@ -17,68 +20,45 @@ Describe "Integration Tests for Initialize-DB" {
         }
     }
 
-    Context "Database creation and connection" {
-        It "Initialize-DB TC01: should create a new database file and return a valid connection string with expected properties" -Tag 'active' {
+    Context "Database creation and connection string" {
+        It "Initialize-DB TC01: should create a new database file and return a valid connection  with expected properties" -Tag 'active' {
             # Arragne: Run the initialization
-            $connectionString = Initialize-DB -DBPath $dbPath
+            $dbConnection = Initialize-DB -DBPath $dbPath -connectionString $connectionString
             # Assert: The database file now exists.
             (Test-Path $dbPath) | Should -BeTrue
 
             # Assert: A non-null connection object is returned.
-            $connectionString | Should -Not -BeNull
+            $dbConnection | Should -Not -BeNull
             
             # Validate connection object properties based on expected shape.
-            $connectionString.Connection    | Should -Be "Shared"
-            $connectionString.Filename      | Should -Be $dbPath
-            $connectionString.InitialSize   | Should -Be 0
-            $connectionString.ReadOnly      | Should -Be $false
-            $connectionString.Upgrade       | Should -Be $true
-            $connectionString.AutoRebuild   | Should -Be $true
-            $connectionString.Collation     | Should -Be "en-US/IgnoreCase, IgnoreNonSpace, IgnoreSymbols"
-        }
-    }
-
-    Context "Using an existing database file" {
-        BeforeEach {
-            # Pre-create an empty file to simulate an existing database.
-            $dbPath = Join-Path $env:TEMP "test.db"
-            Initialize-DB -DBPath $dbPath
+            $dbConnection.Mapper    | Should -Be "LiteDB.BsonMapper"
+            $dbConnection.FileStorage      | Should -Be "LiteDB.LiteStorage``1[System.String]"
+            $dbConnection.UserVersion   | Should -Be 0
+            $dbConnection.Timeout       | Should -Be "00:01:00"
+            $dbConnection.UTCDate       | Should -Be $true
+            $dbConnection.CheckpointSize   | Should -Be 1000
+            $dbConnection.Collation     | Should -Be "en-US/IgnoreCase, IgnoreNonSpace, IgnoreSymbols"
         }
 
-        It "Initialize-DB TC02: should use the existing database file and return a valid connection with expected properties"  {
+        It "Initialize-DB TC02: should update UTC_DATE pragma from false to true to force UTC" -Tag 'active' {
+            # Arrange: Setup Basic DB prior to pragma changes.
+            $basicDb = New-LiteDatabase -ConnectionString $connectionString
+            $pragmas = (Invoke-LiteCommand 'select pragmas from $database;' -As PS -Database $basicDb).pragmas
+            $basicDb.Dispose()
+            $pragmas | Should -Not -BeNullOrEmpty
+            $basicDb_UTC_DATE_pragma = $pragmas.UTC_DATE
 
-            # Assert: The file still exists.
-            (Test-Path $dbPath) | Should -BeTrue
+            $basicDb_UTC_DATE_pragma | Should -BeFalse
 
-            # Act: Initialize the database using the existing file.
-            $connection = Initialize-DB -DBPath $dbPath
-
-            # Assert: The file still exists.
-            (Test-Path $dbPath) | Should -BeTrue
-            
-            # Assert: A non-null connection object is returned.
-            $connection | Should -Not -BeNull
-
-            # Validate key connection object properties.
-            $connection.Database  | Should -Be $dbPath
-            $connection.Collation | Should -Be "en-US/IgnoreCase"
-        }
-    }
-
-    Context "Edge Cases" {
-        It "should throw an error if DBPath is null"  {
-            { Initialize-DB -DBPath $null } | Should -Throw
-        }
-
-        It "should throw an error if DBPath is an empty string"  {
-            { Initialize-DB -DBPath "" } | Should -Throw
-        }
-    }
-
-    Context "Error Handling" {
-        It "should log error details and rethrow if an error occurs"  {
-            # Passing a directory path instead of a file should trigger an error.
-            { Initialize-DB -DBPath $env:TEMP } | Should -Throw
+            # Call Initialize-DB to ensure application requirement of UTC_DATE standard output instead of local
+            Initialize-DB -connectionString $connectionString
+            $db = New-LiteDatabase -ConnectionString $connectionString
+            $pragmas = (Invoke-LiteCommand 'select pragmas from $database;' -As PS -Database $db).pragmas
+            $db.Dispose()
+            $pragmas | Should -Not -BeNullOrEmpty
+            $db_UTC_DATE_pragma = $pragmas.UTC_DATE
+            $db_UTC_DATE_pragma | Should -BeTrue
+            $db_UTC_DATE_pragma | Should -Not -Be $basicDb_UTC_DATE_pragma
         }
     }
 }

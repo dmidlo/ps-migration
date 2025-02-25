@@ -1,20 +1,14 @@
 function Initialize-DB {
-    param($DBPath)
+    param($connectionString)
 
     try {
-        $connectionString = New-DbConnectionString -Culture "en-US" -IgnoreCase -IgnoreNonSpace -IgnoreSymbols -ConnectionType Shared -AutoRebuild -FilePath $DBPath -AutoUpgrade
-
         $database = New-LiteDatabase -ConnectionString $connectionString
 
-        try {
-            Invoke-LiteCommand 'pragma UTC_DATE = true;' -Database $database
-            Invoke-LiteCommand 'select pragmas from $database;' -Database $database
-        }
-        finally {
-            $database.Dispose()
-        }
-
-        return $connectionString
+        Invoke-LiteCommand 'pragma UTC_DATE = true;' -Database $database
+        Invoke-LiteCommand 'select pragmas from $database;' -Database $database
+        Initialize-Collections -Database $database | Out-Null
+        
+        return $database
     }
     catch { 
         Write-PodeHost "Caught an error!"

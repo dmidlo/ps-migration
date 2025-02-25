@@ -24,7 +24,7 @@ function New-DbConnectionString {
         [switch]$AutoRebuild,
 
         [Parameter(ValueFromPipelineByPropertyName)]
-        [switch]$AutoUpgrade,
+        [switch]$Upgrade,
 
         [Parameter(ValueFromPipelineByPropertyName)]
         [long]$InitialSize,
@@ -61,8 +61,8 @@ function New-DbConnectionString {
             $connectionString.set_InitialSize($InitialSize)
         }
 
-        if ($AutoUpgrade) {
-            $connectionString.set_Upgrade($AutoUpgrade)
+        if ($Upgrade) {
+            $connectionString.set_Upgrade($Upgrade)
         }
         
         if ($ReadOnly) {
@@ -78,6 +78,6 @@ function New-DbConnectionString {
         $connectionString.set_Filename($FilePath)
 
         # Output Connection String
-        return $connectionString
+        Write-Output ([LiteDB.ConnectionString]$connectionString)
     }
 }
