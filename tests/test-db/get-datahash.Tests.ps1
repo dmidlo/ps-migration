@@ -1,7 +1,7 @@
 Describe "Get-DataHash" {
 
     Context "Basic Functionality" {
-        It "Get-DataHash TC01: Computes correct hash for simple objects"  {
+        It "Get-DataHash TC01: Computes correct hash for simple objects" -Tag 'active' {
             $data = @{ Name = "Alice"; Age = 30 }
             $result = Get-DataHash -DataObject $data
 
@@ -23,7 +23,7 @@ Describe "Get-DataHash" {
         #     $result.Hash | Should -BeExactly (Compute-HashSHA256 "null")
         # }
 
-        It "Get-DataHash TC03: Handles empty hashtable correctly"  {
+        It "Get-DataHash TC03: Handles empty hashtable correctly" -Tag 'active' {
             $data = @{}
             $result = Get-DataHash -DataObject $data
 
@@ -43,7 +43,7 @@ Describe "Get-DataHash" {
     }
 
     Context "Ignored Fields Handling" {
-        It "Get-DataHash TC05: Excludes ignored fields from hashing"  {
+        It "Get-DataHash TC05: Excludes ignored fields from hashing" -Tag 'active' {
             $data = @{ Name = "Bob"; Age = 25; Guid = "1234-5678" }
             $result = Get-DataHash -DataObject $data -FieldsToIgnore @("Guid")
 
@@ -52,7 +52,7 @@ Describe "Get-DataHash" {
             $result.Json | Should -Match '"Age":25'
         }
 
-        It "Get-DataHash TC06: Ignores fields case-insensitively"  {
+        It "Get-DataHash TC06: Ignores fields case-insensitively" -Tag 'active' {
             $data = @{ ID = "XYZ"; name = "Charlie" }
             $result = Get-DataHash -DataObject $data -FieldsToIgnore @("id")
 
@@ -62,7 +62,7 @@ Describe "Get-DataHash" {
     }
 
     Context "Deterministic Hashing" {
-        It "Get-DataHash TC07: Produces the same hash for the same input"  {
+        It "Get-DataHash TC07: Produces the same hash for the same input" -Tag 'active' {
             $data = @{ Value = 100; Nested = @{ Key = "Data" } }
             $hash1 = (Get-DataHash -DataObject $data).Hash
             $hash2 = (Get-DataHash -DataObject $data).Hash
@@ -70,7 +70,7 @@ Describe "Get-DataHash" {
             $hash1 | Should -BeExactly $hash2
         }
 
-        It "Get-DataHash TC08: Produces different hashes for different inputs"  {
+        It "Get-DataHash TC08: Produces different hashes for different inputs" -Tag 'active' {
             $hash1 = (Get-DataHash -DataObject @{ A = 1 }).Hash
             $hash2 = (Get-DataHash -DataObject @{ A = 2 }).Hash
 
@@ -91,7 +91,7 @@ Describe "Get-DataHash" {
     # }
 
     Context "Nested Ignored Fields" {
-        It "Get-DataHash TC12: Ignores case-insensitive fields in nested objects"  {
+        It "Get-DataHash TC12: Ignores case-insensitive fields in nested objects" -Tag 'active' {
             $data = @{ Guid = "123"; Nested = @{ GUID = "456" } }
             $result = Get-DataHash -DataObject $data -FieldsToIgnore @("guid")
 
