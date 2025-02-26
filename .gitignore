@@ -1,9 +1,6 @@
 StoredObjects/
 scratch.md
-scratch.ps1
-scratch.ipynb
 coverage.xml
 cov.xml
 testResults.xml
 .VSCodeCounter/
-ldbc_mess_around.ps1
