@@ -1,13 +1,13 @@
 # Collection           : Hosts
 # _id                  : 679ddb80fb11150443065dd8
-# META_UTCCreated      : 1738398592845
+# UTC_Created      : 1738398592845
 # IPAddress            : 10.0.0.10
 # CertificateAuthority : {}
 # Role                 : DomainController
 # Hash                 : B012632535B2C9010B418F3C8BB65A469D16593B814F6F1E3BDF8C80955A6EAB
 # SecurityPolicies     : {}
 # AD_Roles             : {GlobalCatalog, PrimaryDomainController}
-# META_UTCUpdated      : 1738398592845
+# UTC_Updated      : 1738398592845
 # DomainName           : example.local
 # FriendlyId           : DC-001
 # DNSConfig            : {}
@@ -24,12 +24,12 @@ function Add-GetKnownHostsTask {
         foreach ($known in $hosts) {
             [ordered]@{
                 Collection   = $known.Collection
-                Added        = $known.META_UTCCreated
+                Added        = $known.UTC_Created
                 IPAddress    = $known.IPAddress
                 CertificateAuthority = "Add Button Here"
                 Roles        = $known.Role
                 ADRoles      = "Add Button Here"
-                Modified     = $known.META_UTCUpdated
+                Modified     = $known.UTC_Updated
                 DomainName   = $known.DomainName
                 Name         = $known.FriendlyId
                 DNSConfig    = "Add Button Here"

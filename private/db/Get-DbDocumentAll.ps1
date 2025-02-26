@@ -15,16 +15,31 @@ function Get-DbDocumentAll {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [LiteDB.LiteDatabase] $Connection,
+        [LiteDB.LiteDatabase] $Datbase,
 
         [Parameter(Mandatory, ValueFromPipeline)]
-        [string] $Collection
+        $Collection,
+        
+        [switch]$ResolveRefs
     )
 
     process {
-        $result = Find-LiteDBDocument $Collection -Connection $Connection -As PSObject
+        $result = Get-LiteData -Collection $Collection -As PS
 
-        # If none found, returns empty array
-        Write-Output $result
+        if ($ResolveRefs) {
+            $resolved = $result | ForEach-Object {
+                if ($_.PSObject.Properties.Name -contains '$Ref') {
+                    $_ | Get-DbHashRef -Database $Datbase -Collection $Collection
+                }
+                else {
+                    $_
+                }
+            }
+            Write-Output $resolved
+        }
+        else {
+            # If none found, returns empty array
+            Write-Output $result
+        }
     }
 }

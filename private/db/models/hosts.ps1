@@ -558,8 +558,8 @@ function New-HostIPv4Address {
             UsableHosts      = $null
             IPClass          = $null
             IsPrivate        = $null
-            META_UTCCreated  = $now
-            META_UTCUpdated  = $now
+            UTC_Created  = $now
+            UTC_Updated  = $now
         }
         
 
@@ -573,7 +573,7 @@ function New-HostIPv4Address {
         $HostIPv4Address.NetworkNames = Merge-Arrays -Arrays @($DbHost.Interfaces, @($HostInterface))
 
         # Update dbHost metadata timestamp
-        $DbHost.META_UTCUpdated = $now
+        $DbHost.UTC_Updated = $now
 
         Write-Output $HostIPv4Address
     }
@@ -623,8 +623,8 @@ function New-HostNetworkName {
             NetworkNameType  = $validation.HostnameType
             HostGuid         = $HostGuid
             IPv4Guid         = $IPv4Guid
-            META_UTCCreated  = $now
-            META_UTCUpdated  = $now
+            UTC_Created  = $now
+            UTC_Updated  = $now
         }
 
         # Apply additional properties if provided
@@ -682,7 +682,7 @@ function Set-HostBasic {
                 Update-PropertyIfNeeded -Target $InputObject -Key $key -Value $Properties[$key] -Force:$Force
             }
         }
-        $InputObject.META_UTCUpdated = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+        $InputObject.UTC_Updated = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
         Write-Output $InputObject
     }
 }
@@ -718,7 +718,7 @@ function Set-HostType {
                 Update-PropertyIfNeeded -Target $InputObject -Key $key -Value $Properties[$key] -Force:$Force
             }
         }
-        $InputObject.META_UTCUpdated = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+        $InputObject.UTC_Updated = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
         Write-Output $InputObject
     }
 }
@@ -782,7 +782,7 @@ function Set-HostDetails {
                 Update-PropertyIfNeeded -Target $InputObject -Key $key -Value $Properties[$key] -Force:$Force
             }
         }
-        $InputObject.META_UTCUpdated = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+        $InputObject.UTC_Updated = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
         Write-Output $InputObject
     }
 }
@@ -885,7 +885,7 @@ function Set-HostServices {
             }
         }
 
-        $InputObject.META_UTCUpdated = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+        $InputObject.UTC_Updated = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
         Write-Output $InputObject
     }
 }
@@ -964,7 +964,7 @@ function Set-HostAsDomainController {
                 Update-PropertyIfNeeded -Target $InputObject -Key $key -Value $Properties[$key] -Force:$Force
             }
         }
-        $InputObject.META_UTCUpdated = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+        $InputObject.UTC_Updated = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
         Write-Output $InputObject
     }
 }

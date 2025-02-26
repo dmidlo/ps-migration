@@ -22,8 +22,8 @@
 #                 $dbHost.IPAddress | Should -BeNullOrEmpty
 #                 $dbHost.HostType | Should -BeNullOrEmpty
 #                 $dbHost.Services | Should -Not -BeNullOrEmpty
-#                 ($dbHost.Keys -contains "META_UTCCreated") | Should -Be $true
-#                 ($dbHost.Keys -contains "META_UTCUpdated") | Should -Be $true
+#                 ($dbHost.Keys -contains "UTC_Created") | Should -Be $true
+#                 ($dbHost.Keys -contains "UTC_Updated") | Should -Be $true
 #             }
 #         }        
 #         It "TC-02: Should merge additional properties when provided" {
@@ -39,10 +39,10 @@
 #     Describe "Set-HostBasic" {
 #         # It "TC-03: Should update the IPAddress property" {
 #         #     $dbHost = Get-TestHost
-#         #     $initialTimestamp = $dbHost.META_UTCUpdated
+#         #     $initialTimestamp = $dbHost.UTC_Updated
 #         #     $dbHost = $dbHost | Set-HostBasic -IPAddress "192.168.1.100"
 #         #     $dbHost.IPAddress | Should -Be "192.168.1.100"
-#         #     $dbHost.META_UTCUpdated | Should -BeGreaterThan $initialTimestamp
+#         #     $dbHost.UTC_Updated | Should -BeGreaterThan $initialTimestamp
 #         # }
 #         It "TC-04: Should update additional properties provided via the hashtable" {
 #             $dbHost = Get-TestHost
@@ -185,12 +185,12 @@
 #         #     $dbHost = $dbHost | Set-HostBasic -IPAddress "10.0.0.1" -Force
 #         #     $dbHost.IPAddress | Should -Be "10.0.0.1"
 #         # }
-#         It "TC-23: Each update should produce a later META_UTCUpdated timestamp" {
+#         It "TC-23: Each update should produce a later UTC_Updated timestamp" {
 #             $dbHost = Get-TestHost | Set-HostBasic -IPAddress "192.168.1.100"
-#             $timestamp1 = $dbHost.META_UTCUpdated
+#             $timestamp1 = $dbHost.UTC_Updated
 #             Start-Sleep -Milliseconds 10
 #             $dbHost = $dbHost | Set-HostBasic -IPAddress "192.168.1.100" -Force
-#             $timestamp2 = $dbHost.META_UTCUpdated
+#             $timestamp2 = $dbHost.UTC_Updated
 #             $timestamp2 | Should -BeGreaterThan $timestamp1
 #         }
 #     }

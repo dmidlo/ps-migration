@@ -5,7 +5,7 @@ function Get-DbDocumentVersionsByGuid {
 
     .DESCRIPTION
     This command looks up all documents in the specified collection matching a given `Guid`. 
-    It then sorts them by the `META_UTCUpdated` timestamp in descending order, so the most 
+    It then sorts them by the `UTC_Updated` timestamp in descending order, so the most 
     recently updated version appears at index 0.
 
     This is useful for scenarios where multiple versions of the same application object 
@@ -26,16 +26,16 @@ function Get-DbDocumentVersionsByGuid {
 
     .NOTES
     Returns a collection (array) of matching documents as PSCustomObjects, 
-    sorted by `META_UTCUpdated` (descending). If no matches are found, 
+    sorted by `UTC_Updated` (descending). If no matches are found, 
     returns an empty array.
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [LiteDB.LiteDatabase] $Connection,
+        [LiteDB.LiteDatabase] $Database,
 
         [Parameter(Mandatory)]
-        [string] $CollectionName,
+        $Collection,
 
         [switch]$ResolveRefs,
 
@@ -45,30 +45,22 @@ function Get-DbDocumentVersionsByGuid {
 
     process {
         # Query all documents matching the provided Guid
-        $results = Find-LiteDBDocument `
-            -Collection $CollectionName `
-            -Connection $Connection `
-            -Where "Guid = '$($Guid)'" `
-            -Select "*" `
-            -As PSObject
+        $results = Get-LiteData -Collection $Collection -Where 'Guid = @Guid', @{Guid = $Guid} -As PS
 
         if (-not $results) {
             return @()  # Return empty array if no documents found
         }
 
-        # Sort by META_UTCUpdated in descending order (most recent first)
-        $sortedResults = $results | Sort-Object META_UTCUpdated -Descending
+        # Sort by UTC_Updated in descending order (most recent first)
+        $sortedResults = $results | Sort-Object UTC_Updated -Descending
 
         if ($ResolveRefs) {
             $resolvedResults = $sortedResults | ForEach-Object {
-                $data = Normalize-Data -InputObject $_ -IgnoreFields @('none')
-                if ($data.Keys -contains '$Ref') {
-                    Write-Host "Resolving."
-                    $data | Get-DbHashRef -Connection $Connection
+                if ($_.PSObject.Properties.Name -contains '$Ref') {
+                    $_ | Get-DbHashRef -Database $Database -Collection $Collection
                 }
                 else {
-                    Write-Host "record not ref."
-                    $data
+                    $_
                 }
             }
 

@@ -51,7 +51,7 @@ function Add-DbDocument {
 
     - **`-IgnoreFields`** `[string[]]` *(Optional)*  
     Specifies fields to be **excluded** from the hash computation.  
-    - Defaults to ignoring internal metadata fields: `_id`, `Guid`, `Hash`, `META_UTCCreated`, `META_UTCUpdated`.  
+    - Defaults to ignoring internal metadata fields: `_id`, `Guid`, `Hash`, `UTC_Created`, `UTC_Updated`.  
     - Allows the caller to **customize deduplication behavior** by controlling which fields contribute to `Hash`.  
     - Usage example:  
         ```powershell
@@ -69,119 +69,96 @@ function Add-DbDocument {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [LiteDB.LiteDatabase] $Connection,
+        [LiteDB.LiteDatabase] $Database,
 
         [Parameter(Mandatory)]
-        [string] $CollectionName,
+        $Collection,
 
         [Parameter(Mandatory, ValueFromPipeline)]
-        [hashtable] $Data,
+        [PSCustomObject]$Data,
 
-        [string[]] $IgnoreFields = @('_id', 'Guid', 'Hash', 'META_UTCCreated', 'META_UTCUpdated', 'Count', 'Length', 'Collection', 'RefHash')
+        [string[]] $IgnoreFields = @('_id', 'Guid', 'Hash', 'UTC_Created', 'UTC_Updated', 'Count', 'Length', 'Collection', 'RefHash')
     )
 
-    # Generate Guid if missing
-    if (-not $Data.ContainsKey('Guid')) {
-        $Data.Guid = [Guid]::NewGuid()
+    # Validate that inbound object has a Guid
+    if($Data.PSObject.Properties.Name -notcontains "Guid") {
+        $Data = ($Data | Add-Member -MemberType NoteProperty -Name "Guid" -Value ([Guid]::NewGuid()) -PassThru)
     }
 
-    # Compute hash
-    if ($Data.Keys -notcontains '$Ref') {
-        $Data['Hash'] = (Get-DataHash -DataObject $Data -FieldsToIgnore $IgnoreFields).Hash
+    # # Compute hash
+    if ($Data.PSObject.Properties.Name -notcontains '$Ref') {
+        $Hash = (Get-DataHash -DataObject $Data -FieldsToIgnore $IgnoreFields).Hash
+        if ($Data.PSObject.Properties.Name -notcontains 'Hash') {
+           $Data = ($Data | Add-Member -MemberType NoteProperty -Name "Hash" -Value $Hash -PassThru) 
+        }
+        else {
+            $Data.Hash = $Hash
+        }
     }
 
-    # Check for existing record by hash
+    # # Check for existing record by hash
     $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-    $exists = Get-DbDocumentByHash -Connection $Connection -CollectionName $CollectionName -Hash $Data.Hash
+    $exists = $Data.Hash | Get-DbDocumentByHash -Database $Database -Collection $Collection
     
     if ($exists) {
-        $latestVersion = $exists.Hash | Get-DbDocumentVersion -Connection $Connection -CollectionName $CollectionName -Latest
-        Write-Host "==================== Preamble"
-        write-host $exists
-        Write-host $exists.GetType()
-        Write-Host $exists.Keys
-        Write-host $latestVersion
-        Write-Host $latestVersion.GetType()
-        Write-Host $latestVersion.Keys
-
-        if ((($exists.Keys -contains '$Ref') -or ($latestVersion.Keys -contains '$Ref'))) {
-            Write-Host "++++++++++++++++++ REF"
+        $latestVersion = $exists.Hash | Get-DbDocumentVersion -Database $Database -Collection $Collection -Latest
+    
+        if ((($exists.PSObject.Properties.Name -contains '$Ref') -or ($latestVersion.PSObject.Properties.Name -contains '$Ref'))) {
             if ($exists.Hash -eq $latestVersion.'$Hash') {
                 $exists = $latestVersion
             }
             $skip = $true
         }
         elseif ($latestVersion.Hash -eq $exists.Hash) {
-            Write-Host "++++++++++++++++++ Lastest"
-                Write-Host $latestVersion.Hash
-                Write-Host $exists.Hash
-                $skip = $true
+            $skip = $true
         }
         else {
-            Write-Host "++++++++++++++++++ New DbHashRef"
-                Write-Host $exists.Hash
-                Write-Host $exists
-                Write-Host $latestVersion.Hash
-                Write-Host $latestVersion
-                $Data = $exists | New-DbHashRef
-                $skip = $false
+            $Data = New-DbHashRef -DbDocument $exists -Collection $Collection
+            $skip = $false
         }
     }
     
-    if ($skip){        
-        $outDoc = Normalize-Data -InputObject $exists -IgnoreFields @("none")
+    if ($skip) {
+        $outDoc = $exists.Hash | Get-DbDocumentByHash -Database $Database -Collection $Collection
     }
     else {
-        # Insert partially so LiteDB auto-assigns _id
-        $PartialDoc = [ordered]@{
-            Hash = $Data['Hash']
-            Guid = $Data['Guid']
+        # Instert partially so LiteDB atuo-assigns _id
+        $initialDoc = [PSCustomObject]@{
+            Hash = $Data.Hash
+            Guid = $Data.Guid
         }
-        $initialDoc = [PSCustomObject]$PartialDoc
-        $initialBson = $initialDoc | ConvertTo-LiteDbBSON
-        Add-LiteDBDocument -Collection $CollectionName -Document $initialBson -Connection $Connection | Out-Null
+        $initialDoc | Add-LiteData -Collection $Collection
 
         # Retrieve the newly inserted doc from LiteDB using Hash
-        $found = Get-DbDocumentByHash -Connection $Connection -CollectionName $CollectionName -Hash $Data.Hash
+        $found = $initialDoc.Hash | Get-DbDocumentByHash -Database $Database -Collection $Collection
 
         if (-not $found) {
-            throw "Could not retrieve newly inserted document in collection '$CollectionName'. Expected Hash: $($Data.Hash). 
-            This may indicate an insertion failure or a query issue."
+            throw "Could not retrieve newly inserted document in collection '$($Collection.Name)'`n  - Expected Hash: $($initialDoc.Hash).`n  - This may indicate an insertion faulure or query issue."
         }
-        
-        
-        # Ensure `_id` was assigned
-        if ($found._id -is [System.Collections.ObjectModel.Collection[PSObject]] ) {
-            Write-host "`n ++ Found"
-            Write-Host $found._id
-            Write-Host ($found._id).GetType().Name
-            Write-Host $found._id.ToString()
-            Write-Host "`n"
+
+        if ($found._id -is [System.Collections.ObjectModel.Collection[PSObject]]) {
             throw "Unhandled Type found in _id property."
-
         }
-        elseif ((-not $found._id)) {
-            throw "LiteDB returned a document but without an _id. Possible database inconsistency."
-        }
-        else {
-            # Now that we have the LiteDB-generated _id, insert it into the Data object.
-            $Data['_id'] = $found._id
-        }
-
-        # Update Timestamps
-        if ($Data['META_UTCCreated']) {
-            $Data['META_UTCUpdated'] = $now
+        elseif (-not $found._id) {
+            throw "LiteDB returned a document but one without an _id. Possible database inconsistency."
         }
         else {
-            $Data['META_UTCCreated'] = $now
-            $Data['META_UTCUpdated'] = $now
+            # Now that we have the LiteDB-Generated _id, instert it into the Data object
+            $Data = ($Data | Add-Member -MemberType NoteProperty -Name "_id" -Value $found._id -Force -PassThru)
+
+            # Update Timestamps
+            if($Data.PSObject.Properties.Name -contains "UTC_Created") {
+                $Data.UTC_Updated = $now
+            }
+            else {
+                $Data = ($Data | Add-Member -MemberType NoteProperty -Name "UTC_Created" -Value $now -PassThru)
+                $Data = ($Data | Add-Member -MemberType NoteProperty -Name "UTC_Updated" -Value $now -PassThru)
+            }
+
+            # Update stub litedb document with the Data object
+            $Data | Set-LiteData -Collection $Collection
+            $outDoc = $Data.Hash | Get-DbDocumentByHash -Database $Database -Collection $Collection
         }
-
-        # Upsert with the new CompositeId + Hash
-        $finalBson = ([PSCustomObject]$Data) | ConvertTo-LiteDbBSON
-        Update-LiteDBDocument -Collection $CollectionName -ID $Data['_id'] -Document $finalBson -Connection $Connection | Out-Null
-
-        $outDoc = Normalize-Data -InputObject $Data -IgnoreFields @("none")
     }
     
     return $outDoc

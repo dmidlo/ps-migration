@@ -1,18 +1,20 @@
 function New-DbHashRef {
-    [CmdletBinding()]
     param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        $DbDocument
+        [Parameter(Mandatory)]
+        $DbDocument,
+
+        [Parameter(Mandatory)]
+        $Collection
     )
 
-    process {
-        $Out = @{
-            RefGuid = [Guid]::NewGuid()
-            Guid = $DbDocument.Guid
-            "`$Hash"  = $DbDocument.Hash
-            "`$Ref" = $DbDocument.Collection
-        }
-        $Out['Hash'] = (Get-DataHash -DataObject $Out -FieldsToIgnore @('_id', 'Hash', 'Count', 'Length', 'Collection')).Hash
-        Write-Output $Out
+    $out = [PSCustomObject]@{
+        RefGuid = [Guid]::NewGuid()
+        Guid = $DbDocument.Guid
+        "`$Hash"  = $DbDocument.Hash
+        "`$Ref" = $Collection.Name
     }
+    $Hash = (Get-DataHash -DataObject $out -FieldsToIgnore @('_id', 'Hash', 'Count', 'Length', 'Collection')).Hash
+    $out = ($out | Add-Member -MemberType NoteProperty -Name "Hash" -Value $Hash -Force -PassThru)
+    
+    return $out
 }

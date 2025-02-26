@@ -56,9 +56,9 @@ function Set-dbComponent {
     When `IsDeleted` is `$true`, you may want to track which “source” collection 
     it came from. This is used if you want to physically relocate it (not shown here).
 
-.PARAMETER META_UTCCreated, META_UTCUpdated
-    Optional timestamps. If not supplied, `META_UTCCreated` is set to the current 
-    UTC time (in ms) on creation, and `META_UTCUpdated` is always set to the 
+.PARAMETER UTC_Created, UTC_Updated
+    Optional timestamps. If not supplied, `UTC_Created` is set to the current 
+    UTC time (in ms) on creation, and `UTC_Updated` is always set to the 
     current UTC time for any operation.
 
 .PARAMETER SerialNumber, FriendlyName, RelativeIndex
@@ -112,8 +112,8 @@ Set-dbComponent -Connection $db -FriendlyName "UpsertExample"
         [string]$Hash,
 
         # Timestamps (raw Unix time in milliseconds).
-        [int]$META_UTCCreated,
-        [int]$META_UTCUpdated,
+        [int]$UTC_Created,
+        [int]$UTC_Updated,
 
         # The "type" of component
         [dbComponentType]$ComponentType = [dbComponentType]::Component,
@@ -201,14 +201,14 @@ Set-dbComponent -Connection $db -FriendlyName "UpsertExample"
                 }
 
                 # Timestamps
-                if ($META_UTCCreated) {
-                    $component["META_UTCCreated"] = $META_UTCCreated
-                    $component["META_UTCUpdated"] = $now
+                if ($UTC_Created) {
+                    $component["UTC_Created"] = $UTC_Created
+                    $component["UTC_Updated"] = $now
                 }
                 else {
                     # brand new doc
-                    $component["META_UTCCreated"] = $now
-                    $component["META_UTCUpdated"] = $now
+                    $component["UTC_Created"] = $now
+                    $component["UTC_Updated"] = $now
                 }
 
                 # Merge in $Properties
@@ -296,10 +296,10 @@ Set-dbComponent -Connection $db -FriendlyName "UpsertExample"
                 $component["IsDeleted"] = $IsDeleted
 
                 # Timestamps
-                $component["META_UTCUpdated"] = $now
+                $component["UTC_Updated"] = $now
                 # Keep the existing creation timestamp if not explicitly provided
-                if ($META_UTCCreated) {
-                    $component["META_UTCCreated"] = $META_UTCCreated
+                if ($UTC_Created) {
+                    $component["UTC_Created"] = $UTC_Created
                 }
 
                 if ($ComponentType) {
@@ -367,13 +367,13 @@ Set-dbComponent -Connection $db -FriendlyName "UpsertExample"
                 }
 
                 # Timestamps
-                if ($META_UTCCreated) {
-                    $component["META_UTCCreated"] = $META_UTCCreated
-                    $component["META_UTCUpdated"] = $now
+                if ($UTC_Created) {
+                    $component["UTC_Created"] = $UTC_Created
+                    $component["UTC_Updated"] = $now
                 }
                 else {
-                    $component["META_UTCCreated"] = $now
-                    $component["META_UTCUpdated"] = $now
+                    $component["UTC_Created"] = $now
+                    $component["UTC_Updated"] = $now
                 }
 
                 # Merge in $Properties

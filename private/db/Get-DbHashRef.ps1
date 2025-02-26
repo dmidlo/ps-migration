@@ -4,24 +4,25 @@ function Get-DbHashRef {
         [Parameter(Mandatory, ValueFromPipeline)]
         $DbHashRef,
         [Parameter(Mandatory)]
-        $Connection
+        $Database,
+        [Parameter(Mandatory)]
+        $Collection
     )
 
     process {
-        Write-Host $DbHashRef.Keys
-        if ($DbHashRef.Keys -contains '$Ref') {
-            $target = ($DbHashRef.'$Hash' | Get-DbDocumentByHash -Connection $Connection -CollectionName $DbHashRef.'$Ref')
-            Write-Host "================= target"
-            Write-Host $target
-            Write-Host $target.GetType()
-            if ($target -and $target.Keys -contains 'RefHash') {
-                [System.Collections.ArrayList]$target["RefHash"].Add($DbHashRef.Hash) 
+        if ($DbHashRef.PSObject.Properties.Name -contains '$Ref') {
+            $RefCollection = Get-LiteCollection -Database $Database -CollectionName $DbHashRef.'$Ref'
+            $target = ($DbHashRef.'$Hash' | Get-DbDocumentByHash -Database $Database -Collection $RefCollection)
+            if ($target -and $target.PSObject.Properties.Name -contains 'RefHash') {
+                if ($target.RefHash -notcontains $DbHashRef.Hash) {
+                    $target.RefHash.Add($DbHashRef.Hash) 
+                }
             }
             else {
-                $target["RefHash"] = [System.Collections.ArrayList]::New()
-                $target["RefHash"].Add($DbHashRef.Hash)
+                $target = ($target | Add-Member -MemberType NoteProperty -Name "RefHash" -Value ([System.Collections.ArrayList]::New()) -PassThru)
+                $target.RefHash.Add($DbHashRef.Hash)
             }
-            Update-LiteDBDocument -Connection $Connection -Collection $DbHashRef.'$Ref' -ID $target['_id'] -Document (([PSCustomObject]$target) | ConvertTo-LiteDbBSON)
+            $target | Set-LiteData -Collection $RefCollection
             Write-Output $target
         }
         else {

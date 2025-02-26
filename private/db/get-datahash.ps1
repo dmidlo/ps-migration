@@ -33,7 +33,7 @@ function Get-DataHash {
         [Parameter(Mandatory = $true)]
         [PSObject]$DataObject,
 
-        [string[]]$FieldsToIgnore = @('_id', 'Guid', 'Hash', 'META_UTCCreated', 'META_UTCUpdated', 'Count', 'Length')
+        [string[]]$FieldsToIgnore = @('_id', 'Guid', 'Hash', 'UTC_Created', 'UTC_Updated', 'Count', 'Length')
 
     )
 

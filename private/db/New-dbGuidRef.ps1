@@ -1,16 +1,20 @@
 function New-DbGuidRef {
-    [CmdletBinding()]
     param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        $DbDocument
+        [Parameter(Mandatory)]
+        $DbDocument,
+
+        [Parameter(Mandatory)]
+        $Collection
     )
 
-    process {
-        Write-Output @{
-            Hash = Get-DataHash -DataObject $DbDocument -FieldsToIgnore @('_id', 'Guid', 'Hash', 'META_UTCCreated', 'Count', 'Length', 'Collection')
-            Guid = [Guid]::NewGuid()
-            "`$Guid"  = $DbDocument.Guid
-            "`$ref" = $DbDocument.Collection
-        }
+    $out = [PSCustomObject]@{
+        RefGuid = [Guid]::NewGuid()
+        Guid = $DbDocument.Guid
+        "`$Guid"  = $DbDocument.Guid
+        "`$Ref" = $Collection.Name
     }
+    $Hash = (Get-DataHash -DataObject $DbDocument -FieldsToIgnore @('_id', 'Guid', 'Hash', 'UTC_Created', 'Count', 'Length', 'Collection')).Hash
+    $out = ($out | Add-Member -MemberType NoteProperty -Name "Hash" -Value $Hash -Force -PassThru)
+
+    return $out
 }

@@ -90,12 +90,12 @@ function Set-dbHost {
         }
 
         # Update timestamp
-        if ($dbHost['META_UTCCreated']) {
-            $dbHost['META_UTCUpdated'] = $now
+        if ($dbHost['UTC_Created']) {
+            $dbHost['UTC_Updated'] = $now
         }
         else {
-            $dbHost['META_UTCCreated'] = $now
-            $dbHost['META_UTCUpdated'] = $now
+            $dbHost['UTC_Created'] = $now
+            $dbHost['UTC_Updated'] = $now
         }
 
         if ($Temp) {

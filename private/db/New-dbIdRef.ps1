@@ -1,14 +1,16 @@
 function New-DbIdRef {
-    [CmdLetBinding()]
     param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        $DbDocument
+        [Parameter(Mandatory)]
+        $DbDocument,
+
+        [Parameter(Mandatory)]
+        $Collection
     )
 
-    process {
-        Write-Output @{
-            "`$id"  = $DbDocument._id
-            "`$ref" = $DbDocument.Collection
-        }
+    $out = [PSCustomObject]@{
+        "`$Id"  = $DbDocument._id
+        "`$Ref" = $Collection.Name
     }
+    
+    return $out
 }

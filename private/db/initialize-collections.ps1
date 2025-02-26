@@ -83,7 +83,7 @@ function Initialize-Collections {
     ###############################################################################
     # HOSTS
     ###############################################################################
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Module' -Indexes @(
+    Ensure-LiteDBCollection -Database $Database -CollectionName 'Modules' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
@@ -158,8 +158,8 @@ function Initialize-Collections {
     
     # $FSMORoles = @()
     # foreach ($fsmoRole in $FSMORolesData) {
-    #     $META_UTCCreated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-    #     $META_UTCUpdated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    #     $UTC_Created  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    #     $UTC_Updated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
 
     #     if ($fsmoRole -in @('SchemaMaster', 'DomainNamingMaster')) {
     #         $Scope = "Forest"
@@ -168,8 +168,8 @@ function Initialize-Collections {
     #         $Scope = "Domain"
     #     }
 
-    #     $fsmoRole['META_UTCCreated']  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-    #     $fsmoRole['META_UTCUpdated']  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    #     $fsmoRole['UTC_Created']  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    #     $fsmoRole['UTC_Updated']  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
     #     $fsmoRole['Scope'] = $Scope
 
     #    $FSMORoles += $fsmoRole
@@ -194,8 +194,8 @@ function Initialize-Collections {
 
     #     $fsmoRoleData = @{
     #         RoleName = $role
-    #         META_UTCCreated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-    #         META_UTCUpdated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    #         UTC_Created  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    #         UTC_Updated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
     #         Scope = $Scope
     #     }
 
@@ -215,7 +215,7 @@ function Initialize-Collections {
 
     #     $fsmoRoleData = @{
     #         RoleName = $_
-    #         META_UTCCreated = ([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())
+    #         UTC_Created = ([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())
     #         Scope          = $Scope
     #     }
 
@@ -346,8 +346,8 @@ function Initialize-Collections {
     #         )
         
     #         # Metadata timestamps
-    #         META_UTCCreated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-    #         META_UTCUpdated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    #         UTC_Created  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    #         UTC_Updated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
     #     }
         
     #     # Insert forest data into the database
@@ -394,8 +394,8 @@ function Initialize-Collections {
     #         SiblingDomains = @('child1.old-ad.example.local', 'child2.old-ad.example.local')
         
     #         # Timestamps
-    #         META_UTCCreated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-    #         META_UTCUpdated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    #         UTC_Created  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    #         UTC_Updated  = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
     #     }
     #     $newDomain = Add-DbDocument -Connection $Connection -CollectionName 'Domains' -Data $domainData
     # }
@@ -432,7 +432,7 @@ function Initialize-Collections {
 
     # # Insert trust relationships into the database
     # foreach ($trust in $trustData) {
-    #     $trust["META_UTCCreated"] = ([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())
+    #     $trust["UTC_Created"] = ([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())
     #     $newTrust = Add-DbDocument -Connection $Connection -CollectionName 'DomainTrusts' -Data $trust
     # }
 

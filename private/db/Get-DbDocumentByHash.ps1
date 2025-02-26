@@ -27,36 +27,49 @@ function Get-DbDocumentByHash {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [LiteDB.LiteDatabase] $Connection,
+        [LiteDB.LiteDatabase] $Database,
 
         [Parameter(Mandatory)]
-        [string] $CollectionName,
+        $Collection,
 
         [Parameter(Mandatory, ValueFromPipeline)]
-        [string] $Hash
+        [string] $Hash,
+
+        [switch]$ResolveRefs
     )
 
     process {
         # Perform a direct lookup by Hash using your existing helper
-        $result = Find-LiteDBDocument `
-            -Collection $CollectionName `
-            -Connection $Connection `
-            -Where "Hash = '$($Hash)'" `
-            -Select "*" `
+        $result = Get-LiteData -Collection $Collection -Where 'Hash = @Hash', @{Hash = $Hash} -As PS
 
         if (-not $result) {
             # Return null if nothing is found
             return $null
         }
 
-        Write-Host "============================ BSON"
         # $result = [PSCustomObject]($result.ToString() | ConvertFrom-Json)
         # If multiple records somehow matched, assume the first is the canonical
         if ($result.Count -gt 1) {
             Write-Warning "Multiple documents found for Hash '$Hash'. Returning the first match."
-            Write-Output (Normalize-Data -InputObject ($result | Select-Object -First 1) -IgnoreFields @('none'))
+            if ($ResolveRefs) {
+                $resolved = $result | ForEach-Object {
+                    if ($_.PSObject.Properties.Name -contains '$Ref') {
+                        $_ | Get-DbHashRef -Database $Database -Collection $Collection
+                    }
+                    else {
+                        $_
+                    }
+                }
+            }
+            Write-Output ($resolved | Select-Object -First 1)
         }
-        Write-Output (Normalize-Data -InputObject $result -IgnoreFields @('none'))
+
+        if ($ResolveRefs) {
+            Write-Output ($result | Get-DbHashRef -Database $Database -Collection $Collection)
+        }
+        else {
+            Write-Output $result
+        }
     }
 
 }

@@ -44,35 +44,37 @@ function Get-DbDocumentVersion {
     [CmdletBinding(DefaultParameterSetName='Latest')]
     param(
         [Parameter(Mandatory)]
-        [LiteDB.LiteDatabase] $Connection,
+        [LiteDB.LiteDatabase]$Database,
 
         [Parameter(Mandatory)]
-        [string] $CollectionName,
+        $Collection,
 
         [Parameter(Mandatory, ValueFromPipeline)]
-        [string] $Hash,
+        [string]$Hash,
 
         [Parameter(Mandatory=$true, ParameterSetName='Next')]
-        [switch] $Next,
+        [switch]$Next,
 
         [Parameter(Mandatory=$true, ParameterSetName='Previous')]
-        [switch] $Previous,
+        [switch]$Previous,
 
         [Parameter(Mandatory=$true, ParameterSetName='Latest')]
-        [switch] $Latest,
+        [switch]$Latest,
 
         [Parameter(Mandatory=$true, ParameterSetName='Original')]
-        [switch] $Original
+        [switch]$Original,
+
+        [switch]$ResolveRefs
     )
 
     process {
         # 1) Retrieve the "current" document by Hash
-        $currentDoc = Get-DbDocumentByHash -Connection $Connection -CollectionName $CollectionName -Hash $Hash
+        $currentDoc = $Hash | Get-DbDocumentByHash -Database $Database -Collection $Collection
         if (-not $currentDoc) {
             throw "Document with Hash '$Hash' not found in collection '$CollectionName'."
         }
 
-        $Versions = $currentDoc.Guid | Get-DbDocumentVersionsByGuid -Connection $Connection -CollectionName $CollectionName
+        $Versions = $currentDoc.Guid | Get-DbDocumentVersionsByGuid -Database $Database -Collection $Collection
         
         if ($Versions -is [PSCustomObject]) {
             $Versions = @($Versions)
@@ -112,7 +114,11 @@ function Get-DbDocumentVersion {
             }
         }
 
-
-        Write-Output (Normalize-Data -InputObject $out -IgnoreFields @('none'))
+        if ($ResolveRefs) {
+            Write-Output ($out | Get-DbHashRef -Database $Database -Collection $Collection)
+        }
+        else {
+            Write-Output $out
+        }
     }
 }

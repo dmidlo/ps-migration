@@ -126,12 +126,12 @@ function Set-HostInterface {
         # }
 
         # # Update timestamp
-        # if ($HostInterface['META_UTCCreated']) {
-        #     $HostInterface['META_UTCUpdated'] = $now
+        # if ($HostInterface['UTC_Created']) {
+        #     $HostInterface['UTC_Updated'] = $now
         # }
         # else {
-        #     $HostInterface['META_UTCCreated'] = $now
-        #     $HostInterface['META_UTCUpdated'] = $now
+        #     $HostInterface['UTC_Created'] = $now
+        #     $HostInterface['UTC_Updated'] = $now
         # }
 
         # if ($IsHost) {
