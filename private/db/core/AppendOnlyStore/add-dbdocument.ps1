@@ -77,13 +77,18 @@ function Add-DbDocument {
         [Parameter(Mandatory, ValueFromPipeline)]
         [PSCustomObject]$Data,
 
-        [string[]] $IgnoreFields = @('_id', 'Guid', 'Hash', 'UTC_Created', 'UTC_Updated', 'Count', 'Length', 'Collection', 'RefHash')
+        [string[]] $IgnoreFields = @('_id', 'Guid', 'Hash', 'UTC_Created', 'UTC_Updated', 'Count', 'Length', 'Collection', 'RefHash', 'ObjVer'),
+
+        [switch] $NoVersionUpdate,
+
+        [switch] $NoTimestampUpdate
     )
 
     # Validate that inbound object has a Guid
     if($Data.PSObject.Properties.Name -notcontains "Guid") {
         $Data = ($Data | Add-Member -MemberType NoteProperty -Name "Guid" -Value ([Guid]::NewGuid()) -PassThru)
     }
+
 
     # # Compute hash
     if ($Data.PSObject.Properties.Name -notcontains '$Ref') {
@@ -113,7 +118,7 @@ function Add-DbDocument {
             $skip = $true
         }
         else {
-            $Data = New-DbHashRef -DbDocument $exists -Collection $Collection
+            $Data = New-DbHashRef -DbDocument $exists -Collection $Collection -RefCollection $Collection
             $skip = $false
         }
     }
@@ -148,11 +153,27 @@ function Add-DbDocument {
 
             # Update Timestamps
             if($Data.PSObject.Properties.Name -contains "UTC_Created") {
-                $Data.UTC_Updated = $now
+                if (-not $NoTimestampUpdate) {
+                    $Data.UTC_Updated = $now
+                }
             }
             else {
                 $Data = ($Data | Add-Member -MemberType NoteProperty -Name "UTC_Created" -Value $now -PassThru)
                 $Data = ($Data | Add-Member -MemberType NoteProperty -Name "UTC_Updated" -Value $now -PassThru)
+            }
+
+
+            # Validate that inbound has a Version integer
+            if(-not $NoVersionUpdate) {
+                # Update ObjVer
+                $ObjVer = ($Data.Guid | Get-DbDocumentVersionsByGuid -Database $Database -Collection $Collection).Count
+
+                if($Data.PSObject.Properties.Name -notcontains "ObjVer") {
+                    $Data = ($Data | Add-Member -MemberType NoteProperty -Name "ObjVer" -Value $ObjVer -PassThru)
+                }
+                else {
+                    $Data.ObjVer = $ObjVer
+                }
             }
 
             # Update stub litedb document with the Data object

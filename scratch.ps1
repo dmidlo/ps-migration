@@ -127,11 +127,11 @@ $original.Hash | Get-DbDocumentVersion -Database $db -Collection $collection -Pr
 
 Write-Host "== DbGuidRef"
 $dbdoc3
-New-DbGuidRef -DbDocument $dbdoc3 -Collection $collection
+New-DbGuidRef -DbDocument $dbdoc3 -Collection $collection -RefCollection $collection
 
 Write-Host "== DbHashRef"
 $dbdoc3
-New-DbHashRef -DbDocument $dbdoc3 -Collection $collection
+New-DbHashRef -DbDocument $dbdoc3 -Collection $collection -RefCollection $collection
 
 Write-Host "== Allow Old hash in not lastest version"
 $dbdoc3
@@ -280,20 +280,21 @@ $dbdoc3b_original | fl
 
 Write-Host "++ GetHashRef"
 ($hashRef = $store.GetHashRef($dbdoc7)) | Out-Null
-$hashRef
+# $hashRef
 
 Write-Host "++ GetGuidRef"
-$newDbGuidRef = New-DbGuidRef -Collection $collection -DbDocument $dbdoc3
-$newDbGuidRef = $newDbGuidRef | Add-DbDocument -Database $db -Collection $collection
+($newDbGuidRef = New-DbGuidRef -Collection $collection -RefCollection $collection -DbDocument $dbdoc3) | Out-Null
+($newDbGuidRef = $newDbGuidRef | Add-DbDocument -Database $db -Collection $collection) | Out-Null
 ($guidRef = $store.GetGuidRef($newDbGuidRef)) | Out-Null
-$guidRef
+# $guidRef
 
-# Write-Host "++ Ensure Collection"
-# $store.EnsureCollection("TestCollection", @(
-#     [PSCustomObject]@{ Field='Hash'; Unique=$true }
-#     [PSCustomObject]@{ Field="Guid"; Unique=$false}
-# )) | Out-Null
+Write-Host "++ Ensure Collection"
+$store.EnsureCollection("TestCollection", @(
+    [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    [PSCustomObject]@{ Field="Guid"; Unique=$false}
+)) | Out-Null
 
-# Write-Host "== Change Collections"
-# $destCollection = Get-LiteCollection -Database $db -CollectionName "TestCollection"
-# $dbdoc3.Guid | Set-DbObjectCollectionByGuid -Database $db -SourceCollection $collection -DestCollection $destCollection
+Write-Host "== Change Collections"
+$destCollection = Get-LiteCollection -Database $db -CollectionName "TestCollection"
+$dbdoc3.Guid | Set-DbObjectCollectionByGuid -Database $db -SourceCollection $collection -DestCollection $destCollection
+($dbdoc3.Guid | Get-DbDocumentVersionsByGuid -Database $db -Collection $collection)

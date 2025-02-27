@@ -52,7 +52,7 @@ function Get-DbDocumentVersionsByGuid {
         }
 
         # Sort by UTC_Updated in descending order (most recent first)
-        $sortedResults = $results | Sort-Object UTC_Updated -Descending
+        $sortedResults = $results | Sort-Object ObjVer -Descending
 
         if ($ResolveRefs) {
             $resolvedResults = $sortedResults | ForEach-Object {
