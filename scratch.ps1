@@ -278,14 +278,15 @@ Write-Host "++ ReadVersion - Next - Resolve `$Refs"
 ($dbdoc3b_original = $store.ReadVersion($dbdoc3b.Hash, [dbVersionSteps]::Next, $true)) | Out-Null
 $dbdoc3b_original | fl
 
-Write-Host "++ GetGuidRef"
-$newDbGuidRef = New-DbGuidRef -Collection $collection -DbDocument $dbdoc3
-($guidRef = $store.GetGuidRef($newDbGuidRef)) | Out-Null
-$guidRef
-
 Write-Host "++ GetHashRef"
 ($hashRef = $store.GetHashRef($dbdoc7)) | Out-Null
 $hashRef
+
+Write-Host "++ GetGuidRef"
+$newDbGuidRef = New-DbGuidRef -Collection $collection -DbDocument $dbdoc3
+$newDbGuidRef = $newDbGuidRef | Add-DbDocument -Database $db -Collection $collection
+($guidRef = $store.GetGuidRef($newDbGuidRef)) | Out-Null
+$guidRef
 
 Write-Host "++ Ensure Collection"
 $store.EnsureCollection("TestCollection", @(
