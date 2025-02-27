@@ -177,6 +177,7 @@ class LiteDbAppendOnlyStore {
     }
 
     # TODO [ ]: Need a method to move documents from one collection to another when documents may also have DbRefs that may also need updating
+
     [void] Delete([string] $Hash) {
         throw "Delete not implemented. This is an append-only (forward-only) journaling system."
     }

@@ -290,6 +290,10 @@ $guidRef
 
 Write-Host "++ Ensure Collection"
 $store.EnsureCollection("TestCollection", @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-        [PSCustomObject]@{ Field="Guid"; Unique=$false}
-    ))
+    [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    [PSCustomObject]@{ Field="Guid"; Unique=$false}
+))
+
+Write-Host "== Change Collections"
+$destCollection = Get-LiteCollection -Database $db -CollectionName "TestCollection"
+$dbdoc3.Guid | Set-DbObjectCollectionByGuid -Database $db -SourceCollection $collection -DestCollection $destCollection
