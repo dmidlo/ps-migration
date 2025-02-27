@@ -4,14 +4,18 @@ function New-DbGuidRef {
         $DbDocument,
 
         [Parameter(Mandatory)]
-        $Collection
+        $Collection,
+
+        [Parameter(Mandatory)]
+        $RefCollection
     )
 
     $out = [PSCustomObject]@{
         RefGuid = [Guid]::NewGuid()
+        RefCol = $Collection.Name
         Guid = $DbDocument.Guid
         "`$Guid"  = $DbDocument.Guid
-        "`$Ref" = $Collection.Name
+        "`$Ref" = $RefCollection.Name
     }
     $Hash = (Get-DataHash -DataObject $DbDocument -FieldsToIgnore @('_id', 'Guid', 'Hash', 'UTC_Created', 'Count', 'Length', 'Collection')).Hash
     $out = ($out | Add-Member -MemberType NoteProperty -Name "Hash" -Value $Hash -Force -PassThru)
