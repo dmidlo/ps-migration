@@ -195,7 +195,7 @@ $dbdoc3d.Hash | Get-DbDocumentVersion -Database $db -Collection $collection -Lat
 $dbdoc3d.Hash | Get-DbDocumentVersion -Database $db -Collection $collection -Latest -ResolveRefs
 
 Write-Host "== Testing the Class"
-$store = New-LiteDbAppendOnlyStore -Database $db -Collection $collection
+$store = New-LiteDbAppendOnlyCollection -Database $db -Collection $collection
 $store
 $store.GetType() | ft
 $store | Get-Member -MemberType Method -Force | ft
@@ -211,7 +211,7 @@ $hashdoc8 = [PSCustomObject]@{
 }
 $hashdoc8 | fl
 Write-Host "++ Create"
-($hashdoc8 = $store.Create($hashdoc8)) | Out-Null
+($hashdoc8 = $store.Add($hashdoc8)) | Out-Null
 $hashdoc8 | fl
 
 Write-Host "++ GetVersionsByGuid"
@@ -222,60 +222,64 @@ Write-Host "++ GetVersionsByGuid - Resolve `$Refs"
 ($Versions = $store.GetVersionsByGuid($dbdoc7.Guid, $true)) | Out-Null
 $Versions | ft
 
+Write-Host "++ Get-DbObject"
+($Versions = $store.GetDbObject($dbdoc7.Guid)) | Out-Null
+$Versions | ft
+
 Write-Host "++ ReadAll"
-($allTempDocs = $store.ReadAll()) | Out-Null
+($allTempDocs = $store.GetAll()) | Out-Null
 $allTempDocs | ft
 
 Write-Host "++ ReadAll - Resolve `$Refs"
-($allTempDocsResolved = $store.ReadAll($true)) | Out-Null
+($allTempDocsResolved = $store.GetAll($true)) | Out-Null
 $allTempDocsResolved | ft
 
 Write-Host "++ ReadByHash"
-($dbdoc7_hashRead = $store.ReadByHash($dbdoc7.Hash)) | Out-Null
+($dbdoc7_hashRead = $store.GetByHash($dbdoc7.Hash)) | Out-Null
 $dbdoc7_hashRead | fl
 
 Write-Host "++ ReadByHash - Resolve `$Refs"
-($dbdoc7_hashRead = $store.ReadByHash($dbdoc7.Hash, $true)) | Out-Null
+($dbdoc7_hashRead = $store.GetByHash($dbdoc7.Hash, $true)) | Out-Null
 $dbdoc7_hashRead | fl
 
 Write-Host "++ ReadById"
-($dbdoc7_idRead = $store.ReadById($dbdoc7._id)) | Out-Null
+($dbdoc7_idRead = $store.GetById($dbdoc7._id)) | Out-Null
 $dbdoc7_idRead | fl
 
 Write-Host "++ ReadById - Resolve `$Refs"
-($dbdoc7_idRead = $store.ReadById($dbdoc7._id, $true)) | Out-Null
+($dbdoc7_idRead = $store.GetById($dbdoc7._id, $true)) | Out-Null
 $dbdoc7_idRead | fl
 
 Write-Host "++ ReadVersion - Original"
-($dbdoc3b_original = $store.ReadVersion($dbdoc3b.Hash, [dbVersionSteps]::Original)) | Out-Null
+($dbdoc3b_original = $store.GetVersion($dbdoc3b.Hash, [dbVersionSteps]::Original)) | Out-Null
 $dbdoc3b_original | fl
 
 Write-Host "++ ReadVersion - Original - Resolve `$Refs"
-($dbdoc3b_original = $store.ReadVersion($dbdoc3b.Hash, [dbVersionSteps]::Original), $true) | Out-Null
+($dbdoc3b_original = $store.GetVersion($dbdoc3b.Hash, [dbVersionSteps]::Original), $true) | Out-Null
 $dbdoc3b_original | fl
 
 Write-Host "++ ReadVersion - Latest"
-($dbdoc3b_original = $store.ReadVersion($dbdoc3b.Hash, [dbVersionSteps]::Latest)) | Out-Null
+($dbdoc3b_original = $store.GetVersion($dbdoc3b.Hash, [dbVersionSteps]::Latest)) | Out-Null
 $dbdoc3b_original | fl
 
 Write-Host "++ ReadVersion - Latest - Resolve `$Refs"
-($dbdoc3b_original = $store.ReadVersion($dbdoc3b.Hash, [dbVersionSteps]::Latest, $true)) | Out-Null
+($dbdoc3b_original = $store.GetVersion($dbdoc3b.Hash, [dbVersionSteps]::Latest, $true)) | Out-Null
 $dbdoc3b_original | fl
 
 Write-Host "++ ReadVersion - Previous"
-($dbdoc3b_original = $store.ReadVersion($dbdoc3b.Hash, [dbVersionSteps]::Previous)) | Out-Null
+($dbdoc3b_original = $store.GetVersion($dbdoc3b.Hash, [dbVersionSteps]::Previous)) | Out-Null
 $dbdoc3b_original | fl
 
 Write-Host "++ ReadVersion - Previous - Resolve `$Refs"
-($dbdoc3b_original = $store.ReadVersion($dbdoc3b.Hash, [dbVersionSteps]::Previous, $true)) | Out-Null
+($dbdoc3b_original = $store.GetVersion($dbdoc3b.Hash, [dbVersionSteps]::Previous, $true)) | Out-Null
 $dbdoc3b_original | fl
 
 Write-Host "++ ReadVersion - Next"
-($dbdoc3b_original = $store.ReadVersion($dbdoc3b.Hash, [dbVersionSteps]::Next)) | Out-Null
+($dbdoc3b_original = $store.GetVersion($dbdoc3b.Hash, [dbVersionSteps]::Next)) | Out-Null
 $dbdoc3b_original | fl
 
 Write-Host "++ ReadVersion - Next - Resolve `$Refs"
-($dbdoc3b_original = $store.ReadVersion($dbdoc3b.Hash, [dbVersionSteps]::Next, $true)) | Out-Null
+($dbdoc3b_original = $store.GetVersion($dbdoc3b.Hash, [dbVersionSteps]::Next, $true)) | Out-Null
 $dbdoc3b_original | fl
 
 Write-Host "++ GetHashRef"
@@ -289,12 +293,11 @@ Write-Host "++ GetGuidRef"
 # $guidRef
 
 Write-Host "++ Ensure Collection"
-$store.EnsureCollection("TestCollection", @(
+$store.EnsureCollection(@(
     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     [PSCustomObject]@{ Field="Guid"; Unique=$false}
-)) | Out-Null
+), "TestCollection") | Out-Null
 
 Write-Host "== Change Collections"
 $destCollection = Get-LiteCollection -Database $db -CollectionName "TestCollection"
 $dbdoc3.Guid | Set-DbObjectCollectionByGuid -Database $db -SourceCollection $collection -DestCollection $destCollection
-($dbdoc3.Guid | Get-DbDocumentVersionsByGuid -Database $db -Collection $collection)

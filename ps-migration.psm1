@@ -213,10 +213,28 @@ class LiteDbAppendOnlyCollection {
         return New-DbGuidRef -DbDocument $DbObjectDocument -Collection $Collection -RefCollection $RefCollection
     }
 
-    # [PSCustomObject] SetDbObjectCollection
+    [Void] MoveDbObjectToCollection([Guid]$Guid, $DestCollection) {
+        $Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection
+    }
 
-    [void] Delete([string] $Hash) {
-        throw "Delete not implemented. This is an append-only (forward-only) journaling system."
+    [void] MoveDbObjectToCollection([PSCustomObject]$DbObject, $DestCollection) {
+        $DbObject.Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection
+    }
+
+    [Void] MoveDbObjectFromCollection([Guid]$Guid, $SourceCollection) {
+        $Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection
+    }
+
+    [Void] MoveDbObjectFromCollection([PSCustomObject]$DbObject, $SourceCollection) {
+        $DbObject.Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection
+    }
+
+    static [Void] MoveDbObject([Guid]$Guid, [LiteDB.LiteDatabase]$Database, $SourceCollection, $DestCollection) {
+        $Guid | Set-DbObjectCollectionByGuid -Database $Database -SourceCollection $SourceCollection -DestCollection $DestCollection
+    }
+
+    static [Void] MoveDbObject([PSCustomObject]$DbObject, [LiteDB.LiteDatabase]$Database, $SourceCollection, $DestCollection) {
+        $DbObject.Guid | Set-DbObjectCollectionByGuid -Database $Database -SourceCollection $SourceCollection -DestCollection $DestCollection
     }
 }
 
