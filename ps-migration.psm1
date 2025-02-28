@@ -188,6 +188,15 @@ class LiteDbAppendOnlyCollection {
             -ResolveRefs
     }
 
+    [System.Object[]] GetDbObject([Guid] $Guid) {
+        # Delegates to Get-DbDocumentVersionsByGuid
+        return Get-DbDocumentVersionsByGuid `
+            -Database $this.Database `
+            -Collection $this.Collection `
+            -Guid $Guid `
+            -AsDbObject
+    }
+
     [PSCustomObject] GetGuidRef([PSCustomObject] $DbGuidRef) {
         return Get-DbGuidRef -Database $this.Database -Collection $this.Collection -DbGuidRef $DbGuidRef
     }
@@ -204,7 +213,7 @@ class LiteDbAppendOnlyCollection {
         return New-DbGuidRef -DbDocument $DbObjectDocument -Collection $Collection -RefCollection $RefCollection
     }
 
-    # TODO [ ]: Need a method to move documents from one collection to another when documents may also have DbRefs that may also need updating
+    # [PSCustomObject] SetDbObjectCollection
 
     [void] Delete([string] $Hash) {
         throw "Delete not implemented. This is an append-only (forward-only) journaling system."

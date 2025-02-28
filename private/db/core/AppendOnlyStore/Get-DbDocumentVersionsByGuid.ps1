@@ -39,6 +39,8 @@ function Get-DbDocumentVersionsByGuid {
 
         [switch]$ResolveRefs,
 
+        [switch]$AsDbObject,
+
         [Parameter(Mandatory, ValueFromPipeline)]
         [Guid] $Guid
     )
@@ -58,6 +60,21 @@ function Get-DbDocumentVersionsByGuid {
             $resolvedResults = $sortedResults | ForEach-Object {
                 if ($_.PSObject.Properties.Name -contains '$Ref') {
                     $_ | Get-DbHashRef -Database $Database -Collection $Collection
+                }
+                else {
+                    $_
+                }
+            }
+
+            Write-Output $resolvedResults
+        }
+        elseif ($AsDbObject) {
+            $resolvedResults = $sortedResults | ForEach-Object {
+                if ($_.PSObject.Properties.Name -contains '$Ref') {
+                    ($return = $_ | Get-DbHashRef -Database $Database -Collection $Collection) | Out-Null
+                    ($return.UTC_Updated = $_.UTC_Updated) | Out-Null
+                    ($return.ObjVer = $_.ObjVer) | Out-Null
+                    $return
                 }
                 else {
                     $_
