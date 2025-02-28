@@ -39,32 +39,30 @@ function Get-DbGuidRef {
     process {
         if ($DbGuidRef.PSObject.Properties.Name -contains '$Ref' -and $DbGuidRef.PSObject.Properties.Name -contains '$Guid') {
             $RefCollection = Get-LiteCollection -Database $Database -CollectionName $DbGuidRef.'$Ref'
-            $targets = ($DbGuidRef.'$Guid' | Get-DbDocumentVersionsByGuid -Database $Database -Collection $RefCollection)
+            $targets = ($DbGuidRef.'$Guid' | Get-DbDocumentVersionsByGuid -Database $Database -Collection $RefCollection) | Where-Object {$_.PSObject.Properties.Name -notcontains '$Ref'}
             $target = Get-ValidTarget -Targets $targets -RefCollection $RefCollection
             
             $DbGuidRefHash = (Get-DataHash -DataObject $DbGuidRef -FieldsToIgnore @('none')).Hash
             foreach ($_t in $targets) {
-                if ($_t.PSObject.Properties.Name -notcontains '$Ref') {
-                    $_tHash = (Get-DataHash -DataObject $_t -FieldsToIgnore @('none')).Hash
+                $_tHash = (Get-DataHash -DataObject $_t -FieldsToIgnore @('none')).Hash
 
-                    if ($_tHash -ne $DbGuidRefHash) {
-                        if ($_t.PSObject.Properties.Name -contains '$guidArcs') {
-                            $arcHashes = [System.Collections.ArrayList]::New()
-                            foreach ($arc in $_t.'$guidArcs') {
-                                $archHash = (Get-DataHash -DataObject $arc -FieldsToIgnore @('none')).Hash
-                                $arcHashes.Add($archHash) | Out-Null
-                            }
-
-                            if ($arcHashes -notcontains $DbGuidRefHash) {
-                                $_t.'$guidArcs'.Add($DbGuidRef) | Out-Null
-                            }
+                if ($_tHash -ne $DbGuidRefHash) {
+                    if ($_t.PSObject.Properties.Name -contains '$guidArcs') {
+                        $arcHashes = [System.Collections.ArrayList]::New()
+                        foreach ($arc in $_t.'$guidArcs') {
+                            $archHash = (Get-DataHash -DataObject $arc -FieldsToIgnore @('none')).Hash
+                            $arcHashes.Add($archHash) | Out-Null
                         }
-                        else {
-                            $_t = ($_t | Add-Member -MemberType NoteProperty -Name '$guidArcs' -Value ([System.Collections.ArrayList]::New()) -PassThru)
+
+                        if ($arcHashes -notcontains $DbGuidRefHash) {
                             $_t.'$guidArcs'.Add($DbGuidRef) | Out-Null
                         }
-                        $_t | Set-LiteData -Collection $RefCollection
                     }
+                    else {
+                        $_t = ($_t | Add-Member -MemberType NoteProperty -Name '$guidArcs' -Value ([System.Collections.ArrayList]::New()) -PassThru)
+                        $_t.'$guidArcs'.Add($DbGuidRef) | Out-Null
+                    }
+                    $_t | Set-LiteData -Collection $RefCollection
                 }
             }
 

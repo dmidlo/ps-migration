@@ -11,11 +11,11 @@ function Get-DbHashRef {
 
     process {
         if ($DbHashRef.PSObject.Properties.Name -contains '$Ref' -and $DbHashRef.PSObject.Properties.Name -contains '$Hash') {
-            $RefCollection = Get-LiteCollection -Database $Database -CollectionName $DbHashRef.'$Ref'
-            $target = ($DbHashRef.'$Hash' | Get-DbDocumentByHash -Database $Database -Collection $RefCollection)
+            ($RefCollection = Get-LiteCollection -Database $Database -CollectionName $DbHashRef.'$Ref') | Out-Null
+            ($target = ($DbHashRef.'$Hash' | Get-DbDocumentByHash -Database $Database -Collection $RefCollection)) | Out-Null
 
             if ($target.PSObject.Properties.Name -contains '$hashArcs') {
-                $arcHashes = [System.Collections.ArrayList]::New()
+                ($arcHashes = [System.Collections.ArrayList]::New()) | Out-Null
                 $DbHashRefHash = (Get-DataHash -DataObject $DbHashRef -FieldsToIgnore @('none')).Hash
                 foreach ($arc in $target.'$hashArcs') {
                     $arcHash = (Get-DataHash -DataObject $arc -FieldsToIgnore @('none')).Hash
@@ -27,10 +27,10 @@ function Get-DbHashRef {
                 }
             }
             else {
-                $target = ($target | Add-Member -MemberType NoteProperty -Name '$hashArcs' -Value ([System.Collections.ArrayList]::New()) -PassThru)
-                $target.'$hashArcs'.Add($DbHashRef)
+                ($target = ($target | Add-Member -MemberType NoteProperty -Name '$hashArcs' -Value ([System.Collections.ArrayList]::New()) -PassThru)) | Out-Null
+                $target.'$hashArcs'.Add($DbHashRef) | Out-Null
             }
-            $target | Set-LiteData -Collection $RefCollection
+            ($target | Set-LiteData -Collection $RefCollection) | Out-Null
             Write-Output $target
         }
         else {

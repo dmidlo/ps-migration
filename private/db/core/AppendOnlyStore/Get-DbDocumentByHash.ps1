@@ -40,7 +40,7 @@ function Get-DbDocumentByHash {
 
     process {
         # Perform a direct lookup by Hash using your existing helper
-        $result = Get-LiteData -Collection $Collection -Where 'Hash = @Hash', @{Hash = $Hash} -As PS
+        ($result = Get-LiteData -Collection $Collection -Where 'Hash = @Hash', @{Hash = $Hash} -As PS) | Out-Null
 
         if (-not $result) {
             # Return null if nothing is found
@@ -54,7 +54,8 @@ function Get-DbDocumentByHash {
             if ($ResolveRefs) {
                 $resolved = $result | ForEach-Object {
                     if ($_.PSObject.Properties.Name -contains '$Ref') {
-                        $_ | Get-DbHashRef -Database $Database -Collection $Collection
+                        ($return = $_ | Get-DbHashRef -Database $Database -Collection $Collection) | Out-Null
+                        $return
                     }
                     else {
                         $_
