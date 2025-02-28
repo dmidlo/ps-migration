@@ -66,13 +66,3 @@ function Generate-RandomPassword {
 
     return $password
 }
-
-# Example usage:
-# $PasswordOptions = [pscustomobject]@{
-#     length = 16
-#     secret = "asdgasg" # Not used in this implementation but retained for structure
-#     Options = "upper,lower,numeric,special"
-# }
-
-# $password = Generate-RandomPassword -PasswordOptions $PasswordOptions
-# Write-Output $password

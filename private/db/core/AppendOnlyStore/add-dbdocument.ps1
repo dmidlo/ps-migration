@@ -77,7 +77,7 @@ function Add-DbDocument {
         [Parameter(Mandatory, ValueFromPipeline)]
         [PSCustomObject]$Data,
 
-        [string[]] $IgnoreFields = @('_id', 'Guid', 'Hash', 'UTC_Created', 'UTC_Updated', 'Count', 'Length', 'Collection', 'RefHash', 'ObjVer'),
+        [string[]] $IgnoreFields = @('_id', 'Guid', 'Hash', 'UTC_Created', 'UTC_Updated', 'Count', 'Length', 'Collection', 'RefHash', 'ObjVer', 'hashArcs', 'guidArcs'),
 
         [switch] $NoVersionUpdate,
 
