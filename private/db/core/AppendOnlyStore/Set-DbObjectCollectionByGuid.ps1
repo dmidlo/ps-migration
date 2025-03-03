@@ -38,6 +38,9 @@ function Set-DbObjectCollectionByGuid {
                     # moved as well.
                     ($RefCollection = Get-LiteCollection -Database $Database -CollectionName $hashArc.RefCol) | Out-Null
                     ($stagedHashArc = $hashArc.Hash | Get-DbDocumentByHash -Database $Database -Collection $RefCollection) | Out-Null
+                    if ($stagedHashArc.PSObject.Properties.Name -notcontains '$Ref') {
+                        ($stagedHashArc = $hashArc.Hash | Get-DbDocumentByHash -Database $Database -Collection $DestCollection) | Out-Null
+                    }
                     ($stagedHashArc.'$Ref' = $DestCollection.Name) | Out-Null
 
                     if ($hashArc.Guid -eq $Guid) {

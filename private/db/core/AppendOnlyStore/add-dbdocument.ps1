@@ -77,7 +77,10 @@ function Add-DbDocument {
         [Parameter(Mandatory, ValueFromPipeline)]
         [PSCustomObject]$Data,
 
-        [string[]] $IgnoreFields = @('_id', 'Guid', 'Hash', 'UTC_Created', 'UTC_Updated', 'Count', 'Length', 'Collection', 'RefHash', 'ObjVer', 'hashArcs', 'guidArcs'),
+        [string[]] $IgnoreFields = @(
+            '_id', 'Guid', 'Hash', 'UTC_Created', 'UTC_Updated',
+            'Count', 'Length', 'Collection', '$ObjVer',
+            '$hashArcs', '$guidArcs', '$RecycledTime', '$BaseCol'),
 
         [switch] $NoVersionUpdate,
 
@@ -165,14 +168,14 @@ function Add-DbDocument {
 
             # Validate that inbound has a Version integer
             if(-not $NoVersionUpdate) {
-                # Update ObjVer
+                # Update $ObjVer
                 $ObjVer = ($Data.Guid | Get-DbDocumentVersionsByGuid -Database $Database -Collection $Collection).Count
 
-                if($Data.PSObject.Properties.Name -notcontains "ObjVer") {
-                    $Data = ($Data | Add-Member -MemberType NoteProperty -Name "ObjVer" -Value $ObjVer -PassThru)
+                if($Data.PSObject.Properties.Name -notcontains '$ObjVer') {
+                    $Data = ($Data | Add-Member -MemberType NoteProperty -Name '$ObjVer' -Value $ObjVer -PassThru)
                 }
                 else {
-                    $Data.ObjVer = $ObjVer
+                    $Data.'$ObjVer' = $ObjVer
                 }
             }
 

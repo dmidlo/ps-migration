@@ -9,7 +9,8 @@ $dbConnectionString = New-DbConnectionString -Culture "en-US" -IgnoreCase -Ignor
 Initialize-DB -ConnectionString $dbConnectionString
 $db = New-LiteDatabase -ConnectionString $dbConnectionString
 
-$collection = Get-LiteCollection -CollectionName "Temp" -Database $db
+$collection = Get-LiteCollection -CollectionName 'Temp' -Database $db
+$store = New-LiteDbAppendOnlyCollection -Database $db -Collection $collection
 $collection
 
 
@@ -46,7 +47,6 @@ $hashdoc3 = [PSCustomObject]@{
     test = 'data'
     dock = "inforamtion"
     store = @(1, 2, 3)
-    # "`$Ref" = "ref"
 }
 $hashdoc3
 
@@ -95,7 +95,7 @@ $dbdoc3b
 $dbdoc3c
 
 Write-Host "== Get All Documents from Temp"
-Get-DbDocumentAll -Datbase $db -Collection $collection
+Get-DbDocumentAll -Database $db -Collection $collection
 
 Write-Host "== Versions by Guid - Ldbc"
 $dbdoc3c.Guid
@@ -180,7 +180,7 @@ $dbdoc6
 $dbdoc7
 
 Write-Host "== Get All Documetns from collection - resolved"
-Get-DbDocumentAll -Datbase $db -Collection $collection -ResolveRefs
+Get-DbDocumentAll -Database $db -Collection $collection -ResolveRefs
 
 Write-Host "== Resolving a Single by Hash"
 $dbdoc7
@@ -195,7 +195,6 @@ $dbdoc3d.Hash | Get-DbDocumentVersion -Database $db -Collection $collection -Lat
 $dbdoc3d.Hash | Get-DbDocumentVersion -Database $db -Collection $collection -Latest -ResolveRefs
 
 Write-Host "== Testing the Class"
-$store = New-LiteDbAppendOnlyCollection -Database $db -Collection $collection
 $store
 $store.GetType() | ft
 $store | Get-Member -MemberType Method -Force | ft
@@ -286,18 +285,40 @@ Write-Host "++ GetHashRef"
 ($hashRef = $store.GetHashRef($dbdoc7)) | Out-Null
 # $hashRef
 
-Write-Host "++ GetGuidRef"
-($newDbGuidRef = New-DbGuidRef -Collection $collection -RefCollection $collection -DbDocument $dbdoc3) | Out-Null
-($newDbGuidRef = $newDbGuidRef | Add-DbDocument -Database $db -Collection $collection) | Out-Null
-($guidRef = $store.GetGuidRef($newDbGuidRef)) | Out-Null
+# Write-Host "++ GetGuidRef"
+# ($newDbGuidRef = New-DbGuidRef -Collection $collection -RefCollection $collection -DbDocument $dbdoc3) | Out-Null
+# ($newDbGuidRef = $newDbGuidRef | Add-DbDocument -Database $db -Collection $collection) | Out-Null
+# ($guidRef = $store.GetGuidRef($newDbGuidRef)) | Out-Null
 # $guidRef
 
 Write-Host "++ Ensure Collection"
-$store.EnsureCollection(@(
-    [PSCustomObject]@{ Field='Hash'; Unique=$true }
-    [PSCustomObject]@{ Field="Guid"; Unique=$false}
-), "TestCollection") | Out-Null
+$store2 = New-LiteDbAppendOnlyCollection -Database $db -Collection 'TestCollection'
+$store.Collection
+$store2.Collection
 
 Write-Host "== Change Collections"
-$destCollection = Get-LiteCollection -Database $db -CollectionName "TestCollection"
-$dbdoc3.Guid | Set-DbObjectCollectionByGuid -Database $db -SourceCollection $collection -DestCollection $destCollection
+($store.MoveDbObjectToCollection($dbdoc3.Guid, $store2.Collection)) | Out-Null
+
+Write-host "== Get a DbObject"
+($hashdoc9 = $store.GetByHash($hashdoc8.Hash)) | Out-Null
+$hashdoc9.data = "more test data"
+($hashdoc9 = $store.Add($hashdoc9)) | Out-Null
+
+($hashdoc10 = $store.GetByHash($hashdoc9.Hash)) | Out-Null
+$hashdoc10.data = "test"
+($hashdoc10 = $store.Add($hashdoc10)) | Out-Null
+
+($hashdoc11 = $store.GetByHash($hashdoc10.Hash, $true)) | Out-Null
+$hashdoc11.data = "even more test data"
+($hashdoc11 = $store.Add($hashdoc11)) | out-null
+
+($dbObj1 = $store.GetDbObject($hashdoc11.Guid)) 
+# $dbObj1 | fl
+
+Write-Host "== Recycle DbObject"
+($store.RecycleDbObject($dbObj1)) | Out-Null
+$RecycleBin = New-LiteDbAppendOnlyCollection -Database $db -Collection 'RecycleBin'
+($recycledObj1 = ($RecycleBin.GetDbObject($hashdoc11.Guid))) | Out-Null
+$recycledObj1.Count
+$GuidToRestore
+$GuidToRestore.GetType()

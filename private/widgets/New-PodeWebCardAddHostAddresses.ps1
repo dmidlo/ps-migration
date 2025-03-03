@@ -69,7 +69,7 @@ Function New-PodeWebCardAddHostAddressesValidator {
     ## No Validation for Chassis Serial Number Needed.
     if($WebEvent.Data -and ($WebEvent.Data['ChassisSerial'].Length -gt 0)) {
         $WebEvent.Session.Data['newHost'] = $WebEvent.Session.Data['newHost'] | Set-dbHost -ChassisSerial $WebEvent.Data['ChassisSerial']
-        $WebEvent.Session.Data['newHost'] = Add-DbDocument -Connection $Connection -CollectionName "Temp" -Data $WebEvent.Session.Data['newHost']
+        $WebEvent.Session.Data['newHost'] = Add-DbDocument -Connection $Connection -CollectionName 'Temp' -Data $WebEvent.Session.Data['newHost']
         Save-PodeSession -Force
     }
 

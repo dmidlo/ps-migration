@@ -15,7 +15,7 @@ function Get-DbDocumentAll {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [LiteDB.LiteDatabase] $Datbase,
+        [LiteDB.LiteDatabase] $Database,
 
         [Parameter(Mandatory, ValueFromPipeline)]
         $Collection,
@@ -29,7 +29,7 @@ function Get-DbDocumentAll {
         if ($ResolveRefs) {
             $resolved = $result | ForEach-Object {
                 if ($_.PSObject.Properties.Name -contains '$Ref') {
-                    $_ | Get-DbHashRef -Database $Datbase -Collection $Collection
+                    $_ | Get-DbHashRef -Database $Database -Collection $Collection
                 }
                 else {
                     $_

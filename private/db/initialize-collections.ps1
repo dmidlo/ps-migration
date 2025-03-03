@@ -10,14 +10,14 @@ function Initialize-Collections {
     Write-PodeHost "Initializing collections and indexes using dbConnection:"
     Out-PodeHost -InputObject $Database
 
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Temp' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true },
-        [PSCustomObject]@{ Field="Guid"; Unique=$false}
-    )
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'RecycleBin' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-        [PSCustomObject]@{ Field="Guid"; Unique=$false}
-    )
+    # Ensure-LiteDBCollection -Database $Database -CollectionName 'Temp' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true },
+    #     [PSCustomObject]@{ Field="Guid"; Unique=$false}
+    # )
+    # Ensure-LiteDBCollection -Database $Database -CollectionName 'RecycleBin' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    #     [PSCustomObject]@{ Field="Guid"; Unique=$false}
+    # )
 
     ###############################################################################
     # Organizations
@@ -71,10 +71,10 @@ function Initialize-Collections {
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
 
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Components' -Indexes @(
-        [PSCustomObject]@{ Field='Hash'; Unique=$true }
-        [PSCustomObject]@{ Field="Guid"; Unique=$false}
-    )
+    # Ensure-LiteDBCollection -Database $Database -CollectionName 'Components' -Indexes @(
+    #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
+    #     [PSCustomObject]@{ Field="Guid"; Unique=$false}
+    # )
 
     Ensure-LiteDBCollection -Database $Database -CollectionName 'Chassis' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }

@@ -99,7 +99,7 @@ function Set-dbHost {
         }
 
         if ($Temp) {
-            $dbHost = Add-DbDocument -CollectionName "Temp" -Connection $Connection -Data $dbHost
+            $dbHost = Add-DbDocument -CollectionName 'Temp' -Connection $Connection -Data $dbHost
         } else {
             $dbHost = Add-DbDocument -CollectionName "Hosts" -Connection $Connection -Data $dbHost
         }

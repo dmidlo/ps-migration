@@ -54,7 +54,7 @@ function Get-DbDocumentVersionsByGuid {
         }
 
         # Sort by UTC_Updated in descending order (most recent first)
-        $sortedResults = $results | Sort-Object ObjVer -Descending
+        $sortedResults = $results | Sort-Object '$ObjVer' -Descending
 
         if ($ResolveRefs) {
             $resolvedResults = $sortedResults | ForEach-Object {
@@ -70,10 +70,10 @@ function Get-DbDocumentVersionsByGuid {
         }
         elseif ($AsDbObject) {
             $resolvedResults = $sortedResults | ForEach-Object {
-                if ($_.PSObject.Properties.Name -contains '$Ref') {
+                if ($_.PSObject.Properties.Name -contains '$Ref' -and $_.PSObject.Properties.Name -contains '$Hash') {
                     ($return = $_ | Get-DbHashRef -Database $Database -Collection $Collection) | Out-Null
                     ($return.UTC_Updated = $_.UTC_Updated) | Out-Null
-                    ($return.ObjVer = $_.ObjVer) | Out-Null
+                    ($return.'$ObjVer' = $_.'$ObjVer') | Out-Null
                     $return
                 }
                 else {

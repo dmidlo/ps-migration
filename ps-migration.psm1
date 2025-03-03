@@ -33,47 +33,69 @@ class LiteDbAppendOnlyCollection {
     [LiteDB.LiteDatabase] $Database
     $Collection
 
-    LiteDbAppendOnlyCollection ([LiteDB.LiteDatabase] $Database, $Collection) {
-        $this.Database   = $Database
-        $this.Collection = $Collection
+    LiteDbAppendOnlyCollection ([LiteDB.LiteDatabase] $Database, [string]$CollectionName) {
+        $this.Database = $Database
+        $this.Collection = Get-LiteCollection -Database $this.Database -CollectionName $CollectionName
+        $this._init_collections()
     }
 
-    [PSObject] Add([PSCustomObject] $Data) {
+    LiteDbAppendOnlyCollection ([LiteDB.LiteDatabase] $Database, [PSObject]$Collection) {
+        $this.Database   = $Database
+        $this.Collection = $Collection
+        $this._init_collections()
+    }
+    
+    hidden [void] _init_collections(){
+        $this.EnsureCollection(@(
+            [PSCustomObject]@{ Field='Hash'; Unique=$true },
+            [PSCustomObject]@{ Field="Guid"; Unique=$false}
+        ), $this.Collection.Name)
+        $this.EnsureCollection(@(
+            [PSCustomObject]@{ Field='Hash'; Unique=$true },
+            [PSCustomObject]@{ Field="Guid"; Unique=$false}
+        ), 'Temp')
+        $this.EnsureCollection(@(
+            [PSCustomObject]@{ Field='Hash'; Unique=$true },
+            [PSCustomObject]@{ Field="Guid"; Unique=$false}
+        ), 'RecycleBin')
+    }
+
+    hidden [PSObject] Add([PSCustomObject] $Data) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data
     }
 
-    [PSObject] Add_NoVersionUpdate([PSCustomObject] $Data) {
+    hidden [PSObject] Add_NoVersionUpdate([PSCustomObject] $Data) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -NoVersionUpdate
     }
 
-    [PSObject] Add_NoTimestampUpdate([PSCustomObject] $Data) {
+    hidden [PSObject] Add_NoTimestampUpdate([PSCustomObject] $Data) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -NoTimestampUpdate
     }
 
-    [PSObject] Add_NoVersionOrTimestampUpdate([PSCustomObject] $Data) {
+    hidden [PSObject] Add_NoVersionOrTimestampUpdate([PSCustomObject] $Data) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -NoVersionUpdate -NoTimestampUpdate
     }
 
-    [PSObject] Add([PSCustomObject] $Data, [string[]] $IgnoreFields) {
+    hidden [PSObject] Add([PSCustomObject] $Data, [string[]] $IgnoreFields) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -IgnoreFields $IgnoreFields
     }
 
-    [PSObject] Add_NoVersionUpdate([PSCustomObject] $Data, [string[]] $IgnoreFields) {
+    hidden [PSObject] Add_NoVersionUpdate([PSCustomObject] $Data, [string[]] $IgnoreFields) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -NoVersionUpdate -IgnoreFields $IgnoreFields
     }
 
-    [PSObject] Add_NoTimestampUpdate([PSCustomObject] $Data, [string[]] $IgnoreFields) {
+    hidden [PSObject] Add_NoTimestampUpdate([PSCustomObject] $Data, [string[]] $IgnoreFields) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -NoTimestampUpdate -IgnoreFields $IgnoreFields
     }
 
-    [PSObject] Add_NoVersionOrTimestampUpdate([PSCustomObject] $Data, [string[]] $IgnoreFields) {
+    hidden [PSObject] Add_NoVersionOrTimestampUpdate([PSCustomObject] $Data, [string[]] $IgnoreFields) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -NoVersionUpdate -NoTimestampUpdate -IgnoreFields $IgnoreFields
     }
@@ -89,14 +111,14 @@ class LiteDbAppendOnlyCollection {
     [System.Object[]] GetAll() {
         # Delegates to Get-DbDocumentAll
         return Get-DbDocumentAll `
-            -Datbase $this.Database `
+            -Database $this.Database `
             -Collection $this.Collection
     }
 
     [System.Object[]] GetAll([switch] $ResolveRefs) {
         # Delegates to Get-DbDocumentAll
         return Get-DbDocumentAll `
-            -Datbase $this.Database `
+            -Database $this.Database `
             -Collection $this.Collection `
             -ResolveRefs:$ResolveRefs
     }
@@ -217,25 +239,119 @@ class LiteDbAppendOnlyCollection {
         $Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection
     }
 
-    [void] MoveDbObjectToCollection([PSCustomObject]$DbObject, $DestCollection) {
-        $DbObject.Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection
+    [void] MoveDbObjectToCollection([PSObject]$DbObject, $DestCollection) {
+        $DbObject[0].Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection
     }
 
     [Void] MoveDbObjectFromCollection([Guid]$Guid, $SourceCollection) {
         $Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection
     }
 
-    [Void] MoveDbObjectFromCollection([PSCustomObject]$DbObject, $SourceCollection) {
-        $DbObject.Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection
+    [Void] MoveDbObjectFromCollection([PSObject]$DbObject, $SourceCollection) {
+        $DbObject[0].Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection
     }
 
     static [Void] MoveDbObject([Guid]$Guid, [LiteDB.LiteDatabase]$Database, $SourceCollection, $DestCollection) {
         $Guid | Set-DbObjectCollectionByGuid -Database $Database -SourceCollection $SourceCollection -DestCollection $DestCollection
     }
 
-    static [Void] MoveDbObject([PSCustomObject]$DbObject, [LiteDB.LiteDatabase]$Database, $SourceCollection, $DestCollection) {
-        $DbObject.Guid | Set-DbObjectCollectionByGuid -Database $Database -SourceCollection $SourceCollection -DestCollection $DestCollection
+    static [Void] MoveDbObject([PSObject]$DbObject, [LiteDB.LiteDatabase]$Database, $SourceCollection, $DestCollection) {
+        $DbObject[0].Guid | Set-DbObjectCollectionByGuid -Database $Database -SourceCollection $SourceCollection -DestCollection $DestCollection
     }
+
+    [void] RecycleDbObject([PSObject]$DbObject) {
+        $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+        $RecycleBin = Get-LiteCollection -Database $this.Database -CollectionName 'RecycleBin'
+        $DbObject = $this.GetVersionsByGuid($DbObject[0].Guid)
+        foreach ($version in $DbObject) {
+            $version = ($version | Add-Member -MemberType NoteProperty -Name '$RecycledTime' -Value $now -Force -PassThru)
+            $version = ($version | Add-Member -MemberType NoteProperty -Name '$BaseCol' -Value $this.Collection.Name -Force -PassThru)
+            $version | Set-LiteData -Collection $this.Collection
+        }
+        $DbObject = $this.GetVersionsByGuid($DbObject[0].Guid)
+        $this.MoveDbObjectToCollection($DbObject, $RecycleBin)
+    }
+
+    [void] RestoreDbObject([Guid]$Guid) {
+        $RecycleBin = Get-LiteCollection -Database $this.Database -CollectionName "RecycleBin"
+        $DbObject = $this.GetVersionsByGuid($Guid)
+        foreach ($version in $DbObject) {
+            Write-Host $version.'$BaseCol'
+            $version.PSObject.Properties.Remove('$BaseCol')
+            Write-Host $version.'$BaseCol'
+        }
+        foreach ($version in $DbObject) {
+            $version.PSObject.Properties.Remove('$BaseCol')
+            $version.PSObject.Properties.Remove('$RecycledTime')
+            $version | Set-LiteData -Collection $RecycleBin
+        }
+        $DbObject = $this.GetVersionsByGuid($DbObject[0].Guid)
+        $this.MoveDbObjectFromCollection($RecycleBin)
+    }
+
+    [void] EmptyRecycleBin() {
+        $RecycleBin = Get-LiteCollection -Database $this.Database -CollectionName 'RecycleBin'
+        Remove-LiteData -Collection $RecycleBin -Where '$BaseCol = @BaseCol', @{BaseCol = $this.Collection.Name}
+    }
+
+    [void] EmptyRecycleBin([Guid]$Guid) {
+        $RecycleBin = Get-LiteCollection -Database $this.Database -CollectionName 'RecycleBin'
+        Remove-LiteData -Collection $RecycleBin -Where 'Guid = @Guid', @{Guid = $Guid}
+    }
+
+    [void] StageDbObject([PSCustomObject] $DbObject) {
+        $Temp = Get-LiteCollection -Database $this.Database -CollectionName 'Temp'
+        
+        # Add `$DestCol` property to track where the object should go upon commit
+        $DbObject = $DbObject | Add-Member -MemberType NoteProperty -Name '$DestCol' -Value $this.Collection.Name -Force -PassThru
+        
+        Add-LiteData -Collection $Temp -InputObject $DbObject
+    }
+
+    [void] CommitDbObject([Guid] $Guid) {
+        $Temp = Get-LiteCollection -Database $this.Database -CollectionName 'Temp'
+        $DbObject = Get-LiteData -Collection $Temp -Where 'Guid = @Guid', @{Guid = $Guid}
+
+        if ($DbObject) {
+            # Determine target collection from $DestCol
+            $TargetCollection = Get-LiteCollection -Database $this.Database -CollectionName $DbObject[0].'$DestCol'
+
+            # Remove `$DestCol` property before committing
+            $DbObject | ForEach-Object {
+                $_.PSObject.Properties.Remove('$DestCol')
+            }
+
+            $this.MoveDbObjectToCollection($DbObject, $TargetCollection)
+        }
+    }
+
+    [void] ClearTemp([Guid] $Guid) {
+        $Temp = Get-LiteCollection -Database $this.Database -CollectionName 'Temp'
+        $DbObject = Get-LiteData -Collection $Temp -Where 'Guid = @Guid', @{Guid = $Guid}
+
+        if ($DbObject -and ($DbObject[0].'$DestCol' -eq $this.Collection.Name)) {
+            $this.RecycleDbObject($DbObject)
+        }
+    }
+
+    [void] ClearTemp() {
+        $Temp = Get-LiteCollection -Database $this.Database -CollectionName 'Temp'
+        $DbObjects = Get-LiteData -Collection $Temp -Where '$DestCol = @DestCol', @{DestCol = $this.Collection.Name}
+
+        foreach ($DbObject in $DbObjects) {
+            $this.RecycleDbObject($DbObject)
+        }
+    }
+
+    [bool] HashExists([string] $Hash) {
+        return Test-LiteData -Collection $this.Collection -Where 'Hash = @Hash', @{Hash = $Hash}
+    }
+
+    [bool] GuidExists([Guid] $Guid) {
+        return Test-LiteData -Collection $this.Collection -Where 'Guid = @Guid', @{Guid = $Guid}
+    }
+
+
 }
 
 

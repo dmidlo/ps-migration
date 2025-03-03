@@ -41,7 +41,7 @@ function Set-dbComponent {
     Defaults to `Component` if not provided.
 
 .PARAMETER IsTemp
-    If `$true`, the document is stored in a temporary collection (by default "Temp" 
+    If `$true`, the document is stored in a temporary collection (by default 'Temp' 
     or you can override with `-TempDestCollection`).
 
 .PARAMETER TempDestCollection
@@ -122,7 +122,7 @@ Set-dbComponent -Connection $db -FriendlyName "UpsertExample"
         [bool]$IsTemp,
 
         # Which collection to use if IsTemp is true
-        [string]$TempDestCollection = "Temp",
+        [string]$TempDestCollection = 'Temp',
 
         # If true, signals that the record should be deleted or "soft-deleted"
         [bool]$IsDeleted,
@@ -145,7 +145,7 @@ Set-dbComponent -Connection $db -FriendlyName "UpsertExample"
         $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
 
         function Get-TargetCollection {
-            if ($IsTemp) { return "Temp" }
+            if ($IsTemp) { return 'Temp' }
             elseif ($IsDeleted) { return 'RecycleBin' }
             else { return 'Components' }
         }
