@@ -75,6 +75,7 @@ function New-DbConnectionString {
         $connectionString.set_Connection([LiteDB.ConnectionType]::$ConnectionType)
 
         # Set Database Filename
+        Resolve-ParentDirectories($FilePath)
         $connectionString.set_Filename($FilePath)
 
         # Output Connection String
