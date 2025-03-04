@@ -15,7 +15,7 @@ function Set-DbObjectCollectionByGuid {
     )
 
     process {
-        ($dbObject = $Guid | Get-DbDocumentVersionsByGuid -Database $Database -Collection $Collection) | Out-Null
+        ($dbObject = $Guid | Get-DbDocumentVersionsByGuid -Database $Database -Collection $SourceCollection) | Out-Null
         ($dbObject = $dbObject | Where-Object { $_.PSObject.Properties.Name -notcontains '$Ref'}) | Out-Null
 
         $firstGuidArc = $true

@@ -298,6 +298,9 @@ $store2.Collection
 
 Write-Host "== Change Collections"
 ($store.MoveDbObjectToCollection($dbdoc3.Guid, $store2.Collection)) | Out-Null
+($store2.MoveDbObjectToCollection($dbdoc3.Guid, $store.Collection))| Out-Null
+
+($store2.MoveDbObjectFromCollection($dbdoc3.Guid, $store.Collection)) | Out-Null
 
 Write-host "== Get a DbObject"
 ($hashdoc9 = $store.GetByHash($hashdoc8.Hash)) | Out-Null
@@ -319,6 +322,80 @@ Write-Host "== Recycle DbObject"
 ($store.RecycleDbObject($dbObj1)) | Out-Null
 $RecycleBin = New-LiteDbAppendOnlyCollection -Database $db -Collection 'RecycleBin'
 ($recycledObj1 = ($RecycleBin.GetDbObject($hashdoc11.Guid))) | Out-Null
-$recycledObj1.Count
-$GuidToRestore
-$GuidToRestore.GetType()
+$recycledObj1.GetType()
+
+$store2.RecycleDbObject($dbdoc3.Guid)
+
+$store.RestoreDbObject($recycledObj1[0].Guid)
+
+$store.RecycleDbObject($recycledObj1)
+
+$store.EmptyRecycleBin($recycledObj1[0].Guid)
+
+$store2.EmptyRecycleBin()
+
+$storeDoc1 = [PSCustomObject]@{
+    Name1 = "Value1"
+    Name2 = "Value2"
+    Name3 = "Value3"
+}
+
+$stagedDoc1 = $store2.StageDbObjectDocument($storeDoc1)
+$stagedDoc1.Name1 = "Value4"
+$stagedDoc1 = $store2.StageDbObjectDocument($stagedDoc1)
+$stagedDoc1.Name2 = "Value5"
+$stagedDoc1 = $store2.StageDbObjectDocument($stagedDoc1)
+$stagedDoc1.Name3 = "Value6"
+$stagedDoc1 = $store2.StageDbObjectDocument($stagedDoc1)
+
+$storeDoc2 = [PSCustomObject]@{
+    Name1 = "Value7"
+    Name2 = "Value8"
+    Name3 = "Value9"
+}
+
+$stagedDoc2 = $store2.StageDbObjectDocument($storeDoc2)
+$stagedDoc2 = $store2.StageDbObjectDocument($storeDoc2)
+$stagedDoc2.Name1 = "Value10"
+$stagedDoc2 = $store2.StageDbObjectDocument($stagedDoc2)
+$stagedDoc2.Name2 = "Value11"
+$stagedDoc2 = $store2.StageDbObjectDocument($stagedDoc2)
+$stagedDoc2.Name3 = "Value12"
+$stagedDoc2 = $store2.StageDbObjectDocument($stagedDoc2)
+
+$storeDoc3 = [PSCustomObject]@{
+    Name1 = "Value13"
+    Name2 = "Value14"
+    Name3 = "Value15"
+}
+
+$stagedDoc3 = $store2.StageDbObjectDocument($storeDoc3)
+$stagedDoc3.Name1 = "Value16"
+$stagedDoc3 = $store2.StageDbObjectDocument($stagedDoc3)
+$stagedDoc3.Name2 = "Value17"
+$stagedDoc3 = $store2.StageDbObjectDocument($stagedDoc3)
+$stagedDoc3.Name3 = "Value18"
+$stagedDoc3 = $store2.StageDbObjectDocument($stagedDoc3)
+
+$storeDoc4 = [PSCustomObject]@{
+    Name1 = "Value19"
+    Name2 = "Value20"
+    Name3 = "Value21"
+}
+
+$stagedDoc4 = $store2.StageDbObjectDocument($storeDoc4)
+$stagedDoc4.Name1 = "Value22"
+$stagedDoc4 = $store2.StageDbObjectDocument($stagedDoc4)
+$stagedDoc4.Name2 = "Value23"
+$stagedDoc4 = $store2.StageDbObjectDocument($stagedDoc4)
+$stagedDoc4.Name3 = "Value24"
+$stagedDoc4 = $store2.StageDbObjectDocument($stagedDoc4)
+
+$store2.CommitDbDocAsDbObject($stagedDoc1.Guid)
+$store2.ClearTemp($stagedDoc2.Guid)
+$store2.ClearTemp()
+
+$stagedDoc1.Hash
+$store2.HashExists($stagedDoc1.Hash)
+$store2.GuidExists($stagedDoc1.Guid)
+# $store2.CommitAllDbDocAsDbObject()

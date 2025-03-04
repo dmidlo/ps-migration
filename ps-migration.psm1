@@ -251,12 +251,17 @@ class LiteDbAppendOnlyCollection {
         $DbObject[0].Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection
     }
 
-    static [Void] MoveDbObject([Guid]$Guid, [LiteDB.LiteDatabase]$Database, $SourceCollection, $DestCollection) {
-        $Guid | Set-DbObjectCollectionByGuid -Database $Database -SourceCollection $SourceCollection -DestCollection $DestCollection
-    }
-
-    static [Void] MoveDbObject([PSObject]$DbObject, [LiteDB.LiteDatabase]$Database, $SourceCollection, $DestCollection) {
-        $DbObject[0].Guid | Set-DbObjectCollectionByGuid -Database $Database -SourceCollection $SourceCollection -DestCollection $DestCollection
+    [void] RecycleDbObject([Guid]$Guid) {
+        $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+        $RecycleBin = Get-LiteCollection -Database $this.Database -CollectionName 'RecycleBin'
+        $DbObject = $this.GetVersionsByGuid($Guid)
+        foreach ($version in $DbObject) {
+            $version = ($version | Add-Member -MemberType NoteProperty -Name '$RecycledTime' -Value $now -Force -PassThru)
+            $version = ($version | Add-Member -MemberType NoteProperty -Name '$BaseCol' -Value $this.Collection.Name -Force -PassThru)
+            $version | Set-LiteData -Collection $this.Collection
+        }
+        $DbObject = $this.GetVersionsByGuid($DbObject[0].Guid)
+        $this.MoveDbObjectToCollection($DbObject, $RecycleBin)
     }
 
     [void] RecycleDbObject([PSObject]$DbObject) {
@@ -273,20 +278,15 @@ class LiteDbAppendOnlyCollection {
     }
 
     [void] RestoreDbObject([Guid]$Guid) {
-        $RecycleBin = Get-LiteCollection -Database $this.Database -CollectionName "RecycleBin"
-        $DbObject = $this.GetVersionsByGuid($Guid)
-        foreach ($version in $DbObject) {
-            Write-Host $version.'$BaseCol'
-            $version.PSObject.Properties.Remove('$BaseCol')
-            Write-Host $version.'$BaseCol'
-        }
+        $RecycleBin = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'RecycleBin'
+        $DbObject = $RecycleBin.GetVersionsByGuid($Guid)
         foreach ($version in $DbObject) {
             $version.PSObject.Properties.Remove('$BaseCol')
             $version.PSObject.Properties.Remove('$RecycledTime')
-            $version | Set-LiteData -Collection $RecycleBin
+            $version | Set-LiteData -Collection $RecycleBin.Collection
         }
-        $DbObject = $this.GetVersionsByGuid($DbObject[0].Guid)
-        $this.MoveDbObjectFromCollection($RecycleBin)
+        $DbObject = $RecycleBin.GetVersionsByGuid($DbObject[0].Guid)
+        $RecycleBin.MoveDbObjectToCollection($DbObject, $this.Collection)
     }
 
     [void] EmptyRecycleBin() {
@@ -299,47 +299,53 @@ class LiteDbAppendOnlyCollection {
         Remove-LiteData -Collection $RecycleBin -Where 'Guid = @Guid', @{Guid = $Guid}
     }
 
-    [void] StageDbObject([PSCustomObject] $DbObject) {
-        $Temp = Get-LiteCollection -Database $this.Database -CollectionName 'Temp'
+    [PSCustomObject] StageDbObjectDocument([PSCustomObject] $PSCustomObject) {
+        $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'Temp'
         
         # Add `$DestCol` property to track where the object should go upon commit
-        $DbObject = $DbObject | Add-Member -MemberType NoteProperty -Name '$DestCol' -Value $this.Collection.Name -Force -PassThru
-        
-        Add-LiteData -Collection $Temp -InputObject $DbObject
+        $PSCustomObject = $PSCustomObject | Add-Member -MemberType NoteProperty -Name '$DestCol' -Value $this.Collection.Name -Force -PassThru
+
+        $staged = $Temp.Add($PSCustomObject)
+
+        return $staged
     }
 
-    [void] CommitDbObject([Guid] $Guid) {
-        $Temp = Get-LiteCollection -Database $this.Database -CollectionName 'Temp'
-        $DbObject = Get-LiteData -Collection $Temp -Where 'Guid = @Guid', @{Guid = $Guid}
+    [void] CommitDbDocAsDbObject([Guid] $Guid) {
+        $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection "Temp"
+        $DbObject = $Temp.GetVersionsByGuid($Guid)
+        foreach ($version in $DbObject) {
+            $version.PSObject.Properties.Remove('$DestCol')
+            $version | Set-LiteData -Collection $Temp.Collection
+        }
+        $DbObject = $Temp.GetVersionsByGuid($DbObject[0].Guid)
+        $Temp.MoveDbObjectToCollection($DbObject, $this.Collection)
+    }
 
-        if ($DbObject) {
-            # Determine target collection from $DestCol
-            $TargetCollection = Get-LiteCollection -Database $this.Database -CollectionName $DbObject[0].'$DestCol'
-
-            # Remove `$DestCol` property before committing
-            $DbObject | ForEach-Object {
-                $_.PSObject.Properties.Remove('$DestCol')
-            }
-
-            $this.MoveDbObjectToCollection($DbObject, $TargetCollection)
+    [void] CommitAllDbDocAsDbObject() {
+        $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection "Temp"
+        $Guids = $Temp.GetAll() | Where-Object {$_.'$DestCol' -like $this.Collection.Name} | Select-Object -Unique 'Guid'
+        foreach ($guid in $Guids) {
+            $guid = [Guid]::Parse($guid.Guid)
+            $this.CommitDbDocAsDbObject($guid)
         }
     }
 
     [void] ClearTemp([Guid] $Guid) {
-        $Temp = Get-LiteCollection -Database $this.Database -CollectionName 'Temp'
-        $DbObject = Get-LiteData -Collection $Temp -Where 'Guid = @Guid', @{Guid = $Guid}
+        $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'Temp'
+        $RecycleBin = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'RecycleBin'
 
-        if ($DbObject -and ($DbObject[0].'$DestCol' -eq $this.Collection.Name)) {
-            $this.RecycleDbObject($DbObject)
-        }
+        $Temp.RecycleDbObject($Guid)
+        $RecycleBin.EmptyRecycleBin($Guid)
     }
 
     [void] ClearTemp() {
-        $Temp = Get-LiteCollection -Database $this.Database -CollectionName 'Temp'
-        $DbObjects = Get-LiteData -Collection $Temp -Where '$DestCol = @DestCol', @{DestCol = $this.Collection.Name}
-
-        foreach ($DbObject in $DbObjects) {
-            $this.RecycleDbObject($DbObject)
+        $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'Temp'
+        $RecycleBin = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'RecycleBin'
+        $Guids = $Temp.GetAll() | Where-Object {$_.'$DestCol' -like $this.Collection.Name} | Select-Object -Unique 'Guid'
+        foreach ($guid in $Guids) {
+            $guid = [Guid]::Parse($guid.Guid)
+            $Temp.RecycleDbObject($guid)
+            $RecycleBin.EmptyRecycleBin($guid)
         }
     }
 
