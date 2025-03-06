@@ -14,7 +14,7 @@ function New-PodeWebCardPasswordGenerator {
             if (-not $WebEvent.Data.Options) {
                 Show-PodeWebToast -Message "You must select at least one character set." -Title "Error" -Icon "alert-rhombus"
             } else {
-                $newPassword = (Generate-RandomPassword -PasswordOptions $WebEvent.Data)
+                $newPassword = (New-RandomPassword -PasswordOptions $WebEvent.Data)
                 Update-PodeWebTextBox -Value $newPassword -Name "secret"
             }
         }
