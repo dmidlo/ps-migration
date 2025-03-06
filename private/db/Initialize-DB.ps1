@@ -6,7 +6,7 @@ function Initialize-DB {
 
         Invoke-LiteCommand 'pragma UTC_DATE = true;' -Database $database
         Invoke-LiteCommand 'select pragmas from $database;' -Database $database
-        Initialize-Collections -Database $database | Out-Null
+        # Initialize-Collections -Database $database | Out-Null
         
         return $database
     }

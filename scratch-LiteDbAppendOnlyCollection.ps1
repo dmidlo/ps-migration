@@ -210,7 +210,7 @@ $hashdoc8 = [PSCustomObject]@{
 }
 $hashdoc8 | fl
 Write-Host "++ Create"
-($hashdoc8 = $store.Add($hashdoc8)) | Out-Null
+($hashdoc8 = $store._Add($hashdoc8)) | Out-Null
 $hashdoc8 | fl
 
 Write-Host "++ GetVersionsByGuid"
@@ -285,11 +285,6 @@ Write-Host "++ GetHashRef"
 ($hashRef = $store.GetHashRef($dbdoc7)) | Out-Null
 # $hashRef
 
-# Write-Host "++ GetGuidRef"
-# ($newDbGuidRef = New-DbGuidRef -Collection $collection -RefCollection $collection -DbDocument $dbdoc3) | Out-Null
-# ($newDbGuidRef = $newDbGuidRef | Add-DbDocument -Database $db -Collection $collection) | Out-Null
-# ($guidRef = $store.GetGuidRef($newDbGuidRef)) | Out-Null
-# $guidRef
 
 Write-Host "++ Ensure Collection"
 $store2 = New-LiteDbAppendOnlyCollection -Database $db -Collection 'TestCollection'
@@ -305,15 +300,15 @@ Write-Host "== Change Collections"
 Write-host "== Get a DbObject"
 ($hashdoc9 = $store.GetByHash($hashdoc8.Hash)) | Out-Null
 $hashdoc9.data = "more test data"
-($hashdoc9 = $store.Add($hashdoc9)) | Out-Null
+($hashdoc9 = $store._Add($hashdoc9)) | Out-Null
 
 ($hashdoc10 = $store.GetByHash($hashdoc9.Hash)) | Out-Null
 $hashdoc10.data = "test"
-($hashdoc10 = $store.Add($hashdoc10)) | Out-Null
+($hashdoc10 = $store._Add($hashdoc10)) | Out-Null
 
 ($hashdoc11 = $store.GetByHash($hashdoc10.Hash, $true)) | Out-Null
 $hashdoc11.data = "even more test data"
-($hashdoc11 = $store.Add($hashdoc11)) | out-null
+($hashdoc11 = $store._Add($hashdoc11)) | out-null
 
 ($dbObj1 = $store.GetDbObject($hashdoc11.Guid)) 
 # $dbObj1 | fl
@@ -330,9 +325,9 @@ $store.RestoreDbObject($recycledObj1[0].Guid)
 
 $store.RecycleDbObject($recycledObj1)
 
-$store.EmptyRecycleBin($recycledObj1[0].Guid)
+# $store.EmptyRecycleBin($recycledObj1[0].Guid)
 
-$store2.EmptyRecycleBin()
+# $store2.EmptyRecycleBin()
 
 $storeDoc1 = [PSCustomObject]@{
     Name1 = "Value1"
@@ -392,10 +387,16 @@ $stagedDoc4.Name3 = "Value24"
 $stagedDoc4 = $store2.StageDbObjectDocument($stagedDoc4)
 
 $store2.CommitDbDocAsDbObject($stagedDoc1.Guid)
-$store2.ClearTemp($stagedDoc2.Guid)
-$store2.ClearTemp()
+# $store2.ClearTemp($stagedDoc2.Guid)
+# $store2.ClearTemp()
 
-$stagedDoc1.Hash
-$store2.HashExists($stagedDoc1.Hash)
-$store2.GuidExists($stagedDoc1.Guid)
-# $store2.CommitAllDbDocAsDbObject()
+# $stagedDoc1.Hash
+# $store2.HashExists($stagedDoc1.Hash)
+# $store2.GuidExists($stagedDoc1.Guid)
+# # $store2.CommitAllDbDocAsDbObject()
+
+Write-Host "++ GetGuidRef"
+($newDbGuidRef = New-DbGuidRef -Collection $collection -RefCollection $collection -DbDocument $dbdoc3) | Out-Null
+($newDbGuidRef = $newDbGuidRef | Add-DbDocument -Database $db -Collection $collection) | Out-Null
+($guidRef = $store2.GetGuidRef($newDbGuidRef)) | Out-Null
+$guidRef

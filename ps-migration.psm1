@@ -12,6 +12,18 @@ enum dbComponentType {
     Interface
 }
 
+enum AddressPurpose {
+    Unknown
+    Billing
+    Shipping
+}
+
+enum AddressType {
+    Unknown
+    Commercial
+    Residential
+}
+
 # Module Utilities
 $utilitiesFolders = @("private")
 foreach ($utilitiesFolder in $utilitiesFolders) {
@@ -60,42 +72,42 @@ class LiteDbAppendOnlyCollection {
         ), 'RecycleBin')
     }
 
-    hidden [PSObject] Add([PSCustomObject] $Data) {
+    hidden [PSObject] _Add([PSCustomObject] $Data) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data
     }
 
-    hidden [PSObject] Add_NoVersionUpdate([PSCustomObject] $Data) {
+    hidden [PSObject] _Add_NoVersionUpdate([PSCustomObject] $Data) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -NoVersionUpdate
     }
 
-    hidden [PSObject] Add_NoTimestampUpdate([PSCustomObject] $Data) {
+    hidden [PSObject] _Add_NoTimestampUpdate([PSCustomObject] $Data) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -NoTimestampUpdate
     }
 
-    hidden [PSObject] Add_NoVersionOrTimestampUpdate([PSCustomObject] $Data) {
+    hidden [PSObject] _Add_NoVersionOrTimestampUpdate([PSCustomObject] $Data) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -NoVersionUpdate -NoTimestampUpdate
     }
 
-    hidden [PSObject] Add([PSCustomObject] $Data, [string[]] $IgnoreFields) {
+    hidden [PSObject] _Add([PSCustomObject] $Data, [string[]] $IgnoreFields) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -IgnoreFields $IgnoreFields
     }
 
-    hidden [PSObject] Add_NoVersionUpdate([PSCustomObject] $Data, [string[]] $IgnoreFields) {
+    hidden [PSObject] _Add_NoVersionUpdate([PSCustomObject] $Data, [string[]] $IgnoreFields) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -NoVersionUpdate -IgnoreFields $IgnoreFields
     }
 
-    hidden [PSObject] Add_NoTimestampUpdate([PSCustomObject] $Data, [string[]] $IgnoreFields) {
+    hidden [PSObject] _Add_NoTimestampUpdate([PSCustomObject] $Data, [string[]] $IgnoreFields) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -NoTimestampUpdate -IgnoreFields $IgnoreFields
     }
 
-    hidden [PSObject] Add_NoVersionOrTimestampUpdate([PSCustomObject] $Data, [string[]] $IgnoreFields) {
+    hidden [PSObject] _Add_NoVersionOrTimestampUpdate([PSCustomObject] $Data, [string[]] $IgnoreFields) {
         # Delegates to Add-DbDocument
         return Add-DbDocument -Database $this.Database -Collection $this.Collection -Data $Data -NoVersionUpdate -NoTimestampUpdate -IgnoreFields $IgnoreFields
     }
@@ -236,19 +248,19 @@ class LiteDbAppendOnlyCollection {
     }
 
     [Void] MoveDbObjectToCollection([Guid]$Guid, $DestCollection) {
-        $Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection
+        $Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection -NoTimestampUpdate
     }
 
     [void] MoveDbObjectToCollection([PSObject]$DbObject, $DestCollection) {
-        $DbObject[0].Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection
+        $DbObject[0].Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection -NoTimestampUpdate
     }
 
     [Void] MoveDbObjectFromCollection([Guid]$Guid, $SourceCollection) {
-        $Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection
+        $Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection -NoTimestampUpdate
     }
 
     [Void] MoveDbObjectFromCollection([PSObject]$DbObject, $SourceCollection) {
-        $DbObject[0].Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection
+        $DbObject[0].Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection -NoTimestampUpdate
     }
 
     [void] RecycleDbObject([Guid]$Guid) {
@@ -305,13 +317,37 @@ class LiteDbAppendOnlyCollection {
         # Add `$DestCol` property to track where the object should go upon commit
         $PSCustomObject = $PSCustomObject | Add-Member -MemberType NoteProperty -Name '$DestCol' -Value $this.Collection.Name -Force -PassThru
 
-        $staged = $Temp.Add($PSCustomObject)
+        $staged = $Temp._Add($PSCustomObject)
 
         return $staged
     }
 
-    [void] CommitDbDocAsDbObject([Guid] $Guid) {
-        $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection "Temp"
+    [System.Object[]] CommitTempObjectAsDbDoc([Guid]$Guid) {
+        $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'Temp'
+        $DbObject = $Temp.GetDbObject($Guid)
+        $out = $DbObject[0]
+        $out.UTC_Created = $DbObject[-1].UTC_Created
+        # $out.'$ObjVer' = 1
+        $out.PSObject.Properties.Remove('$DestCol')
+        $out.PSObject.Properties.Remove('$hashArcs')
+        $this.ClearTemp($Guid)
+        $out = $Temp._Add($out)
+        $out = $Temp.GetVersionsByGuid($out.Guid)
+        Write-Host "`n ++ out"
+        Write-Host $out[0]
+        Write-Host $out.GetType()
+        Write-Host $out[0].Guid
+        Write-Host "`n"
+        $Temp.MoveDbObjectToCollection($out, $this.Collection)
+        $return = $this.GetVersionsByGuid($out[0].Guid)
+        Write-Host "`n ++ return"
+        Write-Host $return
+        Write-Host "`n"
+        return $return
+    }
+
+    [void] CommitAsDbObject([Guid] $Guid) {
+        $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'Temp'
         $DbObject = $Temp.GetVersionsByGuid($Guid)
         foreach ($version in $DbObject) {
             $version.PSObject.Properties.Remove('$DestCol')
@@ -360,6 +396,126 @@ class LiteDbAppendOnlyCollection {
 
 }
 
+[NoRunspaceAffinity()]
+class LiteDbAppendOnlyDocument : LiteDbAppendOnlyCollection {
+    # This someday may be helpfully converted to three classes once [Type] `-is` conditionals
+    # are backported into supporting code to support additional type safety and project code consistency
+    # for now, this will be base class for Standard DB Documents, Temp Db Documents, Recycled DBdocuments, and HashRef/GuidRef Db Documents
+    [LiteDB.ObjectId]$_id
+    [Guid]$Guid
+    [string]$Hash
+    [int64]$UTC_Created
+    [int64]$UTC_Updated
+    [int]$ObjVer
+    [PSCustomObject]$Properties
 
+    LiteDbAppendOnlyDocument($Database, $Collection) : base($Database, $Collection) {}
+
+    LiteDbAppendOnlyDocument($Database, $Collection, [PSCustomObject]$PSCustomObject) : base($Database, $Collection){
+        $this.Properties = $PSCustomObject
+        $this.FromPS()
+    }
+
+    [void] FromPS() {
+        $props = $this.Properties.PSObject.Properties.Name
+        $classProps = $this.PSObject.Properties.Name
+        
+        $instanceProps = [PSCustomObject]@{}
+        foreach ($prop in $props) {
+            if($classProps -contains $prop) {
+                $this.$prop = $this.Properties.$prop
+            } else {
+                $instanceProps = $instanceProps | Add-Member -MemberType NoteProperty -Name $prop -Value $this.Properties.$prop -PassThru
+            }
+        }
+        $this.Properties = $instanceProps
+    }
+
+    [PSCustomObject] ToPS() {
+        $out = [PSCustomObject]@{}
+        $classProps = [System.Collections.ArrayList]($this.PSObject.Properties.Name)
+
+        $classProps.Remove('Database')
+        $classProps.Remove('Collection')
+
+        if ($this.Guid.Guid -like "00000000-0000-0000-0000-000000000000") {
+            $classProps.Remove('Guid')
+        }
+
+        if ($this.UTC_Created -eq 0) {
+            $classProps.Remove('UTC_Created')
+        }
+
+        if ($this.UTC_Updated -eq 0) {
+            $classProps.Remove('UTC_Updated')
+        }
+
+        if ($this.ObjVer -eq 0) {
+            $classProps.Remove('ObjVer')
+        }
+
+        if ($this._id -like "") {
+            $classProps.Remove('_id')
+        }
+        
+        if ($this.Hash -like "") {
+            $classProps.Remove('Hash')
+        }
+
+        if (($this.Properties | Get-Member -MemberType NoteProperty).Count -eq 0){
+            $classProps.Remove('Properties')
+        } else {
+            $instanceProps = $this.Properties.PSObject.Properties.Name
+            foreach ($instanceProp in $instanceProps) {
+                $out = $out | Add-Member -MemberType NoteProperty -Name $instanceProp -Value $this.Properties.$instanceProp -PassThru
+            }
+            $classProps.Remove('Properties')
+        }
+
+        foreach ($classProp in $classProps) {
+            $out = $out | Add-Member -MemberType NoteProperty -Name $classProp -Value $this.$classProp -PassThru
+        }
+        return $out
+    }
+
+    [PsCustomObject] Stage() {
+        $Obj = $this.ToPS()
+        $staged = $this.StageDbObjectDocument($Obj)
+        $stagedProps = $staged.PSObject.Properties.Name
+        if ($stagedProps -contains '$Ref' -and $stagedProps -contains '$Hash') {
+            $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'Temp'
+            $staged = $Temp.GetHashRef($staged)
+        }
+        $this.Properties = $staged
+        $this.FromPS()
+        return $staged
+    }
+
+    [PSCustomObject] Commit () {
+        $commit = $this.CommitTempObjectAsDbDoc($this.Guid)
+        $this.Properties = $commit[0]
+        $this.FromPS()
+        return $commit
+    }
+}
+
+[NoRunspaceAffinity()]
+class PhysicalAddress : LiteDbAppendOnlyDocument {
+    [AddressPurpose]$AddressPurpose
+    [AddressType]$AddressType
+    [string]$StreetAddress1
+    [string]$StreetAddress2
+    [string]$Neighborhood
+    [string]$County
+    [string]$State
+    [string]$Country
+    [string]$Latitude
+    [string]$Longitude
+
+    PhysicalAddress($Database) : base($Database, 'PhysicalAddresses') {}
+
+    PhysicalAddress($Database, [PSCustomObject]$Properties) : base($Database, 'PhysicalAddresses', $Properties) {}
+
+}
 # Export public functions from this module
 Export-ModuleMember -Function * -Alias * -Cmdlet * -Variable *

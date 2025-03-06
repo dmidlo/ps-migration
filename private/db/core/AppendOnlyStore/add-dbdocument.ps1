@@ -90,6 +90,10 @@ function Add-DbDocument {
     # Validate that inbound object has a Guid
     if($Data.PSObject.Properties.Name -notcontains "Guid") {
         $Data = ($Data | Add-Member -MemberType NoteProperty -Name "Guid" -Value ([Guid]::NewGuid()) -PassThru)
+        $guidPresent = $false
+    }
+    else {
+        $guidPresent = $true
     }
 
 
