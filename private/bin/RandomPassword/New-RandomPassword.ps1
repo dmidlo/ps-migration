@@ -46,7 +46,7 @@ function New-RandomPassword {
     $includeNumeric = $options -contains 'numeric'
     $includeSpecial = $options -contains 'special'
 
-    $characterPool = Get-CharacterPool -IncludeUpper $includeUpper -IncludeLower $includeLower -IncludeNumeric $includeNumeric -IncludeSpecial $includeSpecial
+    $characterPool = Get-CharacterPool -IncludeUpper:$includeUpper -IncludeLower:$includeLower -IncludeNumeric:$includeNumeric -IncludeSpecial:$includeSpecial
 
     $password = ""
     for ($i = 0; $i -lt $length; $i++) {

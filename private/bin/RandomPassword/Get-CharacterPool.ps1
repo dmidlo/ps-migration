@@ -8,27 +8,27 @@ function Get-CharacterPool {
         based on user-defined boolean flags.
 
     .PARAMETER IncludeUpper
-        A boolean flag indicating whether to include uppercase letters (A-Z) in the character pool.
+        A switch (boolean) flag indicating whether to include uppercase letters (A-Z) in the character pool.
 
     .PARAMETER IncludeLower
-        A boolean flag indicating whether to include lowercase letters (a-z) in the character pool.
+        A switch (boolean) flag indicating whether to include lowercase letters (a-z) in the character pool.
 
     .PARAMETER IncludeNumeric
-        A boolean flag indicating whether to include numeric digits (0-9) in the character pool.
+        A switch (boolean) flag indicating whether to include numeric digits (0-9) in the character pool.
 
     .PARAMETER IncludeSpecial
-        A boolean flag indicating whether to include special characters (!@#$%^&*()-_=+[]{}|;:,.<>?/) in the character pool.
+        A switch (boolean) flag indicating whether to include special characters (!@#$%^&*()-_=+[]{}|;:,.<>?/) in the character pool.
 
     .OUTPUTS
         [string]
         Returns a string containing the selected character types.
 
     .EXAMPLE
-        PS C:\> Get-CharacterPool -IncludeUpper $true -IncludeLower $true -IncludeNumeric $false -IncludeSpecial $false
+        PS C:\> Get-CharacterPool -IncludeUpper -IncludeLower -IncludeNumeric -IncludeSpecial
         Returns "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
 
     .EXAMPLE
-        PS C:\> Get-CharacterPool -IncludeUpper $false -IncludeLower $false -IncludeNumeric $true -IncludeSpecial $true
+        PS C:\> Get-CharacterPool -IncludeNumeric -IncludeSpecial
         Returns "0123456789!@#$%^&*()-_=+[]{}|;:,.<>?/".
 
     .NOTES
@@ -36,10 +36,10 @@ function Get-CharacterPool {
     #>
 
     param (
-        [bool]$IncludeUpper,
-        [bool]$IncludeLower,
-        [bool]$IncludeNumeric,
-        [bool]$IncludeSpecial
+        [switch]$IncludeUpper,
+        [switch]$IncludeLower,
+        [switch]$IncludeNumeric,
+        [switch]$IncludeSpecial
     )
 
     $pool = ""
