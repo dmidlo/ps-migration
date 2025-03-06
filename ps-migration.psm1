@@ -324,25 +324,38 @@ class LiteDbAppendOnlyCollection {
 
     [System.Object[]] CommitTempObjectAsDbDoc([Guid]$Guid) {
         $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'Temp'
-        $DbObject = $Temp.GetDbObject($Guid)
-        $out = $DbObject[0]
-        $out.UTC_Created = $DbObject[-1].UTC_Created
-        # $out.'$ObjVer' = 1
+        $DbObject = $Temp.GetVersionsByGuid($Guid)
+        $out = $Temp.GetVersion($DbObject[0].Hash, [dbVersionSteps]::Latest, $true)
+        $original = $Temp.GetVersion($DbObject[0].Hash, [dbVersionSteps]::Original, $true)
+        $out.UTC_Created = $original.UTC_Created
+        $out.'$ObjVer' = $original.'$ObjVer'
         $out.PSObject.Properties.Remove('$DestCol')
         $out.PSObject.Properties.Remove('$hashArcs')
-        $this.ClearTemp($Guid)
-        $out = $Temp._Add($out)
-        $out = $Temp.GetVersionsByGuid($out.Guid)
-        Write-Host "`n ++ out"
-        Write-Host $out[0]
-        Write-Host $out.GetType()
-        Write-Host $out[0].Guid
-        Write-Host "`n"
-        $Temp.MoveDbObjectToCollection($out, $this.Collection)
+        foreach ($version in $DbObject) {
+            $versionProps = $version.PSObject.Properties.Name
+            if ($versionProps -contains '$Ref' -and $versionProps -contains '$Hash') {
+                if ($version.'$Hash' -like $out.Hash) {
+                    Write-Host "version: $($version.'$Hash')"
+                    Write-Host "out: $($out.Hash)"
+                    $out | Set-LiteData -Collection $this.Collection
+                }
+                else {
+                    Remove-LiteData -Collection $Temp.Collection -Where 'Hash = @Hash', @{Hash = $version.Hash}
+                }
+            }
+            else {
+                if ($version.Hash -like $out.Hash) {
+                    Write-Host "version: $($version.'$Hash')"
+                    Write-Host "out: $($out.Hash)"
+                    $out | Set-LiteData -Collection $this.Collection
+                }
+                else{
+                    Remove-LiteData -Collection $Temp.Collection -Where 'Hash = @Hash', @{Hash = $version.Hash}
+                }
+            }
+        }
+        # $Temp.MoveDbObjectToCollection($out, $this.Collection)
         $return = $this.GetVersionsByGuid($out[0].Guid)
-        Write-Host "`n ++ return"
-        Write-Host $return
-        Write-Host "`n"
         return $return
     }
 
@@ -406,7 +419,6 @@ class LiteDbAppendOnlyDocument : LiteDbAppendOnlyCollection {
     [string]$Hash
     [int64]$UTC_Created
     [int64]$UTC_Updated
-    [int]$ObjVer
     [PSCustomObject]$Properties
 
     LiteDbAppendOnlyDocument($Database, $Collection) : base($Database, $Collection) {}

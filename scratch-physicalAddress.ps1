@@ -41,6 +41,12 @@ $dbAddress1ps = $dbAddress1.ToPS()
 
 Write-Host "== Stage"
 $dbAddress1.Stage()
+$dbAddress1.StreetAddress2 = "Ste 99"
+$dbAddress1.Stage()
+$dbaddress1.StreetAddress2 = "Ste 98"
+$dbAddress1.Stage()
+$dbAddress1.StreetAddress2 = "Ste 100"
+$dbAddress1.Stage()
 $dbAddress1.Commit()
 $dbAddress1.StreetAddress2 = "Ste 101"
 $dbAddress1.Stage() | Out-Null
@@ -51,14 +57,14 @@ $dbAddress1.Commit() | Out-Null
 $dbAddress1.StreetAddress2 = "Ste 102"
 $dbAddress1.Stage() | Out-Null
 $dbAddress1.Commit() | Out-Null
-$dbAddress1.StreetAddress2 = "Ste 101"
-$dbAddress1.Stage() | Out-Null
-$dbAddress1.Commit() | Out-Null
+# $dbAddress1.StreetAddress2 = "Ste 101"
+# $dbAddress1.Stage() | Out-Null
+# $dbAddress1.Commit() | Out-Null
 # $dbAddress1.StreetAddress2 = "Ste 103"
 # $dbAddress1.Stage()
 # $dbAddress1.StreetAddress2 = "Ste 100"
 # $dbAddress1.Stage()
-Write-Host "== Commit"
-$dbAddress2 = New-PhysicalAddress -Database $db -PSCustomObject $address1
-$dbAddress2.Stage()
-$dbAddress2.Commit()
+# Write-Host "== Commit"
+# $dbAddress2 = New-PhysicalAddress -Database $db -PSCustomObject $address1
+# $dbAddress2.Stage()
+# $dbAddress2.Commit()

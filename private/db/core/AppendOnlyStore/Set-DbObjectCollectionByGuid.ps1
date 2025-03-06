@@ -95,10 +95,10 @@ function Set-DbObjectCollectionByGuid {
                     }
                 }
                 
-                # ($IsAlreadyPresent_version = $stagedVersion.Hash | Get-DbDocumentByHash -Database $Database -Collection $DestCollection) | Out-Null
-                # if (-not $IsAlreadyPresent_version) {
-                # }
-                Add-DbDocument -Database $Database -Collection $DestCollection -Data $stagedVersion -NoVersionUpdate:$NoVersionUpdate.IsPresent -NoTimestampUpdate:$NoTimestampUpdate.IsPresent | Out-Null
+                ($IsAlreadyPresent_version = $stagedVersion.Hash | Get-DbDocumentByHash -Database $Database -Collection $DestCollection) | Out-Null
+                if (-not $IsAlreadyPresent_version) {
+                    Add-DbDocument -Database $Database -Collection $DestCollection -Data $stagedVersion -NoVersionUpdate:$NoVersionUpdate.IsPresent -NoTimestampUpdate:$NoTimestampUpdate.IsPresent | Out-Null
+                }
                 Remove-LiteData -Collection $SourceCollection -Where 'Hash = @Hash', @{Hash = $version.Hash} | Out-Null
             }
             catch {
