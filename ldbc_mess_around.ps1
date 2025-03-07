@@ -153,7 +153,7 @@ $db = Initialize-DB -ConnectionString $dbConnectionString
 # $db | Get-Member -MemberType Method -Force | ft
 # Invoke-LiteCommand 'select pragmas from $database;' -Database $db
 # Confirm-LiteDBCollection -Database $db -CollectionName 'Temp' -Indexes @(
-#         [PSCustomObject]@{ Field='Hash'; Unique=$true }
+#         [PSCustomObject]@{ Field='VersionId'; Unique=$true }
 # )
 
 
@@ -167,12 +167,12 @@ $db = Initialize-DB -ConnectionString $dbConnectionString
 # $TempDoc = @{ _id = $TempId; TempField = 'Temp' }
 # Add-LiteData -Collection $Collection -InputObject $TempDoc
 # Confirm-LiteDBCollection -Database $db -CollectionName $CollectionName -Indexes @(
-#         [PSCustomObject]@{ Field='Hash'; Unique=$true },
+#         [PSCustomObject]@{ Field='VersionId'; Unique=$true },
 #         [PSCustomObject]@{ Field='Guid'; Unique=$false}
 # )
 
 # Test-LiteDBCollection -Database $db -CollectionName $CollectionName -Indexes @(
-#         [PSCustomObject]@{ Field='Hash'; Unique=$true},
+#         [PSCustomObject]@{ Field='VersionId'; Unique=$true},
 #         [PSCustomObject]@{ Field='Guid'; Unique=$false}
 # )
 # Initialize-Collections -Database $db | Out-Null

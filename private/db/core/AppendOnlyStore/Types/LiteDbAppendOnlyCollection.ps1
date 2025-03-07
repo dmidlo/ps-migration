@@ -17,16 +17,19 @@ class LiteDbAppendOnlyCollection {
     
     hidden [void] _init_collections(){
         $this.EnsureCollection(@(
-            [PSCustomObject]@{ Field='Hash'; Unique=$true },
-            [PSCustomObject]@{ Field="Guid"; Unique=$false}
+            [PSCustomObject]@{ Field='VersionId'; Unique=$true },
+            [PSCustomObject]@{ Field="BundleId"; Unique=$false},
+            [PSCustomObject]@{ Field="Thumbprint"; Unique=$true}
         ), $this.Collection.Name)
         $this.EnsureCollection(@(
-            [PSCustomObject]@{ Field='Hash'; Unique=$true },
-            [PSCustomObject]@{ Field="Guid"; Unique=$false}
+            [PSCustomObject]@{ Field='VersionId'; Unique=$true },
+            [PSCustomObject]@{ Field="BundleId"; Unique=$false},
+            [PSCustomObject]@{ Field="Thumbprint"; Unique=$true}
         ), 'Temp')
         $this.EnsureCollection(@(
-            [PSCustomObject]@{ Field='Hash'; Unique=$true },
-            [PSCustomObject]@{ Field="Guid"; Unique=$false}
+            [PSCustomObject]@{ Field='VersionId'; Unique=$true },
+            [PSCustomObject]@{ Field="BundleId"; Unique=$false},
+            [PSCustomObject]@{ Field="Thumbprint"; Unique=$true}
         ), 'RecycleBin')
     }
 
@@ -93,20 +96,20 @@ class LiteDbAppendOnlyCollection {
             -ResolveRefs:$ResolveRefs
     }
 
-    [PSCustomObject] GetByHash([string] $Hash) {
-        # Delegates to Get-DbDocumentByHash
-        return Get-DbDocumentByHash `
+    [PSCustomObject] GetByVersionId([string] $VersionId) {
+        # Delegates to Get-DbDocumentByVersionId
+        return Get-DbDocumentByVersionId `
             -Database $this.Database `
             -Collection $this.Collection `
-            -Hash $Hash
+            -VersionId $VersionId
     }
 
-    [PSCustomObject] GetByHash([string] $Hash, [switch] $ResolveRefs) {
-        # Delegates to Get-DbDocumentByHash
-        return Get-DbDocumentByHash `
+    [PSCustomObject] GetByVersionId([string] $VersionId, [switch] $ResolveRefs) {
+        # Delegates to Get-DbDocumentByVersionId
+        return Get-DbDocumentByVersionId `
             -Database $this.Database `
             -Collection $this.Collection `
-            -Hash $Hash `
+            -VersionId $VersionId `
             -ResolveRefs:$ResolveRefs
     }
 
@@ -127,135 +130,135 @@ class LiteDbAppendOnlyCollection {
             -ResolveRefs:$ResolveRefs
     }
 
-    [PSCustomObject] GetVersion([string]$Hash, [dbVersionSteps]$Version) {
+    [PSCustomObject] GetVersion([string]$VersionId, [dbVersionSteps]$Version) {
         $out = $null
         if ($Version -eq [dbVersionSteps]::Original) {
-            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -Hash $Hash -Original
+            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -VersionId $VersionId -Original
         }
         elseif ($Version -eq [dbVersionSteps]::Latest) {
-            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -Hash $Hash -Latest
+            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -VersionId $VersionId -Latest
         }
         elseif ($Version -eq [dbVersionSteps]::Previous) {
-            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -Hash $Hash -Previous
+            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -VersionId $VersionId -Previous
         }
         elseif ($Version -eq [dbVersionSteps]::Next) {
-            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -Hash $Hash -Next
+            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -VersionId $VersionId -Next
         }
 
         return $out
     }
 
-    [PSCustomObject] GetVersion([string]$Hash, [dbVersionSteps]$Version, [switch]$ResolveRefs) {
+    [PSCustomObject] GetVersion([string]$VersionId, [dbVersionSteps]$Version, [switch]$ResolveRefs) {
         $out = $null
         if ($Version -eq [dbVersionSteps]::Original) {
-            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -Hash $Hash -Original -ResolveRefs
+            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -VersionId $VersionId -Original -ResolveRefs
         }
         elseif ($Version -eq [dbVersionSteps]::Latest) {
-            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -Hash $Hash -Latest -ResolveRefs
+            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -VersionId $VersionId -Latest -ResolveRefs
         }
         elseif ($Version -eq [dbVersionSteps]::Previous) {
-            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -Hash $Hash -Previous -ResolveRefs
+            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -VersionId $VersionId -Previous -ResolveRefs
         }
         elseif ($Version -eq [dbVersionSteps]::Next) {
-            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -Hash $Hash -Next -ResolveRefs
+            $out = Get-DbDocumentVersion -Database $this.Database -Collection $this.Collection -VersionId $VersionId -Next -ResolveRefs
         }
 
         return $out
     }
 
-    [System.Object[]] GetVersionsByGuid([Guid] $Guid) {
-        # Delegates to Get-DbDocumentVersionsByGuid
-        return Get-DbDocumentVersionsByGuid `
+    [System.Object[]] GetVersionsByBundle([Guid] $BundleId) {
+        # Delegates to Get-DbDocumentVersionsByBundle
+        return Get-DbDocumentVersionsByBundle `
             -Database $this.Database `
             -Collection $this.Collection `
-            -Guid $Guid
+            -BundleId $BundleId
     }
 
-    [System.Object[]] GetVersionsByGuid([Guid] $Guid, [switch] $ResolveRefs) {
-        # Delegates to Get-DbDocumentVersionsByGuid
-        return Get-DbDocumentVersionsByGuid `
+    [System.Object[]] GetVersionsByBundle([Guid] $BundleId, [switch] $ResolveRefs) {
+        # Delegates to Get-DbDocumentVersionsByBundle
+        return Get-DbDocumentVersionsByBundle `
             -Database $this.Database `
             -Collection $this.Collection `
-            -Guid $Guid `
+            -BundleId $BundleId `
             -ResolveRefs
     }
 
-    [System.Object[]] GetDbObject([Guid] $Guid) {
-        # Delegates to Get-DbDocumentVersionsByGuid
-        return Get-DbDocumentVersionsByGuid `
+    [System.Object[]] GetDbObject([Guid] $BundleId) {
+        # Delegates to Get-DbDocumentVersionsByBundle
+        return Get-DbDocumentVersionsByBundle `
             -Database $this.Database `
             -Collection $this.Collection `
-            -Guid $Guid `
+            -BundleId $BundleId `
             -AsDbObject
     }
 
-    [PSCustomObject] GetGuidRef([PSCustomObject] $DbGuidRef) {
-        return Get-DbGuidRef -Database $this.Database -Collection $this.Collection -DbGuidRef $DbGuidRef
+    [PSCustomObject] GetBundleRef([PSCustomObject] $DbBundleRef) {
+        return Get-DbBundleRef -Database $this.Database -Collection $this.Collection -DbBundleRef $DbBundleRef
     }
 
-    [PSCustomObject] GetHashRef([PSCustomObject] $DbHashRef) {
-        return Get-DbHashRef -Database $this.Database -Collection $this.Collection -DbHashRef $DbHashRef
+    [PSCustomObject] GetVersionRef([PSCustomObject] $DbVersionRef) {
+        return Get-DbVersionRef -Database $this.Database -Collection $this.Collection -DbVersionRef $DbVersionRef
     }
 
-    [PSCustomObject] NewGuidRef([PSCustomObject] $DbObjectDocument, $Collection) {
-        return New-DbGuidRef -DbDocument $DbObjectDocument -Collection $Collection -RefCollection $this.Collection
+    [PSCustomObject] NewBundleRef([PSCustomObject] $DbObjectDocument, $Collection) {
+        return New-DbBundleRef -DbDocument $DbObjectDocument -Collection $Collection -RefCollection $this.Collection
     }
 
-    static [PSCustomObject] NewGuidRef([PSCustomObject] $DbObjectDocument, $Collection, $RefCollection) {
-        return New-DbGuidRef -DbDocument $DbObjectDocument -Collection $Collection -RefCollection $RefCollection
+    static [PSCustomObject] NewBundleRef([PSCustomObject] $DbObjectDocument, $Collection, $RefCollection) {
+        return New-DbBundleRef -DbDocument $DbObjectDocument -Collection $Collection -RefCollection $RefCollection
     }
 
-    [Void] MoveDbObjectToCollection([Guid]$Guid, $DestCollection) {
-        $Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection -NoTimestampUpdate
+    [Void] MoveDbObjectToCollection([Guid]$BundleId, $DestCollection) {
+        $BundleId | Set-DbObjectCollectionByBundle -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection -NoTimestampUpdate
     }
 
     [void] MoveDbObjectToCollection([PSObject]$DbObject, $DestCollection) {
-        $DbObject[0].Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection -NoTimestampUpdate
+        $DbObject[0].BundleId | Set-DbObjectCollectionByBundle -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection -NoTimestampUpdate
     }
 
-    [Void] MoveDbObjectFromCollection([Guid]$Guid, $SourceCollection) {
-        $Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection -NoTimestampUpdate
+    [Void] MoveDbObjectFromCollection([Guid]$BundleId, $SourceCollection) {
+        $BundleId | Set-DbObjectCollectionByBundle -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection -NoTimestampUpdate
     }
 
     [Void] MoveDbObjectFromCollection([PSObject]$DbObject, $SourceCollection) {
-        $DbObject[0].Guid | Set-DbObjectCollectionByGuid -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection -NoTimestampUpdate
+        $DbObject[0].BundleId | Set-DbObjectCollectionByBundle -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection -NoTimestampUpdate
     }
 
-    [void] RecycleDbObject([Guid]$Guid) {
+    [void] RecycleDbObject([Guid]$BundleId) {
         $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
         $RecycleBin = Get-LiteCollection -Database $this.Database -CollectionName 'RecycleBin'
-        $DbObject = $this.GetVersionsByGuid($Guid)
+        $DbObject = $this.GetVersionsByBundle($BundleId)
         foreach ($version in $DbObject) {
             $version = ($version | Add-Member -MemberType NoteProperty -Name '$RecycledTime' -Value $now -Force -PassThru)
             $version = ($version | Add-Member -MemberType NoteProperty -Name '$BaseCol' -Value $this.Collection.Name -Force -PassThru)
             $version | Set-LiteData -Collection $this.Collection
         }
-        $DbObject = $this.GetVersionsByGuid($DbObject[0].Guid)
+        $DbObject = $this.GetVersionsByBundle($DbObject[0].BundleId)
         $this.MoveDbObjectToCollection($DbObject, $RecycleBin)
     }
 
     [void] RecycleDbObject([PSObject]$DbObject) {
         $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
         $RecycleBin = Get-LiteCollection -Database $this.Database -CollectionName 'RecycleBin'
-        $DbObject = $this.GetVersionsByGuid($DbObject[0].Guid)
+        $DbObject = $this.GetVersionsByBundle($DbObject[0].BundleId)
         foreach ($version in $DbObject) {
             $version = ($version | Add-Member -MemberType NoteProperty -Name '$RecycledTime' -Value $now -Force -PassThru)
             $version = ($version | Add-Member -MemberType NoteProperty -Name '$BaseCol' -Value $this.Collection.Name -Force -PassThru)
             $version | Set-LiteData -Collection $this.Collection
         }
-        $DbObject = $this.GetVersionsByGuid($DbObject[0].Guid)
+        $DbObject = $this.GetVersionsByBundle($DbObject[0].BundleId)
         $this.MoveDbObjectToCollection($DbObject, $RecycleBin)
     }
 
-    [void] RestoreDbObject([Guid]$Guid) {
+    [void] RestoreDbObject([Guid]$BundleId) {
         $RecycleBin = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'RecycleBin'
-        $DbObject = $RecycleBin.GetVersionsByGuid($Guid)
+        $DbObject = $RecycleBin.GetVersionsByBundle($BundleId)
         foreach ($version in $DbObject) {
             $version.PSObject.Properties.Remove('$BaseCol')
             $version.PSObject.Properties.Remove('$RecycledTime')
             $version | Set-LiteData -Collection $RecycleBin.Collection
         }
-        $DbObject = $RecycleBin.GetVersionsByGuid($DbObject[0].Guid)
+        $DbObject = $RecycleBin.GetVersionsByBundle($DbObject[0].BundleId)
         $RecycleBin.MoveDbObjectToCollection($DbObject, $this.Collection)
     }
 
@@ -264,9 +267,9 @@ class LiteDbAppendOnlyCollection {
         Remove-LiteData -Collection $RecycleBin -Where '$BaseCol = @BaseCol', @{BaseCol = $this.Collection.Name}
     }
 
-    [void] EmptyRecycleBin([Guid]$Guid) {
+    [void] EmptyRecycleBin([Guid]$BundleId) {
         $RecycleBin = Get-LiteCollection -Database $this.Database -CollectionName 'RecycleBin'
-        Remove-LiteData -Collection $RecycleBin -Where 'Guid = @Guid', @{Guid = $Guid}
+        Remove-LiteData -Collection $RecycleBin -Where 'BundleId = @BundleId', @{BundleId = $BundleId}
     }
 
     [PSCustomObject] StageDbObjectDocument([PSCustomObject] $PSCustomObject) {
@@ -280,88 +283,88 @@ class LiteDbAppendOnlyCollection {
         return $staged
     }
 
-    [System.Object[]] CommitTempObjectAsDbDoc([Guid]$Guid) {
+    [System.Object[]] CommitTempObjectAsDbDoc([Guid]$BundleId) {
         $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'Temp'
-        $DbObject = $Temp.GetVersionsByGuid($Guid)
-        $out = $Temp.GetVersion($DbObject[0].Hash, [dbVersionSteps]::Latest, $true)
-        $original = $Temp.GetVersion($DbObject[0].Hash, [dbVersionSteps]::Original, $true)
+        $DbObject = $Temp.GetVersionsByBundle($BundleId)
+        $out = $Temp.GetVersion($DbObject[0].VersionId, [dbVersionSteps]::Latest, $true)
+        $original = $Temp.GetVersion($DbObject[0].VersionId, [dbVersionSteps]::Original, $true)
         $out.UTC_Created = $original.UTC_Created
         $out.'$ObjVer' = $original.'$ObjVer'
         $out.PSObject.Properties.Remove('$DestCol')
-        $out.PSObject.Properties.Remove('$hashArcs')
+        $out.PSObject.Properties.Remove('$VersionArcs')
         foreach ($version in $DbObject) {
             $versionProps = $version.PSObject.Properties.Name
-            if ($versionProps -contains '$Ref' -and $versionProps -contains '$Hash') {
-                if ($version.'$Hash' -like $out.Hash) {
-                    Write-Host "version: $($version.'$Hash')"
-                    Write-Host "out: $($out.Hash)"
+            if ($versionProps -contains '$Ref' -and $versionProps -contains '$VersionId') {
+                if ($version.'$VersionId' -like $out.VersionId) {
+                    Write-Host "version: $($version.'$VersionId')"
+                    Write-Host "out: $($out.VersionId)"
                     $out | Set-LiteData -Collection $this.Collection
                 }
                 else {
-                    Remove-LiteData -Collection $Temp.Collection -Where 'Hash = @Hash', @{Hash = $version.Hash}
+                    Remove-LiteData -Collection $Temp.Collection -Where 'VersionId = @VersionId', @{VersionId = $version.VersionId}
                 }
             }
             else {
-                if ($version.Hash -like $out.Hash) {
-                    Write-Host "version: $($version.'$Hash')"
-                    Write-Host "out: $($out.Hash)"
+                if ($version.VersionId -like $out.VersionId) {
+                    Write-Host "version: $($version.'$VersionId')"
+                    Write-Host "out: $($out.VersionId)"
                     $out | Set-LiteData -Collection $this.Collection
                 }
                 else{
-                    Remove-LiteData -Collection $Temp.Collection -Where 'Hash = @Hash', @{Hash = $version.Hash}
+                    Remove-LiteData -Collection $Temp.Collection -Where 'VersionId = @VersionId', @{VersionId = $version.VersionId}
                 }
             }
         }
         # $Temp.MoveDbObjectToCollection($out, $this.Collection)
-        $return = $this.GetVersionsByGuid($out[0].Guid)
+        $return = $this.GetVersionsByBundle($out[0].BundleId)
         return $return
     }
 
-    [void] CommitAsDbObject([Guid] $Guid) {
+    [void] CommitAsDbObject([Guid] $BundleId) {
         $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'Temp'
-        $DbObject = $Temp.GetVersionsByGuid($Guid)
+        $DbObject = $Temp.GetVersionsByBundle($BundleId)
         foreach ($version in $DbObject) {
             $version.PSObject.Properties.Remove('$DestCol')
             $version | Set-LiteData -Collection $Temp.Collection
         }
-        $DbObject = $Temp.GetVersionsByGuid($DbObject[0].Guid)
+        $DbObject = $Temp.GetVersionsByBundle($DbObject[0].BundleId)
         $Temp.MoveDbObjectToCollection($DbObject, $this.Collection)
     }
 
     [void] CommitAllDbDocAsDbObject() {
         $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection "Temp"
-        $Guids = $Temp.GetAll() | Where-Object {$_.'$DestCol' -like $this.Collection.Name} | Select-Object -Unique 'Guid'
-        foreach ($guid in $Guids) {
-            $guid = [Guid]::Parse($guid.Guid)
-            $this.CommitDbDocAsDbObject($guid)
+        $BundleIds = $Temp.GetAll() | Where-Object {$_.'$DestCol' -like $this.Collection.Name} | Select-Object -Unique 'BundleId'
+        foreach ($BundleId in $BundleIds) {
+            $BundleId = [Guid]::Parse($BundleId.Guid)
+            $this.CommitDbDocAsDbObject($BundleId)
         }
     }
 
-    [void] ClearTemp([Guid] $Guid) {
+    [void] ClearTemp([Guid] $BundleId) {
         $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'Temp'
         $RecycleBin = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'RecycleBin'
 
-        $Temp.RecycleDbObject($Guid)
-        $RecycleBin.EmptyRecycleBin($Guid)
+        $Temp.RecycleDbObject($BundleId)
+        $RecycleBin.EmptyRecycleBin($BundleId)
     }
 
     [void] ClearTemp() {
         $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'Temp'
         $RecycleBin = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'RecycleBin'
-        $Guids = $Temp.GetAll() | Where-Object {$_.'$DestCol' -like $this.Collection.Name} | Select-Object -Unique 'Guid'
-        foreach ($guid in $Guids) {
-            $guid = [Guid]::Parse($guid.Guid)
-            $Temp.RecycleDbObject($guid)
-            $RecycleBin.EmptyRecycleBin($guid)
+        $BundleIds = $Temp.GetAll() | Where-Object {$_.'$DestCol' -like $this.Collection.Name} | Select-Object -Unique 'BundleId'
+        foreach ($BundleId in $BundleIds) {
+            $BundleId = [Guid]::Parse($BundleId.Guid)
+            $Temp.RecycleDbObject($BundleId)
+            $RecycleBin.EmptyRecycleBin($BundleId)
         }
     }
 
-    [bool] HashExists([string] $Hash) {
-        return Test-LiteData -Collection $this.Collection -Where 'Hash = @Hash', @{Hash = $Hash}
+    [bool] VersionExists([string] $VersionId) {
+        return Test-LiteData -Collection $this.Collection -Where 'VersionId = @VersionId', @{VersionId = $VersionId}
     }
 
-    [bool] GuidExists([Guid] $Guid) {
-        return Test-LiteData -Collection $this.Collection -Where 'Guid = @Guid', @{Guid = $Guid}
+    [bool] BundleExists([Guid] $BundleId) {
+        return Test-LiteData -Collection $this.Collection -Where 'BundleId = @BundleId', @{BundleId = $BundleId}
     }
 
 

@@ -1,71 +1,4 @@
 function Add-DbDocument {
-    <#
-    .SYNOPSIS
-    Inserts a record in two steps:
-    1) Allow LiteDB to generate `_id`
-    2) Update the record with `_id`
-
-    .DESCRIPTION
-    This function enforces a structured three-identifier system to support **database abstraction, 
-    record versioning, and optimized lookups** within the pseudo-ORM layer.
-
-    ### **Three-Identifier System**
-    - **Guid**: Represents the *application-layer object identifier*. It is **not a record** but 
-        uniquely identifies an **object** within the application. A `Guid` can be associated with 
-        multiple **record versions** (`Hash` values), but it must always be linked to at least one 
-        `Hash`. This ensures that the object remains identifiable across different database systems.
-        
-    - **Hash**: Represents the *unique record identifier*. Each `Hash` corresponds **one-to-one** 
-        with a `Guid`, meaning that every specific **version of an object** has exactly one `Hash`. 
-        This allows for **deduplication and version tracking**, ensuring that different states of 
-        an object are distinguishable.
-
-    - **_id**: A LiteDB-generated primary key, used **only as an optimization tool**. The `_id`
-        exists purely to facilitate **efficient lookups** within LiteDB and is **not relied upon** 
-        for application-level identity or relationships.
-
-    ### **Double-Lookup Requirement**
-    To ensure consistency and correctness, this function **performs two explicit lookups**:
-    1) **Pre-insertion duplicate check**: Searches for an existing record using `Hash` to 
-        prevent redundant inserts.
-    2) **Post-insertion retrieval**: Finds the newly inserted record using `hash` to acquire `_id`, 
-        which is required for subsequent updates.
-
-    This ensures that:
-    - **Each application object (`Guid`) can have multiple versions (`Hash`)**, but each version 
-        remains unique.
-    - **Records remain database-agnostic** by abstracting identity management away from `_id`.
-    - **LiteDB's `_id` is leveraged purely for internal efficiency**, without affecting 
-        business logic.
-
-    ### **PARAMETERS**
-    - **`-Connection`** `[LiteDB.LiteDatabase]` *(Mandatory)*  
-    The active LiteDB connection object.
-
-    - **`-CollectionName`** `[string]` *(Mandatory)*  
-    The name of the collection where the document will be stored.
-
-    - **`-Data`** `[hashtable]` *(Mandatory)*  
-    The document to insert. If `Guid` is not present in the input data, the function will generate 
-    one automatically.
-
-    - **`-IgnoreFields`** `[string[]]` *(Optional)*  
-    Specifies fields to be **excluded** from the hash computation.  
-    - Defaults to ignoring internal metadata fields: `_id`, `Guid`, `Hash`, `UTC_Created`, `UTC_Updated`.  
-    - Allows the caller to **customize deduplication behavior** by controlling which fields contribute to `Hash`.  
-    - Usage example:  
-        ```powershell
-        Add-DbDocument -Connection $db -CollectionName 'Domains' -Data $record -IgnoreFields @('Timestamp', 'Comments')
-        ```
-
-    .EXAMPLE
-    $record = @{
-        FriendlyId = 'DOM-ALPHA'
-        FQDN       = 'mydomain.local'
-    }
-    Add-DbDocument -Connection $db -CollectionName 'Domains' -Data $record
-    #>
-
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
@@ -78,74 +11,82 @@ function Add-DbDocument {
         [PSCustomObject]$Data,
 
         [string[]] $IgnoreFields = @(
-            '_id', 'Guid', 'Hash', 'UTC_Created', 'UTC_Updated',
+            '_id', 'BundleId', 'Thumbprint', 'VersionId', 'UTC_Created', 'UTC_Updated',
             'Count', 'Length', 'Collection', '$ObjVer',
-            '$hashArcs', '$guidArcs', '$RecycledTime', '$BaseCol'),
+            '$ThumbprintArcs', '$BundleArcs', '$RecycledTime', '$BaseCol'),
 
         [switch] $NoVersionUpdate,
 
         [switch] $NoTimestampUpdate
     )
 
-    # Validate that inbound object has a Guid
-    if($Data.PSObject.Properties.Name -notcontains "Guid") {
-        $Data = ($Data | Add-Member -MemberType NoteProperty -Name "Guid" -Value ([Guid]::NewGuid()) -PassThru)
-        $guidPresent = $false
+    # Validate that inbound object has a BundleId
+    if($Data.PSObject.Properties.Name -notcontains "BundleId") {
+        $Data = ($Data | Add-Member -MemberType NoteProperty -Name "BundleId" -Value ([Guid]::NewGuid()) -PassThru)
+        $BundleIdPresent = $false
     }
     else {
-        $guidPresent = $true
+        $BundleIdPresent = $true
     }
 
 
-    # # Compute hash
+    # # Compute Thumbprint and VersionId
     if ($Data.PSObject.Properties.Name -notcontains '$Ref') {
-        $Hash = (Get-DataHash -DataObject $Data -FieldsToIgnore $IgnoreFields).Hash
-        if ($Data.PSObject.Properties.Name -notcontains 'Hash') {
-           $Data = ($Data | Add-Member -MemberType NoteProperty -Name "Hash" -Value $Hash -PassThru) 
+        $Thumbprint = (Get-DataHash -DataObject $Data -FieldsToIgnore $IgnoreFields).Hash
+        $VersionId = (Get-DataHash -DataObject @{Thumbprint = $Thumbprint; BundleId = $Data.BundleId} -FieldsToIgnore @('none')).Hash
+
+        if ($Data.PSObject.Properties.Name -notcontains 'Thumbprint') {
+            $Data = ($Data | Add-Member -MemberType NoteProperty -Name "Thumbprint" -Value $Thumbprint -PassThru) 
+            $Data = ($Data | Add-Member -MemberType NoteProperty -Name "VersionId" -Value $VersionId -PassThru)
         }
         else {
-            $Data.Hash = $Hash
+            $Data.Thumbprint = $Thumbprint
+            $Data.VersionId = $VersionId
         }
     }
 
-    # # Check for existing record by hash
+    # # Check for existing record by VersionId
     $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-    $exists = $Data.Hash | Get-DbDocumentByHash -Database $Database -Collection $Collection
+    $existsInBundle = $Data.VersionId | Get-DbDocumentByVersionId -Database $Database -Collection $Collection
     
-    if ($exists) {
-        $latestVersion = $exists.Hash | Get-DbDocumentVersion -Database $Database -Collection $Collection -Latest
+    if ($existsInBundle -and $BundleIdPresent) {
+        $latestVersion = $existsInBundle.VersionId | Get-DbDocumentVersion -Database $Database -Collection $Collection -Latest
     
-        if ((($exists.PSObject.Properties.Name -contains '$Ref') -or ($latestVersion.PSObject.Properties.Name -contains '$Ref'))) {
-            if ($exists.Hash -eq $latestVersion.'$Hash') {
-                $exists = $latestVersion
+        if ((($existsInBundle.PSObject.Properties.Name -contains '$Ref') -or ($latestVersion.PSObject.Properties.Name -contains '$Ref'))) {
+            if ($existsInBundle.VersionId -eq $latestVersion.'$Thumbprint') {
+                $existsInBundle = $latestVersion
             }
             $skip = $true
         }
-        elseif ($latestVersion.Hash -eq $exists.Hash) {
+        elseif ($latestVersion.VersionId -eq $existsInBundle.VersionId) {
             $skip = $true
         }
         else {
-            $Data = New-DbHashRef -DbDocument $exists -Collection $Collection -RefCollection $Collection
+            $Data = New-DbVersionIdRef -DbDocument $existsInBundle -Collection $Collection -RefCollection $Collection
             $skip = $false
         }
     }
+    else {
+        $skip = $false
+    }
     
     if ($skip) {
-        $outDoc = $exists.Hash | Get-DbDocumentByHash -Database $Database -Collection $Collection
+        $outDoc = $existsInBundle.VersionId | Get-DbDocumentByVersionId -Database $Database -Collection $Collection
     }
     else {
         # Instert partially so LiteDB atuo-assigns _id
         $initialDoc = [PSCustomObject]@{
-            Hash = $Data.Hash
-            Guid = $Data.Guid
+            Thumbprint = $Data.Thumbprint
+            BundleId = $Data.BundleId
+            VersionId = $Data.VersionId
         }
         $initialDoc | Add-LiteData -Collection $Collection
 
-        # Retrieve the newly inserted doc from LiteDB using Hash
-        $found = $initialDoc.Hash | Get-DbDocumentByHash -Database $Database -Collection $Collection
+        # Retrieve the newly inserted doc from LiteDB using VersionId
+        $found = $initialDoc.VersionId | Get-DbDocumentByVersionId -Database $Database -Collection $Collection
 
         if (-not $found) {
-            throw "Could not retrieve newly inserted document in collection '$($Collection.Name)'`n  - Expected Hash: $($initialDoc.Hash).`n  - This may indicate an insertion faulure or query issue."
+            throw "Could not retrieve newly inserted document in collection '$($Collection.Name)'`n  - Expected VersionId: $($initialDoc.VersionId).`n  - This may indicate an insertion faulure or query issue."
         }
 
         if ($found._id -is [System.Collections.ObjectModel.Collection[PSObject]]) {
@@ -173,7 +114,7 @@ function Add-DbDocument {
             # Validate that inbound has a Version integer
             if(-not $NoVersionUpdate) {
                 # Update $ObjVer
-                $ObjVer = ($Data.Guid | Get-DbDocumentVersionsByGuid -Database $Database -Collection $Collection).Count
+                $ObjVer = ($Data.BundleId | Get-DbDocumentVersionsByBundle -Database $Database -Collection $Collection).Count
 
                 if($Data.PSObject.Properties.Name -notcontains '$ObjVer') {
                     $Data = ($Data | Add-Member -MemberType NoteProperty -Name '$ObjVer' -Value $ObjVer -PassThru)
@@ -185,7 +126,7 @@ function Add-DbDocument {
 
             # Update stub litedb document with the Data object
             $Data | Set-LiteData -Collection $Collection
-            $outDoc = $Data.Hash | Get-DbDocumentByHash -Database $Database -Collection $Collection
+            $outDoc = $Data.VersionId | Get-DbDocumentByVersionId -Database $Database -Collection $Collection
         }
     }
     

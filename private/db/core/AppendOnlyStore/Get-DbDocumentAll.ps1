@@ -29,7 +29,7 @@ function Get-DbDocumentAll {
         if ($ResolveRefs) {
             $resolved = $result | ForEach-Object {
                 if ($_.PSObject.Properties.Name -contains '$Ref') {
-                    $_ | Get-DbHashRef -Database $Database -Collection $Collection
+                    $_ | Get-DbVersionRef -Database $Database -Collection $Collection
                 }
                 else {
                     $_

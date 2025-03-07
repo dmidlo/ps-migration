@@ -1,21 +1,4 @@
-function Get-DbDocumentById {
-    <#
-    .SYNOPSIS
-    Retrieves a single LiteDB document by its _id.
-
-    .PARAMETER Connection
-    Active LiteDB.LiteDatabase object.
-
-    .PARAMETER CollectionName
-    The target LiteDB collection name.
-
-    .PARAMETER Id
-    The LiteDB _id value to look up. Adjust type if needed 
-    (e.g., [String], [int], or [LiteDB.ObjectId]).
-
-    .EXAMPLE
-    Get-DbDocumentById -Connection $db -CollectionName 'Domains' -Id 123
-    #>
+function Get-DbDocumentByVersionId {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
@@ -25,25 +8,29 @@ function Get-DbDocumentById {
         $Collection,
 
         [Parameter(Mandatory, ValueFromPipeline)]
-        [Object] $Id,
+        [string] $VersionId,
 
         [switch]$ResolveRefs
     )
 
     process {
-        $result = Get-LiteData -Collection $collection -ById $Id -As PS
-        
+        # Perform a direct lookup by Version using your existing helper
+        ($result = Get-LiteData -Collection $Collection -Where 'VersionId = @VersionId', @{VersionId = $VersionId} -As PS) | Out-Null
+
         if (-not $result) {
+            # Return null if nothing is found
             return $null
         }
 
-        # If multiple found (unexpected for an _id), return first + warning
+        # $result = [PSCustomObject]($result.ToString() | ConvertFrom-Json)
+        # If multiple records somehow matched, assume the first is the canonical
         if ($result.Count -gt 1) {
-            Write-Warning "Multiple documents found for ObjectId '$Id'. Returning the first match. This should never happen for LiteDB ObjectIds"
+            Write-Warning "Multiple documents found for VersionId '$VersionId'. Returning the first match."
             if ($ResolveRefs) {
                 $resolved = $result | ForEach-Object {
                     if ($_.PSObject.Properties.Name -contains '$Ref') {
-                        $_ | Get-DbVersionRef -Database $Database -Collection $Collection
+                        ($return = $_ | Get-DbVersionRef -Database $Database -Collection $Collection) | Out-Null
+                        $return
                     }
                     else {
                         $_
@@ -60,4 +47,5 @@ function Get-DbDocumentById {
             Write-Output $result
         }
     }
+
 }

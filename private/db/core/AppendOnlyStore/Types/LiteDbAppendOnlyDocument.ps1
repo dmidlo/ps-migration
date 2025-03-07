@@ -2,10 +2,11 @@
 class LiteDbAppendOnlyDocument : LiteDbAppendOnlyCollection {
     # This someday may be helpfully converted to three classes once [Type] `-is` conditionals
     # are backported into supporting code to support additional type safety and project code consistency
-    # for now, this will be base class for Standard DB Documents, Temp Db Documents, Recycled DBdocuments, and HashRef/GuidRef Db Documents
+    # for now, this will be base class for Standard DB Documents, Temp Db Documents, Recycled DBdocuments, and VersionRef/BundleRef Db Documents
     [LiteDB.ObjectId]$_id
-    [Guid]$Guid
-    [string]$Hash
+    [Guid]$BundleId
+    [string]$Thumbprint
+    [string]$VersionId
     [int64]$UTC_Created
     [int64]$UTC_Updated
     [PSCustomObject]$Properties
@@ -39,8 +40,8 @@ class LiteDbAppendOnlyDocument : LiteDbAppendOnlyCollection {
         $classProps.Remove('Database')
         $classProps.Remove('Collection')
 
-        if ($this.Guid.Guid -like "00000000-0000-0000-0000-000000000000") {
-            $classProps.Remove('Guid')
+        if ($this.BundleId.Guid -like "00000000-0000-0000-0000-000000000000") {
+            $classProps.Remove('BundleId')
         }
 
         if ($this.UTC_Created -eq 0) {
@@ -59,8 +60,8 @@ class LiteDbAppendOnlyDocument : LiteDbAppendOnlyCollection {
             $classProps.Remove('_id')
         }
         
-        if ($this.Hash -like "") {
-            $classProps.Remove('Hash')
+        if ($this.VersionId -like "") {
+            $classProps.Remove('VersionId')
         }
 
         if (($this.Properties | Get-Member -MemberType NoteProperty).Count -eq 0){
@@ -83,9 +84,9 @@ class LiteDbAppendOnlyDocument : LiteDbAppendOnlyCollection {
         $Obj = $this.ToPS()
         $staged = $this.StageDbObjectDocument($Obj)
         $stagedProps = $staged.PSObject.Properties.Name
-        if ($stagedProps -contains '$Ref' -and $stagedProps -contains '$Hash') {
+        if ($stagedProps -contains '$Ref' -and $stagedProps -contains '$VersionId') {
             $Temp = New-LiteDbAppendOnlyCollection -Database $this.Database -Collection 'Temp'
-            $staged = $Temp.GetHashRef($staged)
+            $staged = $Temp.GetVersionRef($staged)
         }
         $this.Properties = $staged
         $this.FromPS()
@@ -93,7 +94,7 @@ class LiteDbAppendOnlyDocument : LiteDbAppendOnlyCollection {
     }
 
     [PSCustomObject] Commit () {
-        $commit = $this.CommitTempObjectAsDbDoc($this.Guid)
+        $commit = $this.CommitTempObjectAsDbDoc($this.BundleId)
         $this.Properties = $commit[0]
         $this.FromPS()
         return $commit
