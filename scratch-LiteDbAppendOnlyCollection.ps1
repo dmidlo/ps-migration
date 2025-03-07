@@ -1,4 +1,5 @@
 using module ".\ps-migration.psd1"
+. ".\build.ps1"
 $dbPath = ".\StoredObjects\ps-migration.db"
  
 Remove-Item -Path $dbPath

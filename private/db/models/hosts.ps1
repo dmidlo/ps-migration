@@ -605,7 +605,7 @@ function New-HostNetworkName {
         $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
 
         # Validate the hostname format before proceeding
-        $validation = Validate-HostnameFormat -Hostname $Name
+        $validation = Test-HostnameFormat -Hostname $Name
         if (-not $validation.IsValid) {
             Write-Error "Invalid hostname format: $($validation.Message)"
             return

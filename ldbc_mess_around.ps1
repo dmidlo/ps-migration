@@ -1,4 +1,5 @@
 Clear-Host
+. ".\build.ps1"
 Import-Module '.\ps-migration.psd1' -Force
 # PS C:\Users\AVT.ASA\Documents\PowerShell\Modules\ps-migration> get-command -module ldbc
 # CommandType     Name                                               Version    Source
@@ -67,7 +68,7 @@ Import-Module '.\ps-migration.psd1' -Force
 #         $pragmas | Get-Member
 # }
 
-# $dbPassword = Get-StoredCredential -CredentialName "dbPassword" -Path ".\StoredObjects\Credentials\"
+# $dbPassword = Get-StoredCredential -FileName "dbPassword" -Path ".\StoredObjects\Credentials\"
 
 # PS C:\Users\AVT.ASA\Documents\PowerShell\Modules\ps-migration> get-help Get-LiteCollection -Full 
 
@@ -151,7 +152,7 @@ $db = Initialize-DB -ConnectionString $dbConnectionString
 # $db = New-LiteDatabase -ConnectionString $connectionString
 # $db | Get-Member -MemberType Method -Force | ft
 # Invoke-LiteCommand 'select pragmas from $database;' -Database $db
-# Ensure-LiteDBCollection -Database $db -CollectionName 'Temp' -Indexes @(
+# Confirm-LiteDBCollection -Database $db -CollectionName 'Temp' -Indexes @(
 #         [PSCustomObject]@{ Field='Hash'; Unique=$true }
 # )
 
@@ -165,7 +166,7 @@ $db = Initialize-DB -ConnectionString $dbConnectionString
 # $TempId = [LiteDB.ObjectId]::NewObjectId()
 # $TempDoc = @{ _id = $TempId; TempField = 'Temp' }
 # Add-LiteData -Collection $Collection -InputObject $TempDoc
-# Ensure-LiteDBCollection -Database $db -CollectionName $CollectionName -Indexes @(
+# Confirm-LiteDBCollection -Database $db -CollectionName $CollectionName -Indexes @(
 #         [PSCustomObject]@{ Field='Hash'; Unique=$true },
 #         [PSCustomObject]@{ Field='Guid'; Unique=$false}
 # )

@@ -45,12 +45,12 @@ function Get-DataHash {
         return @{
             NormalizedData = $null
             Json           = $json
-            Hash           = Compute-HashSHA256 $json
+            Hash           = New-HashSHA256 $json
         }
     }
 
     try {
-        $normalizedData = Normalize-Data -InputObject $DataObject -IgnoreFields $ignoreFields
+        $normalizedData = Convert-ToNormalizedData -InputObject $DataObject -IgnoreFields $ignoreFields
     }
     catch {
         throw "Normalization Error: $_"
@@ -64,7 +64,7 @@ function Get-DataHash {
     }
 
     # Compute the hash once and store
-    $hash = Compute-HashSHA256 $json
+    $hash = New-HashSHA256 $json
 
     # Write-Host "`n=== Normalized Data ===`n$(ConvertTo-Json -InputObject $normalizedData -Depth 50 | Out-String)"
     # Write-Host "`n=== Serialized JSON ===`n$json"

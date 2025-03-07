@@ -1,4 +1,5 @@
 Clear-Host
-Import-Module .\ps-migration.psd1 -Force
+. ".\build.ps1"
+Import-Module ps-migration -Force
 Clear-Host
-start-psMigration -Dev -Clear -ResetDatabase -Test
+Start-PsMigration -Dev -Clear -ResetDatabase -Test

@@ -76,7 +76,7 @@ Function New-PodeWebCardAddHostAddressesValidator {
     # Mac Address Validation
     # Allow for no entry `-gt 0`
     if($WebEvent.Data['MacAddress'].Length -gt 0) {
-        $MacAddress = Validate-MACAddressString -MacAddress $WebEvent.Data['MacAddress']
+        $MacAddress = Test-MACAddressString -MacAddress $WebEvent.Data['MacAddress']
         if (-not $MacAddress.IsValid) {
             Out-PodeWebValidation -Name "MacAddress" -Message $MacAddress.Message
         }
@@ -114,7 +114,7 @@ Function New-PodeWebCardAddHostAddressesValidator {
 
     # Hostname Validation
     if($WebEvent.Data['Hostname'].Length -gt 0) {
-        $Hostname = Validate-HostnameFormat -Hostname $WebEvent.Data['Hostname']
+        $Hostname = Test-HostnameFormat -Hostname $WebEvent.Data['Hostname']
         if(-not $Hostname.IsValid) {
             Out-PodeWebValidation -Name "Hostname" -Message $Hostname.Message
         }

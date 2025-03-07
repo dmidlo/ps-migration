@@ -1,4 +1,4 @@
-function Start-psMigrationServer {
+function Start-PsMigrationServer {
     [CmdletBinding()]
     param(
         [int]$HttpPort,

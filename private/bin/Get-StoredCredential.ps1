@@ -1,13 +1,13 @@
 function Get-StoredCredential {
     param (
         [Parameter(Mandatory = $true)]
-        [string]$CredentialName,
+        [string]$FileName,
         [Parameter(Mandatory = $true)]
         [string]$Path
     )
 
     # Define the path for the .clixml file
-    $credentialFile = Join-Path -Path $Path -ChildPath "$CredentialName.clixml"
+    $credentialFile = Join-Path -Path $Path -ChildPath "$FileName.clixml"
     Resolve-ParentDirectories -filePath $credentialFile
 
     # Check if the credential file exists

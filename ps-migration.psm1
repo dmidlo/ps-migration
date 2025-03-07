@@ -1,3 +1,4 @@
+
 enum dbVersionSteps {
     Next
     Previous
@@ -16,12 +17,14 @@ enum AddressPurpose {
     Unknown
     Billing
     Shipping
+    Operations
 }
 
 enum AddressType {
     Unknown
     Commercial
     Residential
+    Other
 }
 
 # Module Utilities
@@ -113,11 +116,11 @@ class LiteDbAppendOnlyCollection {
     }
 
     [void] EnsureCollection([array]$Indexes) {
-        Ensure-LiteDBCollection -Database $this.Database -CollectionName $this.Collection -Indexes $Indexes
+        Confirm-LiteDBCollection -Database $this.Database -CollectionName $this.Collection -Indexes $Indexes
     }
 
     [void] EnsureCollection([array]$Indexes, [string]$CollectionName) {
-        Ensure-LiteDBCollection -Database $this.Database -CollectionName $CollectionName -Indexes $Indexes
+        Confirm-LiteDBCollection -Database $this.Database -CollectionName $CollectionName -Indexes $Indexes
     }
 
     [System.Object[]] GetAll() {
@@ -529,5 +532,23 @@ class PhysicalAddress : LiteDbAppendOnlyDocument {
     PhysicalAddress($Database, [PSCustomObject]$Properties) : base($Database, 'PhysicalAddresses', $Properties) {}
 
 }
+
+# Module Utilities
+$utilitiesFolders = @("private")
+foreach ($utilitiesFolder in $utilitiesFolders) {
+    Get-ChildItem -Recurse "$PSScriptRoot\$utilitiesFolder\*.ps1" -File | ForEach-Object {
+        . $_.FullName
+    }
+}
+
+# Exported Functions
+$exportFolders = @("public")
+foreach ($exportFolder in $exportFolders) {
+    Get-ChildItem -Recurse "$PSScriptRoot\$exportFolder\*.ps1" -File | ForEach-Object {
+        . $_.FullName
+    }
+}
+
 # Export public functions from this module
 Export-ModuleMember -Function * -Alias * -Cmdlet * -Variable *
+

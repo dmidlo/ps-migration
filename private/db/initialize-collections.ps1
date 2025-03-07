@@ -10,11 +10,11 @@ function Initialize-Collections {
     Write-PodeHost "Initializing collections and indexes using dbConnection:"
     Out-PodeHost -InputObject $Database
 
-    # Ensure-LiteDBCollection -Database $Database -CollectionName 'Temp' -Indexes @(
+    # Confirm-LiteDBCollection -Database $Database -CollectionName 'Temp' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true },
     #     [PSCustomObject]@{ Field="Guid"; Unique=$false}
     # )
-    # Ensure-LiteDBCollection -Database $Database -CollectionName 'RecycleBin' -Indexes @(
+    # Confirm-LiteDBCollection -Database $Database -CollectionName 'RecycleBin' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     #     [PSCustomObject]@{ Field="Guid"; Unique=$false}
     # )
@@ -22,79 +22,79 @@ function Initialize-Collections {
     ###############################################################################
     # Organizations
     ###############################################################################
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Organizations' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Organizations' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Regions' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Regions' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Campuses' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Campuses' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Sites' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Sites' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Floors' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Floors' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Areas' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Areas' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Rooms' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Rooms' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Racks' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Racks' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Panels' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Panels' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Channels' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Channels' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Circuits' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Circuits' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Providers' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Providers' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
 
-    # Ensure-LiteDBCollection -Database $Database -CollectionName 'Components' -Indexes @(
+    # Confirm-LiteDBCollection -Database $Database -CollectionName 'Components' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     #     [PSCustomObject]@{ Field="Guid"; Unique=$false}
     # )
 
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Chassis' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Chassis' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
     ###############################################################################
     # HOSTS
     ###############################################################################
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Modules' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Modules' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    Ensure-LiteDBCollection -Database $Database -CollectionName 'Interfaces' -Indexes @(
+    Confirm-LiteDBCollection -Database $Database -CollectionName 'Interfaces' -Indexes @(
         [PSCustomObject]@{ Field='Hash'; Unique=$true }
         [PSCustomObject]@{ Field="Guid"; Unique=$false}
     )
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'IPv4Addresses' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'IPv4Addresses' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'NetworkNames' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'NetworkNames' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
 
@@ -133,7 +133,7 @@ function Initialize-Collections {
     ###############################################################################
     # DOMAINS - FSMORoles
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'FSMORoles' -Indexes @( 
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'FSMORoles' -Indexes @( 
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
 
@@ -230,7 +230,7 @@ function Initialize-Collections {
     ###############################################################################
     # DOMAINS - Forests
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Forests' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'Forests' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
 
@@ -357,7 +357,7 @@ function Initialize-Collections {
     ###############################################################################
     # DOMAINS
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Domains' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'Domains' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
 
@@ -407,7 +407,7 @@ function Initialize-Collections {
     # DOMAINS - Trusts
     ###############################################################################
 
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DomainTrusts' -Indexes @( 
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'DomainTrusts' -Indexes @( 
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
 
@@ -439,7 +439,7 @@ function Initialize-Collections {
     ###############################################################################
     # TENANTS
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Tenants' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'Tenants' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -457,7 +457,7 @@ function Initialize-Collections {
     ###############################################################################
     # USERS
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Users' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'Users' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -476,7 +476,7 @@ function Initialize-Collections {
     ###############################################################################
     # GROUPS
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Groups' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'Groups' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -493,7 +493,7 @@ function Initialize-Collections {
     ###############################################################################
     # MIGRATION BATCHES
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'MigrationBatches' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'MigrationBatches' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -513,7 +513,7 @@ function Initialize-Collections {
     ###############################################################################
     # DHCP SCOPES, LEASES, RESERVATIONS
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DHCP_Scopes' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'DHCP_Scopes' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -529,7 +529,7 @@ function Initialize-Collections {
     # $newScope = Add-DbDocument -Connection $Connection -CollectionName 'DHCP_Scopes' -Data $scopeData
     # Write-PodeHost "Inserted DHCP Scope:" $newScope.FriendlyId
 
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DHCP_Leases' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'DHCP_Leases' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -545,7 +545,7 @@ function Initialize-Collections {
     # $newLease = Add-DbDocument -Connection $Connection -CollectionName 'DHCP_Leases' -Data $leaseData
     # Write-PodeHost "Inserted DHCP Lease for IP:" $newLease.IPAddress
 
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DHCP_Reservations' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'DHCP_Reservations' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash';  Unique=$true }
     # )
     # Usage example:
@@ -562,7 +562,7 @@ function Initialize-Collections {
     ###############################################################################
     # FILE SERVERS & SHARES
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'FileServers' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'FileServers' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -576,7 +576,7 @@ function Initialize-Collections {
     # $newFileServer = Add-DbDocument -Connection $Connection -CollectionName 'FileServers' -Data $fileServerData
     # Write-PodeHost "Inserted FileServer:" $newFileServer.FriendlyId
 
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'FileShares' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'FileShares' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash';   Unique=$true }
     # )
     # Usage example:
@@ -596,7 +596,7 @@ function Initialize-Collections {
     ###############################################################################
     # GROUP POLICY
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'GroupPolicy' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'GroupPolicy' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -616,7 +616,7 @@ function Initialize-Collections {
     ###############################################################################
     # DRIVE MAPPINGS
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'DriveMappings' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'DriveMappings' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -634,7 +634,7 @@ function Initialize-Collections {
     ###############################################################################
     # PROFILE MIGRATIONS
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'ProfileMigrations' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'ProfileMigrations' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -655,7 +655,7 @@ function Initialize-Collections {
     ###############################################################################
     # FULL-MESH MIGRATIONS
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'FullMeshMigrations' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'FullMeshMigrations' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -675,7 +675,7 @@ function Initialize-Collections {
     ###############################################################################
     # MAILFLOW / MAIL SECURITY APPLIANCES / SMART CONNECTORS
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'Mailflow' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'Mailflow' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -690,7 +690,7 @@ function Initialize-Collections {
     # $newMailflow = Add-DbDocument -Connection $Connection -CollectionName 'Mailflow' -Data $mailflowData
     # Write-PodeHost "Inserted Mailflow:" $newMailflow.FriendlyId
 
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'MailSecurityAppliances' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'MailSecurityAppliances' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -705,7 +705,7 @@ function Initialize-Collections {
     # $newAppliance = Add-DbDocument -Connection $Connection -CollectionName 'MailSecurityAppliances' -Data $applianceData
     # Write-PodeHost "Inserted Mail Security Appliance:" $newAppliance.FriendlyId
 
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'SmartConnectors' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'SmartConnectors' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:
@@ -723,7 +723,7 @@ function Initialize-Collections {
     ###############################################################################
     # MIGRATION WORKFLOWS
     ###############################################################################
-    # Ensure-LiteDBCollection -Connection $Connection -CollectionName 'MigrationWorkflows' -Indexes @(
+    # Confirm-LiteDBCollection -Connection $Connection -CollectionName 'MigrationWorkflows' -Indexes @(
     #     [PSCustomObject]@{ Field='Hash'; Unique=$true }
     # )
     # Usage example:

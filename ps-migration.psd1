@@ -25,7 +25,8 @@
 
     # Modules that must be installed from the gallery
     RequiredModules   = @(
-        @{ ModuleName = 'Pode'; ModuleVersion = '2.9.0' },  # example versions
+        @{ ModuleName = 'Pester'; ModuleVersion = '5.7.1'},
+        @{ ModuleName = 'Pode'; ModuleVersion = '2.9.0' },
         @{ ModuleName = 'Pode.Web'; ModuleVersion = '0.8.3' },
         @{ ModuleName = 'Ldbc'; ModuleVersion = '0.8.11'}
     )

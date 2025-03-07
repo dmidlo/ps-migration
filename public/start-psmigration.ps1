@@ -1,4 +1,4 @@
-function Start-psMigration {
+function Start-PsMigration {
     [CmdletBinding()]
     param(
         [switch]$Dev,
@@ -6,8 +6,8 @@ function Start-psMigration {
         [switch]$ResetDatabase,
         [string]$DatabasePath = "$PSScriptRoot\StoredObjects\ps-migration.db",
         [switch]$Clear,
-        [int]$HttpPort = 80,
-        [int]$HttpsPort = 443
+        [int]$HttpPort = 8080,
+        [int]$HttpsPort = 8443
     )
 
     # Clear the host if requested
@@ -35,13 +35,13 @@ function Start-psMigration {
     # If in development mode, perform additional tasks
     if ($Dev) {
         # Import the ps-migration module
-        $modulePath = Join-Path -Path $PSScriptRoot -ChildPath "ps-migration.psd1"
+        $module = "ps-migration"
         try {
-            Import-Module -Name $modulePath -Force -ErrorAction Stop
-            Write-Verbose "Imported module: $modulePath"
+            Import-Module -Name $module -Force -ErrorAction Stop
+            Write-Verbose "Imported module: $module"
         }
         catch {
-            Write-Warning "Failed to import module from '$modulePath': $_"
+            Write-Warning "Failed to import module '$module': $_"
         }
 
         Write-Verbose "Maintenance tasks completed."
@@ -75,7 +75,7 @@ function Start-psMigration {
                 $PesterDebugConfiguration.Run.SkipRemainingOnFailure = 'Block' # Stop execution within a block if a test fails
 
                 # Filter Configuration for Debugging Specific Tests
-                $PesterDebugConfiguration.Filter.Tag = @('GetCharacterPool')  # Run only tests with these tags
+                $PesterDebugConfiguration.Filter.Tag = @('active')  # Run only tests with these tags
                 # $PesterDebugConfiguration.Filter.ExcludeTag = @('Slow')        # Exclude slow tests from debug runs
 
                 # Code Coverage Settings
@@ -113,7 +113,7 @@ function Start-psMigration {
     # Start the migration server (this happens in both Dev and non-Dev modes)
     try {
         if(-not $Test) {
-            Start-psMigrationServer -HttpPort $HttpPort -HttpsPort $HttpsPort -Dev:$Dev.IsPresent
+            Start-PsMigrationServer -HttpPort $HttpPort -HttpsPort $HttpsPort -Dev:$Dev.IsPresent
             Write-Verbose "psMigration server started on HTTP port $HttpPort and HTTPS port $HttpsPort."
         }
     }
