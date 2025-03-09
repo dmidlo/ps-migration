@@ -54,7 +54,7 @@ function Start-PsMigrationServer {
 
         #Setup Database Connection
         $dbConnectionString = New-DbConnectionString -Culture "en-US" -IgnoreCase -IgnoreNonSpace -IgnoreSymbols -ConnectionType Shared -AutoRebuild -FilePath (Get-PodeConfig).databasePath -Upgrade
-        Initialize-DB -ConnectionString $dbConnectionString
+        Initialize-LiteDbDatabase -ConnectionString $dbConnectionString
         $db = New-LiteDatabase -ConnectionString $dbConnectionString
         Set-PodeState -Name "dbConnectionString" -Value $dbConnectionString
         Set-PodeState -Name "db" -Value $db

@@ -19,17 +19,17 @@ class LiteDbAppendOnlyCollection {
         $this.EnsureCollection(@(
             [PSCustomObject]@{ Field='VersionId'; Unique=$true },
             [PSCustomObject]@{ Field="BundleId"; Unique=$false},
-            [PSCustomObject]@{ Field="Thumbprint"; Unique=$true}
+            [PSCustomObject]@{ Field="ContentId"; Unique=$false}
         ), $this.Collection.Name)
         $this.EnsureCollection(@(
             [PSCustomObject]@{ Field='VersionId'; Unique=$true },
             [PSCustomObject]@{ Field="BundleId"; Unique=$false},
-            [PSCustomObject]@{ Field="Thumbprint"; Unique=$true}
+            [PSCustomObject]@{ Field="ContentId"; Unique=$false}
         ), 'Temp')
         $this.EnsureCollection(@(
             [PSCustomObject]@{ Field='VersionId'; Unique=$true },
             [PSCustomObject]@{ Field="BundleId"; Unique=$false},
-            [PSCustomObject]@{ Field="Thumbprint"; Unique=$true}
+            [PSCustomObject]@{ Field="ContentId"; Unique=$false}
         ), 'RecycleBin')
     }
 
@@ -74,11 +74,11 @@ class LiteDbAppendOnlyCollection {
     }
 
     [void] EnsureCollection([array]$Indexes) {
-        Confirm-LiteDBCollection -Database $this.Database -CollectionName $this.Collection -Indexes $Indexes
+        Initialize-LiteDbCollection -Database $this.Database -CollectionName $this.Collection -Indexes $Indexes
     }
 
     [void] EnsureCollection([array]$Indexes, [string]$CollectionName) {
-        Confirm-LiteDBCollection -Database $this.Database -CollectionName $CollectionName -Indexes $Indexes
+        Initialize-LiteDbCollection -Database $this.Database -CollectionName $CollectionName -Indexes $Indexes
     }
 
     [System.Object[]] GetAll() {

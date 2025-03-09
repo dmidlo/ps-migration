@@ -116,11 +116,11 @@ class LiteDbAppendOnlyCollection {
     }
 
     [void] EnsureCollection([array]$Indexes) {
-        Confirm-LiteDBCollection -Database $this.Database -CollectionName $this.Collection -Indexes $Indexes
+        Initialize-LiteDbCollection -Database $this.Database -CollectionName $this.Collection -Indexes $Indexes
     }
 
     [void] EnsureCollection([array]$Indexes, [string]$CollectionName) {
-        Confirm-LiteDBCollection -Database $this.Database -CollectionName $CollectionName -Indexes $Indexes
+        Initialize-LiteDbCollection -Database $this.Database -CollectionName $CollectionName -Indexes $Indexes
     }
 
     [System.Object[]] GetAll() {
