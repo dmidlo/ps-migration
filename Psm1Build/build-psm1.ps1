@@ -1,5 +1,7 @@
 function __import_enums {
     $enums = @(
+        "private\bin\powershell\Networking\GetMacAddressAnalysis\Types\MacAddressType.ps1"
+        "private\bin\powershell\Networking\GetMacAddressAnalysis\Types\MacAddressOriginType.ps1"
         "private\db\core\AppendOnlyStore\Types\dbVersionSteps.ps1",
         "private\db\models\Types\ComponentType.ps1",
         "private\db\models\Types\PhysicalAddressPurpose.ps1",
@@ -17,6 +19,7 @@ function __import_dotsourcing {
 
 function __import_classes {
     $classes = @(
+        "private\bin\powershell\Networking\GetMacAddressAnalysis\Types\MacAddressAnalyzer.ps1"
         "private\db\core\AppendOnlyStore\Types\LiteDbAppendOnlyCollection.ps1",
         "private\db\core\AppendOnlyStore\Types\LiteDbAppendOnlyDocument.ps1",
         "private\db\models\Types\PhysicalAddress.ps1"

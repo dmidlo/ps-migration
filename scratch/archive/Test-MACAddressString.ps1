@@ -8,6 +8,8 @@ function Test-MACAddressString {
         )]
         [Alias('MAC')]
         [string]$MacAddress,
+        [string]$CacheFile,
+        [int]$CacheDays,
         [switch]$SkipOUI
     )
 
@@ -75,7 +77,7 @@ function Test-MACAddressString {
 
         # Check if it is a valid OUI
         if (-not $SkipOUI) {
-            $OUIList = Get-IEEEOUIList -CacheDays 1
+            $OUIList = Get-IEEEOUIList -CacheFile $CacheFile -CacheDays $CacheDays
             if (-not (Test-OUI -MacAddress $cleanedMac -OUIHashTable $OUIList)) {
                 $err = "Unregistered OUI: $OUI is not found in the official IEEE list."
                 Write-Error $err
