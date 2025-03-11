@@ -11,9 +11,9 @@ Describe "Add-DbDocument Integration Tests" {
         if (Test-Path $dbPath) { Remove-Item -Path $dbPath -Force }
     }
 
-    Context "✅ Functional Tests" {
-        It "should insert a new document and retrieve it" {
-            $sampleData = [PSCustomObject]@{ Name = "TestDocument"; Content = "Test content."; BundleId = "12345" }
+    Context "Add-DbDocument: Functional Tests" {
+        It "Add-DbDocument TC01: should insert a new document and retrieve it" -Tag 'private','db','dbCore','AppendOnlyStore','AddDbDocument','active' {
+            $sampleData = [PSCustomObject]@{ Name = "TestDocument"; Content = "Test content."}
             $result = Add-DbDocument -Database $db -Collection $collection -Data $sampleData
 
             $result | Should -BeOfType [PSCustomObject]
