@@ -4,7 +4,7 @@ class LiteDbAppendOnlyDocument : LiteDbAppendOnlyCollection {
     # are backported into supporting code to support additional type safety and project code consistency
     # for now, this will be base class for Standard DB Documents, Temp Db Documents, Recycled DBdocuments, and VersionRef/BundleRef Db Documents
     [LiteDB.ObjectId]$_id
-    [string]$ContentId
+    [string]$ContentMark
     [Guid]$BundleId
     [string]$VersionId
     [int64]$UTC_Created

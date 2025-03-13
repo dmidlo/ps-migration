@@ -27,7 +27,7 @@ function Get-DbDocumentVersion {
 
     process {
         # 1) Retrieve the "current" document by VersionId
-        $currentDoc = $VersionId | Get-DbDocumentByVersionId -Database $Database -Collection $Collection
+        $currentDoc = $VersionId | Get-DbDocumentByVersion -Database $Database -Collection $Collection
         if (-not $currentDoc) {
             throw "Document with VersionId '$VersionId' not found in collection '$CollectionName'."
         }

@@ -26,7 +26,7 @@ $Versiondoc1
 
 Write-Host "++ hash1"
 $hash1 = Get-DataHash -DataObject $Versiondoc1
-$Versiondoc1['ContentId'] = $hash1.Hash
+$Versiondoc1['ContentMark'] = $hash1.Hash
 $Versiondoc1
 
 Write-Host "== Versiondoc2"
@@ -39,7 +39,7 @@ $Versiondoc2
 
 Write-Host "++ hash2"
 $hash2 = Get-DataHash -DataObject $Versiondoc2
-($Versiondoc2 | Add-Member -MemberType NoteProperty -Name "ContentId" -Value $hash2.Hash -PassThru) | Out-Null
+($Versiondoc2 | Add-Member -MemberType NoteProperty -Name "ContentMark" -Value $hash2.Hash -PassThru) | Out-Null
 $Versiondoc2
 
 Write-Host "== Versiondoc3"
@@ -53,17 +53,17 @@ $Versiondoc3
 
 # Write-Host "++ hash3"
 # $hash3 = Get-DataHash -DataObject $Versiondoc3
-# ($Versiondoc3 | Add-Member -MemberType NoteProperty -Name "ContentId" -Value $hash3.Hash -PassThru) | Out-Null
+# ($Versiondoc3 | Add-Member -MemberType NoteProperty -Name "ContentMark" -Value $hash3.Hash -PassThru) | Out-Null
 # $Versiondoc3
 
 # Write-Host "== dbdoc1"
 # $Versiondoc1, $Versiondoc2 | Add-LiteData -Collection $collection
 
-# $dbdoc1 = Get-LiteData $collection -Where 'ContentId = @ContentId', @{ContentId = $Versiondoc1.ContentId}
+# $dbdoc1 = Get-LiteData $collection -Where 'ContentMark = @ContentMark', @{ContentMark = $Versiondoc1.ContentMark}
 # $dbdoc1
 
 # Write-Host "== dbdoc2"
-# $dbdoc2 = $Versiondoc2.ContentId | Get-DbDocumentByContentId -Database $db -Collection $collection
+# $dbdoc2 = $Versiondoc2.ContentMark | Get-DbDocumentByContentMark -Database $db -Collection $collection
 # $dbdoc2
 
 # Write-Host "== dbdoc2 data"
@@ -74,23 +74,23 @@ $dbdoc3 = $Versiondoc3 | Add-DbDocument -Database $db -Collection $collection
 $dbdoc3
 
 Write-Host "== dbdoc3 namechange"
-$nameChangeDoc = $dbdoc3.ContentId | Get-DbDocumentByContent -Database $db -Collection $collection
+$nameChangeDoc = $dbdoc3.ContentMark | Get-DbDocumentByContent -Database $db -Collection $collection
 $nameChangeDoc.name = "dbdoc3"
 $dbdoc3b = $nameChangeDoc | Add-DbDocument -Database $db -Collection $collection
 $dbdoc3
 $dbdoc3b
 
 Write-Host "== dbdoc3 datachange"
-$dataChangeDoc = $dbdoc3b.VersionId | Get-DbDocumentByVersionId -Database $db -Collection $collection
+$dataChangeDoc = $dbdoc3b.VersionId | Get-DbDocumentByVersion -Database $db -Collection $collection
 $dataChangeDoc.test = "Updated Data"
 $dbdoc3c = $dataChangeDoc | Add-DbDocument -Database $db -Collection $collection
 $dbdoc3b
 $dbdoc3c
 
 Write-Host "== Renew Objects from Db"
-$dbdoc3 = $dbdoc3.VersionId | Get-DbDocumentByVersionId -Database $db -Collection $collection
-$dbdoc3b = $dbdoc3b.VersionId | Get-DbDocumentByVersionId -Database $db -Collection $collection
-$dbdoc3c = $dbdoc3c.VersionId | Get-DbDocumentByVersionId -Database $db -Collection $collection
+$dbdoc3 = $dbdoc3.VersionId | Get-DbDocumentByVersion -Database $db -Collection $collection
+$dbdoc3b = $dbdoc3b.VersionId | Get-DbDocumentByVersion -Database $db -Collection $collection
+$dbdoc3c = $dbdoc3c.VersionId | Get-DbDocumentByVersion -Database $db -Collection $collection
 $dbdoc3
 $dbdoc3b
 $dbdoc3c
@@ -140,7 +140,7 @@ $dbdoc5 = $dbdoc3 | Add-DbDocument -Database $db -Collection $collection
 $dbdoc5
 
 Write-Host "== Allow Old VersionId not in lastest version - again."
-$nameChangeDoc = $dbdoc3c.VersionId | Get-DbDocumentByVersionId -Database $db -Collection $collection
+$nameChangeDoc = $dbdoc3c.VersionId | Get-DbDocumentByVersion -Database $db -Collection $collection
 $nameChangeDoc.name = "dbdoc3d"
 $dbdoc3d = $nameChangeDoc | Add-DbDocument -Database $db -Collection $collection
 $dbdoc3c
@@ -165,13 +165,13 @@ $resolvedVersions = $dbdoc7.BundleId | Get-DbDocumentVersionsByBundle -Database 
 $resolvedVersions
 
 Write-Host "== Renew Objects from Db"
-$dbdoc3 = $dbdoc3.VersionId | Get-DbDocumentByVersionId -Database $db -Collection $collection
-$dbdoc3b = $dbdoc3b.VersionId | Get-DbDocumentByVersionId -Database $db -Collection $collection
-$dbdoc3c = $dbdoc3c.VersionId | Get-DbDocumentByVersionId -Database $db -Collection $collection
-$dbdoc3d = $dbdoc3d.VersionId | Get-DbDocumentByVersionId -Database $db -Collection $collection
-$dbdoc5 = $dbdoc5.VersionId | Get-DbDocumentByVersionId -Database $db -Collection $collection
-$dbdoc6 = $dbdoc6.VersionId | Get-DbDocumentByVersionId -Database $db -Collection $collection
-$dbdoc7 = $dbdoc7.VersionId | Get-DbDocumentByVersionId -Database $db -Collection $collection
+$dbdoc3 = $dbdoc3.VersionId | Get-DbDocumentByVersion -Database $db -Collection $collection
+$dbdoc3b = $dbdoc3b.VersionId | Get-DbDocumentByVersion -Database $db -Collection $collection
+$dbdoc3c = $dbdoc3c.VersionId | Get-DbDocumentByVersion -Database $db -Collection $collection
+$dbdoc3d = $dbdoc3d.VersionId | Get-DbDocumentByVersion -Database $db -Collection $collection
+$dbdoc5 = $dbdoc5.VersionId | Get-DbDocumentByVersion -Database $db -Collection $collection
+$dbdoc6 = $dbdoc6.VersionId | Get-DbDocumentByVersion -Database $db -Collection $collection
+$dbdoc7 = $dbdoc7.VersionId | Get-DbDocumentByVersion -Database $db -Collection $collection
 $dbdoc3
 $dbdoc3b
 $dbdoc3c
@@ -185,7 +185,7 @@ Get-DbDocumentAll -Database $db -Collection $collection -ResolveRefs
 
 Write-Host "== Resolving a Single by VersionId"
 $dbdoc7
-$dbdoc7.VersionId | Get-DbDocumentByVersionId -Database $db -Collection $collection -ResolveRefs
+$dbdoc7.VersionId | Get-DbDocumentByVersion -Database $db -Collection $collection -ResolveRefs
 
 Write-Host "== Resolving a Single by Id"
 $dbdoc7

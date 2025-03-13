@@ -12,7 +12,7 @@ function Get-DbVersionRef {
     process {
         if ($DbVersionRef.PSObject.Properties.Name -contains '$Ref' -and $DbVersionRef.PSObject.Properties.Name -contains '$VersionId') {
             ($RefCollection = Get-LiteCollection -Database $Database -CollectionName $DbVersionRef.'$Ref') | Out-Null
-            ($target = ($DbVersionRef.'$VersionId' | Get-DbDocumentByVersionId -Database $Database -Collection $RefCollection)) | Out-Null
+            ($target = ($DbVersionRef.'$VersionId' | Get-DbDocumentByVersion -Database $Database -Collection $RefCollection)) | Out-Null
 
             if ($target.PSObject.Properties.Name -contains '$VersionArcs') {
                 ($arcVersions = [System.Collections.ArrayList]::New()) | Out-Null

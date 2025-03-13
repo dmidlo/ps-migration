@@ -19,17 +19,17 @@ class LiteDbAppendOnlyCollection {
         $this.EnsureCollection(@(
             [PSCustomObject]@{ Field='VersionId'; Unique=$true },
             [PSCustomObject]@{ Field="BundleId"; Unique=$false},
-            [PSCustomObject]@{ Field="ContentId"; Unique=$false}
+            [PSCustomObject]@{ Field="ContentMark"; Unique=$false}
         ), $this.Collection.Name)
         $this.EnsureCollection(@(
             [PSCustomObject]@{ Field='VersionId'; Unique=$true },
             [PSCustomObject]@{ Field="BundleId"; Unique=$false},
-            [PSCustomObject]@{ Field="ContentId"; Unique=$false}
+            [PSCustomObject]@{ Field="ContentMark"; Unique=$false}
         ), 'Temp')
         $this.EnsureCollection(@(
             [PSCustomObject]@{ Field='VersionId'; Unique=$true },
             [PSCustomObject]@{ Field="BundleId"; Unique=$false},
-            [PSCustomObject]@{ Field="ContentId"; Unique=$false}
+            [PSCustomObject]@{ Field="ContentMark"; Unique=$false}
         ), 'RecycleBin')
     }
 
@@ -97,16 +97,16 @@ class LiteDbAppendOnlyCollection {
     }
 
     [PSCustomObject] GetByVersionId([string] $VersionId) {
-        # Delegates to Get-DbDocumentByVersionId
-        return Get-DbDocumentByVersionId `
+        # Delegates to Get-DbDocumentByVersion
+        return Get-DbDocumentByVersion `
             -Database $this.Database `
             -Collection $this.Collection `
             -VersionId $VersionId
     }
 
     [PSCustomObject] GetByVersionId([string] $VersionId, [switch] $ResolveRefs) {
-        # Delegates to Get-DbDocumentByVersionId
-        return Get-DbDocumentByVersionId `
+        # Delegates to Get-DbDocumentByVersion
+        return Get-DbDocumentByVersion `
             -Database $this.Database `
             -Collection $this.Collection `
             -VersionId $VersionId `

@@ -37,7 +37,9 @@ function New-DbVersionRef {
         "`$VersionId"  = $DbDocument.VersionId
         "`$Ref" = $RefCollection.Name
     }
-    $VersionId = (Get-DataHash -DataObject $out -FieldsToIgnore @('_id', 'ContentId', 'VersionId', 'Count', 'Length')).Hash
+    $ContentMark = (Get-DataHash -DataObject $out -FieldsToIgnore @('_id', 'ContentMark', 'VersionId', 'Count', 'Length')).Hash
+    $VersionId = (Get-DataHash -DataObject @{ContentMark = $ContentMark; BundleId = $out.BundleId} -FieldsToIgnore @('none')).Hash
+    $out = ($out | Add-Member -MemberType NoteProperty -Name "ContentMark" -Value $ContentMark -Force -PassThru)
     $out = ($out | Add-Member -MemberType NoteProperty -Name "VersionId" -Value $VersionId -Force -PassThru)
     
     return $out

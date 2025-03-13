@@ -19,6 +19,8 @@ function Get-DbDocumentVersionsByBundle {
         # Query all documents matching the provided BundleId
         $results = Get-LiteData -Collection $Collection -Where 'BundleId = @BundleId', @{BundleId = $BundleId} -As PS
 
+        # $Collection = Get-LiteCollection -Database $db -CollectionName "blah"
+
         if (-not $results) {
             return @()  # Return empty array if no documents found
         }

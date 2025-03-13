@@ -1,4 +1,4 @@
-function Get-DbDocumentByVersionId {
+function Get-DbDocumentByVersion {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
@@ -24,19 +24,7 @@ function Get-DbDocumentByVersionId {
 
         # If multiple records somehow matched, assume the first is the canonical
         if ($result.Count -gt 1) {
-            Write-Warning "Multiple documents found for VersionId '$VersionId'. Returning the first match."
-            if ($ResolveRefs) {
-                $resolved = $result | ForEach-Object {
-                    if ($_.PSObject.Properties.Name -contains '$Ref') {
-                        ($return = $_ | Get-DbVersionRef -Database $Database -Collection $Collection) | Out-Null
-                        $return
-                    }
-                    else {
-                        $_
-                    }
-                }
-            }
-            Write-Output ($resolved | Select-Object -First 1)
+            throw "Multiple documents found for $VersionId. Something is really really wrong."
         }
 
         if ($ResolveRefs) {
