@@ -192,7 +192,7 @@ Describe "Add-DbDocument Integration Tests" -Tag 'Integration' {
         It @TC09
 
         $TC10 = @{
-            Name = "T10: Returns all documents in a bundle, sorted most recent first"
+            Name = "Add-DbDocument TC10: Returns all documents in a bundle, sorted most recent first"
             Tag = @('private','db','dbCore','AppendOnlyStore','AddDbDocument','active')
             Test = {
                 $bundleId = [Guid]::NewGuid()
