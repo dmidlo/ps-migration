@@ -68,23 +68,35 @@ function Add-DbDocument {
     
         $existsProps = $existsInBundle.PSCustom.Properties.Name
         $latestProps = $latestVersion.PSObject.Properties.Name
-        if ((($existsProps -contains '$Ref') -or ($latestProps -contains '$Ref'))) {
-            
-            if ($existsProps -notcontains '$Ref' -and $latestProps -contains '$Ref') {
-                if ($existsInBundle.VersionId -eq $latestVersion.'$VersionId') {
-                    $existsInBundle = $latestVersion
-                    Write-Host "Here"
-                    $skip = $true
-                }
+        
+        if (-not $wasRef) { # if it was a doc and not a ref
+            # if it is the already the latest
+            if ($existsInBundle.VersionId -eq $latestVersion.VersionId) {
+                $skip = $true
+            }
+            else {
+                # if it was a doc and the doc already exists but is not the latest create a versionRef, otherwise process as normal
+                $Data = New-DbVersionRef -DbDocument $existsInBundle -Collection $Collection -RefCollection $Collection
+                $skip = $false
             }
         }
-        elseif ($latestVersion.VersionId -eq $existsInBundle.VersionId) {
-            Write-Host "There"
-            $skip = $true
-        }
         else {
-            $Data = New-DbVersionRef -DbDocument $existsInBundle -Collection $Collection -RefCollection $Collection
-            $skip = $false
+            if ($existsInBundle.VersionId -eq $latestVersion.VersionId) {
+                # if it was a ref and the ref itself is already the lastest
+                $skip = $true
+            }
+            elseif ($existsInBundle.'$VersionId' -eq $latestVersion.VersionId) {
+                # if it was a ref and the ref already points to the latest
+                $skip = $true
+            }
+            elseif ($existsInBundle.'$VersionId' -eq $latestVersion.'$VersionId') {
+                # if it was a ref and the lastest version is a ref to the same version
+                $skip = $true
+            }
+            else {
+                # if it was a ref and the lastest version is a ref to a different version
+                $skip = $false
+            }   
         }
     }
     elseif ($wasRef -and $BundleIdPresent) {

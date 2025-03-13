@@ -34,39 +34,38 @@ Describe "Set-DbObjectCollectionByBundle Integration Tests" -Tag 'Integration' {
             Test = {
                 # Seed test data
                 $Bundle1Id = [Guid]::NewGuid()
-                $bundle1 = @("OriginalData1","OriginalData2","OriginalData3","OriginalData2","OriginalData5","OriginalData6","OriginalData7")
+                $bundle1 = @("OriginalData1","OriginalData2","OriginalData3","OriginalData4","OriginalData5","OriginalData6","OriginalData7")
                 foreach ($version in $bundle1) {
-                    $AddParams = [PSCustomObject]@{
-                        Database = $db
-                        Collection = $SourceCollection
-                        Data = @{DataField = $version; BundleId = $Bundle1Id}
+                    $AddParams = @{
+                        Database = [LiteDB.LiteDatabase]$db
+                        Collection = [LiteDB.LiteCollection[LiteDB.BsonDocument]]$SourceCollection
+                        Data = [PSCustomObject]@{DataField = $version; BundleId = $Bundle1Id}
                     }
-                    # Add-DbDocument @AddParams
+                    Add-DbDocument @AddParams
                 }
             }
         }
-        It @TC01
+        # It @TC01
     }
-}
 
-#     $TC02 = @{
-#         Name = "Set-DbOjectCollectionByBundle TC02: Generates ContentMark, VersionId, BundleId, and persists correctly"
-#         # Tag = @('private','db','dbCore','AppendOnlyStore','SetDbObjectCollectionByBundle','active')
-#         Test = {
-#             # Seed test data
-#             $Bundle1Id = [Guid]::NewGuid()
-#             $bundle1 = @("OriginalData1","OriginalData2","OriginalData1","OriginalData2","OriginalData1","OriginalData2","OriginalData1")
-#             foreach ($version in $bundle1) {
-#                 $AddParams = [PSCustomObject]@{
-#                     Database = $db
-#                     Collection = $SourceCollection
-#                     Data = @{DataField = $version; BundleId = $Bundle1Id}
-#                 }
-#                 Add-DbDocument @AddParams
-#             }
-#         }
-#     }
-#     It @TC02
+    $TC02 = @{
+        Name = "Set-DbOjectCollectionByBundle TC02: Generates ContentMark, VersionId, BundleId, and persists correctly"
+        Tag = @('private','db','dbCore','AppendOnlyStore','SetDbObjectCollectionByBundle','active')
+        Test = {
+            # Seed test data
+            $Bundle1Id = [Guid]::NewGuid()
+            $bundle1 = @("OriginalData1","OriginalData2","OriginalData1","OriginalData2","OriginalData1","OriginalData2","OriginalData1")
+            foreach ($version in $bundle1) {
+                $AddParams = @{
+                    Database = [LiteDB.LiteDatabase]$db
+                    Collection = [LiteDB.LiteCollection[LiteDB.BsonDocument]]$SourceCollection
+                    Data = [PSCustomObject]@{DataField = $version; BundleId = $Bundle1Id}
+                }
+                Add-DbDocument @AddParams
+            }
+        }
+    }
+    It @TC02
 
 #     $TC03 = @{
 #         Name = "Set-DbOjectCollectionByBundle TC03: Generates ContentMark, VersionId, BundleId, and persists correctly"
@@ -143,7 +142,7 @@ Describe "Set-DbObjectCollectionByBundle Integration Tests" -Tag 'Integration' {
 #         }
 #     }
 #     It @TC06
-# }
+}
 #     BeforeEach {
 #         # Reset collections
 #         @($SourceCollection, $DestCollection, $RefCollection) | ForEach-Object {
