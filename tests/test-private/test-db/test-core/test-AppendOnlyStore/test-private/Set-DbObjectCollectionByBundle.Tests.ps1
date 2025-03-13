@@ -99,6 +99,14 @@ Describe "Set-DbObjectCollectionByBundle Integration Tests" -Tag 'Integration' {
                 $BundleIds.Count | Should -Be 1
                 $ContentMarks = $bundle1 | Select-Object -ExpandProperty ContentMark | Sort-Object -Unique
                 $ContentMarks.Count | Should -Be 7
+                $VersionRefs = $bundle1 | Where-Object { $_.PSObject.Properties.Name -contains '$VersionId'}
+                $VersionRefs.Count | Should -Be 0
+                $BundleRefs = $bundle1 | Where-Object { $_.PSObject.Properties.Name -contains '$BundleId'}
+                $BundleRefs.Count | Should -Be 0
+                $ContentRefs = $bundle1 | Where-Object { $_.PSObject.Properties.Name -contains '$ContentMark'}
+                $ContentRefs.Count | Should -Be 0
+                $Docs = $bundle1 | Where-Object { $_.PSObject.Properties.Name -notcontains '$Ref'}
+                $Docs.Count | Should -Be 7
                 $bundle1[0] | Should -BeNullOrEmpty
 
                 $bundle1[6].PSObject.Properties.Name | Should -Not -Contain '$Ref'
