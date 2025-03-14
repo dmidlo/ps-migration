@@ -13,43 +13,45 @@ function Set-DbBundleCollection {
         [Parameter(Mandatory)]
         $DestCollection,
 
-        [switch]$NoVersionUpdate,
+        [bool]$NoVersionUpdate = $true,
 
-        [switch]$NoTimestampUpdate,
+        [bool]$NoTimestampUpdate = $true,
 
-        [switch]$UseBundleRegistry
+        [bool]$UseBundleRegistry = $true
     )
 
     process {
-        ($dbObject = $BundleId | Get-DbDocumentVersionsByBundle -Database $Database -Collection $SourceCollection) | Out-Null
+        $null = ($dbObject = $BundleId | Get-DbDocumentVersionsByBundle -Database $Database -Collection $SourceCollection)
 
         $Database.beginTrans()
         try {
             foreach ($version in $dbObject) {
                 try {
-                    ($props = $version.PSObject.Properties.Name) | Out-Null
-                    ($stagedVersion = $version.VersionId | Get-DbDocumentByVersion -Database $Database -Collection $SourceCollection) | Out-Nul
+                    $null = ($props = $version.PSObject.Properties.Name)
+                    $null = ($stagedVersion = $version.VersionId | Get-DbDocumentByVersion -Database $Database -Collection $SourceCollection)
                     
-                    ($IsAlreadyPresent_version = $stagedVersion.VersionId | Get-DbDocumentByVersion -Database $Database -Collection $DestCollection) | Out-Null
+                    $null = ($IsAlreadyPresent_version = $stagedVersion.VersionId | Get-DbDocumentByVersion -Database $Database -Collection $DestCollection)
                     if (-not $IsAlreadyPresent_version) {
                         $AddParams = @{
                             Database = $Database
                             Collection = $DestCollection
                             Data = $stagedVersion
-                            NoVersionUpdate = $NoVersionUpdate.IsPresent
-                            NoTimestampUpdate = $NoTimestampUpdate.IsPresent
-                            UseBundleRegistry = $UseBundleRegistry.IsPresent
+                            NoVersionUpdate = $NoVersionUpdate
+                            NoTimestampUpdate = $NoTimestampUpdate
+                            UseBundleRegistry = $UseBundleRegistry
                             UseTransaction = $false
                         }
                         $null = Add-DbDocument @AddParams
                     }
-                    Remove-LiteData -Collection $SourceCollection -Where 'VersionId = @VersionId', @{VersionId = $version.VersionId} | Out-Null
+                    $null = Remove-LiteData -Collection $SourceCollection -Where 'VersionId = @VersionId', @{VersionId = $version.VersionId}
                 }
                 catch {
                     throw $_
                 }
             }
             $Database.Commit()
+            $out = Get-DbDocumentVersionsByBundle -Database $Database -Collection $DestCollection -BundleId $BundleId
+            return $out
         }
         catch {
             $Database.rollback()

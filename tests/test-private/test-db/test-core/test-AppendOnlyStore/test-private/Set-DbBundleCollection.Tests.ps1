@@ -426,22 +426,27 @@ Describe "Set-DbBundleCollection Integration Tests" -Tag 'Integration' {
         It @TC07
     }
 
-    It "should move an object while preserving all expected properties" {
-        $SeedSet1 = (SeedSet1 -Seed)
-        $SeedSet1 | Should -BeNullOrEmpty
-        $OriginalObject = Get-DbDocumentByVersion -Database $Database -Collection $SourceCollection -VersionId "v1"
+    $TC08 = @{
+        Name = "should move an object while preserving all expected properties"
+        Tag = @('private','db','dbCore','AppendOnlyStore','SetDbObjectCollectionByBundle','active')
+        Test = {
+            $SeedSet1 = (SeedSet1 -Seed)
+            $BundleId = $SeedSet1.srcBundle1.guid 
+            
+            $updatedBundle = Set-DbBundleCollection -BundleId $BundleId -Database $db -SourceCollection $SourceCollection -DestCollection $DestCollection
+            $updatedBundle | Should -BeNullOrEmpty
 
-        Set-DbBundleCollection -BundleId $BundleId -Database $Database -SourceCollection $SourceCollection -DestCollection $DestCollection
+            $MovedObject = Get-DbDocumentByVersion -Database $Database -Collection $DestCollection -VersionId "v1"
+            $MovedObject | Should -Not -BeNullOrEmpty
 
-        $MovedObject = Get-DbDocumentByVersion -Database $Database -Collection $DestCollection -VersionId "v1"
-        $MovedObject | Should -Not -BeNullOrEmpty
+            $OriginalObject.PSObject.Properties | Where-Object { $_.Name -notin @("CollectionName", "Timestamp") } | ForEach-Object {
+                $_.Value | Should -Be $MovedObject.($_.Name)
+            }
 
-        $OriginalObject.PSObject.Properties | Where-Object { $_.Name -notin @("CollectionName", "Timestamp") } | ForEach-Object {
-            $_.Value | Should -Be $MovedObject.($_.Name)
+            Get-DbDocumentByVersion -Database $Database -Collection $SourceCollection -VersionId "v1" | Should -BeNullOrEmpty
         }
-
-        Get-DbDocumentByVersion -Database $Database -Collection $SourceCollection -VersionId "v1" | Should -BeNullOrEmpty
     }
+    It @TC08 
 }
 
 

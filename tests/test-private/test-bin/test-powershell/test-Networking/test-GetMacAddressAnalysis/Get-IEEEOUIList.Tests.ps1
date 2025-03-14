@@ -77,7 +77,7 @@ Describe "Get-IEEEOUIList" -Tag "Unit", "Integration" {
     Context "Integration Test - Valid Cache File" {
         BeforeEach {
             # Save actual OUI data for real integration test
-            Get-IEEEOUIList -CacheFile $TestCacheFile -CacheDays 1 | Out-Null
+            $null = Get-IEEEOUIList -CacheFile $TestCacheFile -CacheDays 1
         }
 
         It "Get-IEEEOUIList TC05: should retrieve valid cached OUI data" -Tag 'bin','powershell','networking','TestMACAddressString','GetIEEEOUIList','active' {

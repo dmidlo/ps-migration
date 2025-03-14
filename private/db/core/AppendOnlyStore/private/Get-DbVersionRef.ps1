@@ -11,26 +11,26 @@ function Get-DbVersionRef {
 
     process {
         if ($DbVersionRef.PSObject.Properties.Name -contains '$Ref' -and $DbVersionRef.PSObject.Properties.Name -contains '$VersionId') {
-            ($RefCollection = Get-LiteCollection -Database $Database -CollectionName $DbVersionRef.'$Ref') | Out-Null
-            ($target = ($DbVersionRef.'$VersionId' | Get-DbDocumentByVersion -Database $Database -Collection $RefCollection)) | Out-Null
+            $null = ($RefCollection = Get-LiteCollection -Database $Database -CollectionName $DbVersionRef.'$Ref')
+            $null = ($target = ($DbVersionRef.'$VersionId' | Get-DbDocumentByVersion -Database $Database -Collection $RefCollection))
 
             if ($target.PSObject.Properties.Name -contains '$VersionArcs') {
-                ($arcVersions = [System.Collections.ArrayList]::New()) | Out-Null
+                $null = ($arcVersions = [System.Collections.ArrayList]::New())
                 $DbVersionRefVersionId = (Get-DataHash -DataObject $DbVersionRef -FieldsToIgnore @('none')).Hash
                 foreach ($arc in $target.'$VersionArcs') {
                     $arcVersion = (Get-DataHash -DataObject $arc -FieldsToIgnore @('none')).Hash
-                    $arcVersions.Add($arcVersion) | Out-Null
+                    $null = $arcVersions.Add($arcVersion)
                 }
                 
                 if ($arcVersions -notcontains $DbVersionRefVersionId) {
-                    $target.'$VersionArcs'.Add($DbVersionRef) | Out-Null
+                    $null = $target.'$VersionArcs'.Add($DbVersionRef)
                 }
             }
             else {
-                ($target = ($target | Add-Member -MemberType NoteProperty -Name '$VersionArcs' -Value ([System.Collections.ArrayList]::New()) -PassThru)) | Out-Null
-                $target.'$VersionArcs'.Add($DbVersionRef) | Out-Null
+                $null = ($target = ($target | Add-Member -MemberType NoteProperty -Name '$VersionArcs' -Value ([System.Collections.ArrayList]::New()) -PassThru))
+                $null = $target.'$VersionArcs'.Add($DbVersionRef)
             }
-            ($target | Set-LiteData -Collection $RefCollection) | Out-Null
+            $null = ($target | Set-LiteData -Collection $RefCollection)
             Write-Output $target
         }
         else {

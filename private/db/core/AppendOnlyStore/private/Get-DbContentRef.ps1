@@ -11,26 +11,26 @@ function Get-DbContentRef {
 
     process {
         if ($DbContentRef.PSObject.Properties.Name -contains '$Ref' -and $DbContentRef.PSObject.Properties.Name -contains '$ContentMark') {
-            ($RefCollection = Get-LiteCollection -Database $Database -CollectionName $DbContentRef.'$Ref') | Out-Null
-            ($target = ($DbContentRef.'$ContentMark' | Get-DbDocumentByContent -Database $Database -Collection $RefCollection)) | Out-Null
+            $null = ($RefCollection = Get-LiteCollection -Database $Database -CollectionName $DbContentRef.'$Ref')
+            $null = ($target = ($DbContentRef.'$ContentMark' | Get-DbDocumentByContent -Database $Database -Collection $RefCollection))
 
             if ($target.PSObject.Properties.Name -contains '$ContentArcs') {
-                ($arcContentMarks = [System.Collections.ArrayList]::New()) | Out-Null
+                $null = ($arcContentMarks = [System.Collections.ArrayList]::New())
                 $DbContentRefContentMark = (Get-DataHash -DataObject $DbContentRef -FieldsToIgnore @('none')).Hash
                 foreach ($arc in $target.'$ContentArcs') {
                     $arcContentMark = (Get-DataHash -DataObject $arc -FieldsToIgnore @('none')).Hash
-                    $arcContentMarks.Add($arcContentMark) | Out-Null
+                    $null = $arcContentMarks.Add($arcContentMark)
                 }
                 
                 if ($arcContentMarks -notcontains $DbContentRefContentMark) {
-                    $target.'$ContentArcs'.Add($DbContentRef) | Out-Null
+                    $null = $target.'$ContentArcs'.Add($DbContentRef)
                 }
             }
             else {
-                ($target = ($target | Add-Member -MemberType NoteProperty -Name '$ContentArcs' -Value ([System.Collections.ArrayList]::New()) -PassThru)) | Out-Null
-                $target.'$ContentArcs'.Add($DbContentRef) | Out-Null
+                $null = ($target = ($target | Add-Member -MemberType NoteProperty -Name '$ContentArcs' -Value ([System.Collections.ArrayList]::New()) -PassThru))
+                $null = $target.'$ContentArcs'.Add($DbContentRef)
             }
-            ($target | Set-LiteData -Collection $RefCollection) | Out-Null
+            $null = ($target | Set-LiteData -Collection $RefCollection)
             Write-Output $target
         }
         else {

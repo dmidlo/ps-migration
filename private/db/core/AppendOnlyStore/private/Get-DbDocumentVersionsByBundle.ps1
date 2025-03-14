@@ -43,9 +43,9 @@ function Get-DbDocumentVersionsByBundle {
         elseif ($AsDbObject) {
             $resolvedResults = $sortedResults | ForEach-Object {
                 if ($_.PSObject.Properties.Name -contains '$Ref' -and $_.PSObject.Properties.Name -contains '$VersionId') {
-                    ($return = $_ | Get-DbVersionRef -Database $Database -Collection $Collection) | Out-Null
-                    ($return.UTC_Updated = $_.UTC_Updated) | Out-Null
-                    ($return.'$ObjVer' = $_.'$ObjVer') | Out-Null
+                    $null = ($return = $_ | Get-DbVersionRef -Database $Database -Collection $Collection)
+                    $null = ($return.UTC_Updated = $_.UTC_Updated)
+                    $null = ($return.'$ObjVer' = $_.'$ObjVer')
                     $return
                 }
                 else {

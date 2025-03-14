@@ -15,7 +15,7 @@ function Get-DbDocumentByVersion {
 
     process {
         # Perform a direct lookup by Version using your existing helper
-        ($result = Get-LiteData -Collection $Collection -Where 'VersionId = @VersionId', @{VersionId = $VersionId} -As PS) | Out-Null
+        $null = ($result = Get-LiteData -Collection $Collection -Where 'VersionId = @VersionId', @{VersionId = $VersionId} -As PS)
 
         if (-not $result) {
             # Return null if nothing is found

@@ -51,7 +51,7 @@ function Start-PsMigration {
             try {
                 # Ensure the Pester module is imported
                 if (-not (Get-Module -Name Pester)) {
-                    Import-Module -Name Pester -PassThru -ErrorAction Stop | Out-Null
+                    $null = Import-Module -Name Pester -PassThru -ErrorAction Stop
                     Write-Verbose "Imported Pester module."
                 }
 

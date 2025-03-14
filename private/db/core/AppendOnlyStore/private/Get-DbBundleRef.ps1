@@ -18,7 +18,7 @@ function Get-DbBundleRef {
             )
 
             $i = 0
-            ($latest = $Targets[$i].VersionId | Get-DbDocumentVersion -Database $Database -Collection $RefCollection -Latest) | Out-Null
+            $null = ($latest = $Targets[$i].VersionId | Get-DbDocumentVersion -Database $Database -Collection $RefCollection -Latest)
 
             if ($latest.PSObject.Properties.Name -contains '$Ref') {
                 $Versions = $latest.BundleId | Get-DbDocumentVersionsByBundle -Database $Database -Collection $RefCollection
@@ -51,16 +51,16 @@ function Get-DbBundleRef {
                         $arcVersions = [System.Collections.ArrayList]::New()
                         foreach ($arc in $_t.'$BundleArcs') {
                             $arcVersion = (Get-DataHash -DataObject $arc -FieldsToIgnore @('none')).Hash
-                            $arcVersions.Add($arcVersion) | Out-Null
+                            $null = $arcVersions.Add($arcVersion)
                         }
 
                         if ($arcVersions -notcontains $DbBundleRefVersionId) {
-                            $_t.'$BundleArcs'.Add($DbBundleRef) | Out-Null
+                            $null = $_t.'$BundleArcs'.Add($DbBundleRef)
                         }
                     }
                     else {
                         $_t = ($_t | Add-Member -MemberType NoteProperty -Name '$BundleArcs' -Value ([System.Collections.ArrayList]::New()) -PassThru)
-                        $_t.'$BundleArcs'.Add($DbBundleRef) | Out-Null
+                        $null = $_t.'$BundleArcs'.Add($DbBundleRef)
                     }
                     $_t | Set-LiteData -Collection $RefCollection
                 }

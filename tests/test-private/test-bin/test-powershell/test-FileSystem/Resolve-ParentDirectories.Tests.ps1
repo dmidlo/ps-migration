@@ -26,7 +26,7 @@ Describe "Resolve-ParentDirectories" {
 
     It "Resolve-ParentDirectories TC02: does not modify existing directories" -Tag 'bin','powershell','FileSystem','ResolveParentDirectories','active' {
         # Pre-create the directory
-        New-Item -Path $testDirPath -ItemType Directory -Force | Out-Null
+        $null = New-Item -Path $testDirPath -ItemType Directory -Force
 
         # Capture last write time before function call
         $lastWriteTimeBefore = (Get-Item $testDirPath).LastWriteTime
@@ -46,7 +46,7 @@ Describe "Resolve-ParentDirectories" {
 
     It "Resolve-ParentDirectories TC03: throws an error if a file exists at the directory path" -Tag 'bin','powershell','FileSystem','ResolveParentDirectories','active' {
         # Create a file where the directory should be
-        New-Item -Path $testDirPath -ItemType File -Force | Out-Null
+        $null = New-Item -Path $testDirPath -ItemType File -Force
 
         # Ensure the path exists and is a file
         (Get-Item $testDirPath).PSIsContainer | Should -Be $false

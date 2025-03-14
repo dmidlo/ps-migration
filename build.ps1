@@ -3,7 +3,7 @@ Clear-Host
 $psm1Path = "$PSScriptRoot\ps-migration.psm1"
 
 if (-not (Test-Path -Path $psm1Path)) {
-    New-Item -ItemType File -Path $psm1Path -Force | Out-Null
+    $null = New-Item -ItemType File -Path $psm1Path -Force
 }
 Set-Content -Path $psm1Path -Value "" -Encoding utf8
 

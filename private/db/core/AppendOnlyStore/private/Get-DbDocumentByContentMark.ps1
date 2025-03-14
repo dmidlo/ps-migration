@@ -15,7 +15,7 @@ function Get-DbDocumentByContentMark {
 
     process {
         # Perform a direct lookup by ContentMark using existing helper
-        ($result = Get-LiteData -Collection $Collection -Where 'ContentMark = @ContentMark', @{ContentMark = $ContentMark} -As PS) | Out-Null
+        $null = ($result = Get-LiteData -Collection $Collection -Where 'ContentMark = @ContentMark', @{ContentMark = $ContentMark} -As PS)
         if (-not $result) {
             # Return null if nothing is found
             return $null
@@ -28,7 +28,7 @@ function Get-DbDocumentByContentMark {
             if ($ResolveRefs) {
                 foreach ($_ in $result) {
                     if ($_.PSObject.Properties.Name -contains '$Ref') {
-                        ($version = $_ | Get-DbVersionRef -Database $Database -Collection $Collection) | Out-Null
+                        $null = ($version = $_ | Get-DbVersionRef -Database $Database -Collection $Collection)
                         $out.Add($version)
                     }
                     else {
