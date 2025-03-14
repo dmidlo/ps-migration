@@ -209,19 +209,19 @@ class LiteDbAppendOnlyCollection {
     }
 
     [Void] MoveDbObjectToCollection([Guid]$BundleId, $DestCollection) {
-        $BundleId | Set-DbObjectCollectionByBundle -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection -NoTimestampUpdate
+        $BundleId | Set-DbBundleCollection -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection -NoTimestampUpdate
     }
 
     [void] MoveDbObjectToCollection([PSObject]$DbObject, $DestCollection) {
-        $DbObject[0].BundleId | Set-DbObjectCollectionByBundle -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection -NoTimestampUpdate
+        $DbObject[0].BundleId | Set-DbBundleCollection -Database $this.Database -SourceCollection $this.Collection -DestCollection $DestCollection -NoTimestampUpdate
     }
 
     [Void] MoveDbObjectFromCollection([Guid]$BundleId, $SourceCollection) {
-        $BundleId | Set-DbObjectCollectionByBundle -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection -NoTimestampUpdate
+        $BundleId | Set-DbBundleCollection -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection -NoTimestampUpdate
     }
 
     [Void] MoveDbObjectFromCollection([PSObject]$DbObject, $SourceCollection) {
-        $DbObject[0].BundleId | Set-DbObjectCollectionByBundle -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection -NoTimestampUpdate
+        $DbObject[0].BundleId | Set-DbBundleCollection -Database $this.Database -SourceCollection $SourceCollection -DestCollection $this.Collection -NoTimestampUpdate
     }
 
     [void] RecycleDbObject([Guid]$BundleId) {

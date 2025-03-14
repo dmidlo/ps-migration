@@ -75,7 +75,7 @@ function Start-PsMigration {
                 $PesterDebugConfiguration.Run.SkipRemainingOnFailure = 'Block' # Stop execution within a block if a test fails
 
                 # Filter Configuration for Debugging Specific Tests
-                $PesterDebugConfiguration.Filter.Tag = @('AddDbDocument','SetDbObjectCollectionByBundle')  # Run only tests with these tags
+                $PesterDebugConfiguration.Filter.Tag = @('AppendOnlyStore')  # Run only tests with these tags
                 # $PesterDebugConfiguration.Filter.ExcludeTag = @('Slow')        # Exclude slow tests from debug runs
 
                 # Code Coverage Settings

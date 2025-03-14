@@ -17,7 +17,11 @@ function Add-DbDocument {
 
         [switch] $NoVersionUpdate,
 
-        [switch] $NoTimestampUpdate
+        [switch] $NoTimestampUpdate,
+
+        [switch] $UseBundleRegistry,
+
+        [bool] $UseTransaction = $true
     )
 
     # Validate that inbound object has a BundleId
@@ -54,14 +58,30 @@ function Add-DbDocument {
 
     # # Check for existing record by VersionId
     $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-    if ($Data.PSObject.Properties.Name -notcontains '$Ref') {
+
+    $DataProps = $Data.PSObject.Properties.Name
+    if ($DataProps -notcontains '$Ref') {
         $existsInBundle = $Data.VersionId | Get-DbDocumentByVersion -Database $Database -Collection $Collection
         $wasRef = $false
     }
-    elseif ($Data.PSObject.Properties.Name -contains '$VersionId') {
+    elseif ($DataProps -contains '$VersionId') {
         $existsInBundle = $Data.'$VersionId' | Get-DbDocumentByVersion -Database $Database -Collection $Collection
         $wasRef = $true
     }
+    elseif ($DataProps -contains '$RegistryId') {
+        # if bundleIds ever make it into this filter, they should go below registryIds
+        $BundleRegistry = Initialize-BundleRegistry -Database $Database
+        $existsInBundle = $Data.VersionId | Get-DbDocumentByVersion -Database $Database -Collection $BundleRegistry
+        $Data.VersionId = $Data.'$RegistryId'
+        if ($existsInBundle) {
+            $existsInBundle.VersionId = $Data.VersionId
+        }
+        $RefCollection = $Collection
+        $Collection = $BundleRegistry
+        $wasRegistryRef = $true
+        $wasRef = $true
+    }
+
     
     if ($existsInBundle -and $BundleIdPresent) {
         $latestVersion = $existsInBundle.VersionId | Get-DbDocumentVersion -Database $Database -Collection $Collection -Latest
@@ -110,7 +130,10 @@ function Add-DbDocument {
         $outDoc = $existsInBundle.VersionId | Get-DbDocumentByVersion -Database $Database -Collection $Collection
     }
     else {
-        $Database.BeginTrans()
+        if ($UseTransaction -or -not $wasRegistryRef) {
+            $Database.BeginTrans()
+        }
+
         try {
             # Instert partially so LiteDB atuo-assigns _id
             $Data.PSObject.Properties.Remove('_id')
@@ -152,7 +175,7 @@ function Add-DbDocument {
                     else {
                         # `-NoTimestampUpdate` is active. If we're not supposed to update timestamps on a new version where
                         # bundleId is present on the inbound that means we moving to or from Temp or RecycleBin Collections
-                        # with `Set-DbObjectCollectionByBundle` and the timestamps need to be preserved.  They are found
+                        # with `Set-DbBundleCollection` and the timestamps need to be preserved.  They are found
                         # on the $ExistsInBundle object. $Data should already have UTC_CREATED and UTC_UPDATED, and they should
                         # be unmodified.
                         $props = $Data.PSObject.Properties.Name
@@ -188,11 +211,19 @@ function Add-DbDocument {
                 # Update stub litedb document with the Data object
                 $Data | Set-LiteData -Collection $Collection
                 $outDoc = $Data.VersionId | Get-DbDocumentByVersion -Database $Database -Collection $Collection
-                $Database.Commit()
+
+                if ($UseBundleRegistry) {
+                    $BundleRegistry = Initialize-BundleRegistry -Database $Database
+                    $bundleRef = New-DbBundleRef -DbDocument $outDoc -Collection $BundleRegistry -RefCollection $Collection -IsRegistryRef
+                    $null = Add-DbDocument -Database $Database -Collection $BundleRegistry -Data $bundleRef
+                }
+                else {
+                    if ($UseTransaction) {$Database.Commit()}
+                }
             }
         }
         catch {
-            $Database.Rollback();
+            if ($UseTransaction) {$Database.Rollback()}
             throw $_
         }
     }

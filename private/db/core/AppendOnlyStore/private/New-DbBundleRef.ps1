@@ -7,7 +7,9 @@ function New-DbBundleRef {
         $Collection,
 
         [Parameter(Mandatory)]
-        $RefCollection
+        $RefCollection,
+
+        [switch]$IsRegistryRef
     )
 
     $out = [PSCustomObject]@{
@@ -17,10 +19,20 @@ function New-DbBundleRef {
         "`$BundleId"  = $DbDocument.BundleId
         "`$Ref" = $RefCollection.Name
     }
-    $ContentMark = (Get-DataHash -DataObject $DbDocument -FieldsToIgnore @('_id', 'ContentMark', 'VersionId', 'BundleId', 'UTC_Created', 'Count', 'Length')).Hash
+    $ContentMark = (Get-DataHash -DataObject $out -FieldsToIgnore @('_id', 'ContentMark', 'VersionId', 'BundleId', 'UTC_Created', 'Count', 'Length')).Hash
     $VersionId = (Get-DataHash -DataObject @{ContentMark = $ContentMark; BundleId = $out.BundleId} -FieldsToIgnore @('none')).Hash
     $out = ($out | Add-Member -MemberType NoteProperty -Name "ContentMark" -Value $ContentMark -Force -PassThru)
     $out = ($out | Add-Member -MemberType NoteProperty -Name "VersionId" -Value $VersionId -Force -PassThru)
+    
+    if($IsRegistryRef) {
+        $RegistryId = (Get-DataHash -DataObject @{
+            RefCol = $out.RefCol
+            BundleId = $out.BundleId
+            '$BundleId' = $out.'$BundleId'
+            '$Ref' = $out.'$Ref'
+        } -FieldsToIgnore @('none')).Hash
+        $out = ($out | Add-Member -MemberType NoteProperty -Name '$RegistryId' -Value $RegistryId -Force -PassThru)
+    }
 
     return $out
 }
